@@ -1,2 +1,2 @@
 # SaltBot
-A simple betting bot for SaltyBet. At present, it bets 10% randomly.
+A simple betting bot for SaltyBet. Currently, its only strategy is to bet 10% randomly.
