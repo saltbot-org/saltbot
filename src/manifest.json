@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+
+  "name": "SaltBot",
+  "description": "This extension automates betting on SaltyBet.com.",
+  "version": "1.0",
+
+  "content_scripts": [
+    {
+      "matches": ["http://www.saltybet.com/*"],
+      "js": ["salty.js"]
+    }
+  ]
+}
