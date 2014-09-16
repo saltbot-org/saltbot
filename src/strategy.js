@@ -2,47 +2,65 @@ function Strategy(strategyName) {
 	var btn10 = document.getElementById("interval1");
 	var btnRed = document.getElementById("player1");
 	var btnBlue = document.getElementById("player2");
-	var player1 = btnRed.getAttribute("name");
-	var player2 = btnBlue.getAttribute("name");
-	this.name = strategyName || null;
+	var p1name = btnRed.getAttribute("value");
+	var p2name = btnBlue.getAttribute("value");
+	var strategyName = strategyName || null;
 	var prediction = null;
+	var totals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
 	this.execute = function(info) {
 		return null;
 	};
-	this.getP1Name=function (){
-		return player1;		
+	this.getWinner = function() {
+		var newTotals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
+		var winner = null;
+		if (newTotals > totals) {
+			winner = prediction;
+		} else if (newTotals < totals) {
+			winner = (prediction == p1name) ? p2name : p1name;
+		}
+		return winner;
 	};
-	this.getP2Name=function (){
-		return player2;		
+	this.getP1Name = function() {
+		return p1name;
 	};
-	this.getP1Button=function (){
-		return btnRed;		
+	this.getP2Name = function() {
+		return p2name;
 	};
-	this.getP2Button=function (){
-		return btnBlue;		
+	this.getP1Button = function() {
+		return btnRed;
 	};
-	this.getMinimumBetButton=function (){
-		return btn10;		
+	this.getP2Button = function() {
+		return btnBlue;
 	};
-	this.getStrategyName=function (){
-		return strategyName;	
+	this.getMinimumBetButton = function() {
+		return btn10;
 	};
-	
-}
-
-function CoinToss(btn1, btn2) {
-	this.base = Strategy;
-	this.base("ct");
-	
-	this.execute = function(info) {
-		prediction=(Math.random()>.5)?player1:player2;
+	this.getStrategyName = function() {
+		return strategyName;
+	};
+	this.setPrediction = function(p) {
+		prediction=p;
+	};
+	this.getPrediction = function() {
 		return prediction;
 	};
+
 }
 
-function MoreWins(btn1, btn2) {
+function CoinToss() {
 	this.base = Strategy;
-	this.base(player1, player2, "mw");
+	this.base("ct");
+
+	this.execute = function(info) {
+		var pred = (Math.random() > .5) ? this.getP1Name() : this.getP2Name();
+		this.setPrediction(pred);		
+		return pred;
+	};
+}
+
+function MoreWins() {
+	this.base = Strategy;
+	this.base("mw");
 	this.execute = function(info) {
 		return null;
 	};

@@ -12,6 +12,9 @@ function Match(strategy) {
 	var character1 = null;
 	var character2 = null;
 	var winner = null;
+	this.getStrategy=function (){
+		return strategy;		
+	};
 	// chrome.storage.local.set({'value': theValue}, function() {
 	// // Notify that we saved.
 	// message('Settings saved');
@@ -38,6 +41,7 @@ function Match(strategy) {
 
 	});
 	this.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
+		
 		if (names.indexOf(w) > -1) {
 			if (w == character1.name) {
 				character1.wins += 1;
@@ -57,8 +61,8 @@ function Match(strategy) {
 		this.c1 = character1.name;
 		this.c2 = character2.name;
 		this.w = winner;
-		this.sn = strategy.name;
-		this.pw = strategy.prediction == winner;
+		this.sn = strategy.getStrategyName();
+		this.pw = strategy.getPrediction() == winner;
 	};
 }
 
