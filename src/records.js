@@ -1,5 +1,4 @@
-debugRecords = false;
-if (debugRecords) {
+function dr() {
 	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
 		console.log("-\ndebugging records...");
 		//match records:
@@ -21,4 +20,9 @@ if (debugRecords) {
 		}
 
 	});
+}
+
+debugRecords = true;
+if (debugRecords) {
+	dr();
 }

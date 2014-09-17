@@ -64,7 +64,7 @@ function Controller() {
 							if (characters_v1[i].name == c1.name) {
 								c1_index = i;
 							}
-							if (characters_v2[i].name == c2.name) {
+							if (characters_v1[i].name == c2.name) {
 								c2_index = i;
 							}
 						}
@@ -84,17 +84,19 @@ function Controller() {
 						}
 						//
 						chrome.storage.local.set({
-							'matches_v1' : matches_v1,
+							'matches_v1' : matches_v1//,
+							// 'characters_v1' : characters_v1
+						}, function() {
+							if (debugMode) {
+								console.log("-\nmatch record saved");
+							}
+						});
+						chrome.storage.local.set({
+							// 'matches_v1' : matches_v1,
 							'characters_v1' : characters_v1
 						}, function() {
 							if (debugMode) {
-								console.log("-");
-								console.log("records saved");
-								// console.log("active: " + active);
-								// console.log("available: " + bettingAvailable);
-								// console.log("entered: " + bettingEntered);
-								// console.log("complete: " + bettingComplete);
-								console.log("-");
+								console.log("-\ncharacter records saved");
 							}
 						});
 					});
