@@ -101,11 +101,11 @@ function pr() {
 	});
 }
 
-debugRecords = false;
+debugRecords = true;
 purifyRecords = true;
-if (debugRecords) {
-	dr();
-}
 if (purifyRecords) {
 	pr();
+}
+if (debugRecords) {
+	dr();
 }

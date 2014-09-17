@@ -62,34 +62,3 @@ function Match(strategy) {
 		this.pw = strategy.getPrediction() == winner;
 	};
 }
-
-function Tracker() {
-	var currentMatch = null;
-
-	this.setMatch = function() {
-		//Get player names directly from the buttons
-
-		currentMatch = new Match(c1name, c2name);
-	};
-	this.setWinner = function(w) {
-		var result = currentMatch.getRecord(w);
-		if (result != null) {
-			console.log(" match ending information: " + "p1: " + result.c1 + "p2: " + result.c2 + "w: " + result.w + "sn: " + result.sn + "pw: " + result.pw);
-		}
-	};
-	this.saveRecord = function(w) {
-		if ([this.character1, this.character2].indexOf(w) > -1) {
-			var match = [this.character1, this.character2, w];
-
-			chrome.storage.local.set({
-				'value' : theValue
-			}, function() {
-				// Notify that we saved.
-				message('Settings saved');
-			});
-
-		}
-
-	};
-
-}

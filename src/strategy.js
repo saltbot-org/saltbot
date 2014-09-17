@@ -68,14 +68,17 @@ function MoreWins() {
 		if (c1.wins != c2.wins) {
 			p=(c1.wins > c2.wins) ? c1.name : c2.name;
 			console.log(p+" has more wins; MW betting "+p);
+			this.setPrediction(p);
 			return p;
 		} else if (c1.losses != c2.losses) {
 			p=(c1.losses < c2.losses) ? c1.name : c2.name;
 			console.log(p+" has less losses; MW betting "+p);
+			this.setPrediction(p);
 			return p;
 		} else {
 			p=(Math.random() > .5) ? c1.name : c2.name;
 			console.log("MW has no data; MW betting randomly");
+			this.setPrediction(p);
 			return p; 
 		}
 	};
