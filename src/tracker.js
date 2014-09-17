@@ -15,14 +15,9 @@ function Match(strategy) {
 	this.getStrategy=function (){
 		return strategy;		
 	};
-	// chrome.storage.local.set({'value': theValue}, function() {
-	// // Notify that we saved.
-	// message('Settings saved');
-	// });
+	
 
 	//Attempt to get character objects from storage, if they don't exist create them
-	
-	// this.getCharactersCallback = ;
 	chrome.storage.local.get(names, function(result) {
 		character1 = (result.hasOwnProperty(names[0])) ? result[names[0]] : new Character(names[0]);
 		character2 = (result.hasOwnProperty(names[1])) ? result[names[1]] : new Character(names[1]);

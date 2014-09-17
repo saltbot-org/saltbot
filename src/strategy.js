@@ -1,10 +1,10 @@
-function Strategy(strategyName) {
+function Strategy(sn) {
 	var btn10 = document.getElementById("interval1");
 	var btnRed = document.getElementById("player1");
 	var btnBlue = document.getElementById("player2");
 	var p1name = btnRed.getAttribute("value");
 	var p2name = btnBlue.getAttribute("value");
-	var strategyName = strategyName || null;
+	var sName = sn;
 	var prediction = null;
 	var totals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
 	this.execute = function(info) {
@@ -36,7 +36,7 @@ function Strategy(strategyName) {
 		return btn10;
 	};
 	this.getStrategyName = function() {
-		return strategyName;
+		return sName;
 	};
 	this.setPrediction = function(p) {
 		prediction=p;
