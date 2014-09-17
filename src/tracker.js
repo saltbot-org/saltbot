@@ -12,16 +12,18 @@ function Match(strategy) {
 	var character1 = null;
 	var character2 = null;
 	var winner = null;
-	this.getStrategy=function (){
-		return strategy;		
+	this.getStrategy = function() {
+		return strategy;
 	};
-	
 
 	//Attempt to get character objects from storage, if they don't exist create them
 	chrome.storage.local.get(names, function(result) {
 		character1 = (result.hasOwnProperty(names[0])) ? result[names[0]] : new Character(names[0]);
 		character2 = (result.hasOwnProperty(names[1])) ? result[names[1]] : new Character(names[1]);
-		var prediction = strategy.execute();
+		var prediction = strategy.execute({
+			"character1" : character1,
+			"character2" : character2
+		});
 		var baseSeconds = 2000;
 		setTimeout(function() {
 			strategy.getMinimumBetButton().click();
@@ -36,7 +38,7 @@ function Match(strategy) {
 
 	});
 	this.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
-		
+
 		if (names.indexOf(w) > -1) {
 			if (w == character1.name) {
 				character1.wins += 1;

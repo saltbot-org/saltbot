@@ -88,7 +88,7 @@ function Controller() {
 							'characters_v1' : characters_v1
 						}, function() {
 							if (debugMode) {
-								console.log("-\nmatch record saved");
+								console.log("-\nrecords saved");
 							}
 						});
 					});
@@ -99,7 +99,7 @@ function Controller() {
 
 			if (Math.random() > 0.01) {//skip 1% of matches
 
-				match = new Match(new CoinToss());
+				match = new Match(new MoreWins());
 
 			} else {
 				match = null;

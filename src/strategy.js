@@ -39,7 +39,7 @@ function Strategy(sn) {
 		return sName;
 	};
 	this.setPrediction = function(p) {
-		prediction=p;
+		prediction = p;
 	};
 	this.getPrediction = function() {
 		return prediction;
@@ -53,7 +53,7 @@ function CoinToss() {
 
 	this.execute = function(info) {
 		var pred = (Math.random() > .5) ? this.getP1Name() : this.getP2Name();
-		this.setPrediction(pred);		
+		this.setPrediction(pred);
 		return pred;
 	};
 }
@@ -62,7 +62,22 @@ function MoreWins() {
 	this.base = Strategy;
 	this.base("mw");
 	this.execute = function(info) {
-		return null;
+		var c1 = info.character1;
+		var c2 = info.character2;
+		var p;
+		if (c1.wins != c2.wins) {
+			p=(c1.wins > c2.wins) ? c1.name : c2.name;
+			console.log(p+" has more wins; MW betting "+p);
+			return p;
+		} else if (c1.losses != c2.losses) {
+			p=(c1.losses < c2.losses) ? c1.name : c2.name;
+			console.log(p+" has less losses; MW betting "+p);
+			return p;
+		} else {
+			p=(Math.random() > .5) ? c1.name : c2.name;
+			console.log("MW has no data; MW betting randomly");
+			return p; 
+		}
 	};
 }
 
