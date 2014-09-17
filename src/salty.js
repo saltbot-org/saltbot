@@ -42,7 +42,7 @@ function Controller() {
 					chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
 						//store new match record
 						if (results.hasOwnProperty("matches_v1")) {
-							results.matches_v1.append(mr);
+							results.matches_v1.push(mr);
 							matches_v1 = results.matches_v1;
 						} else {
 							matches_v1 = [];
@@ -84,19 +84,11 @@ function Controller() {
 						}
 						//
 						chrome.storage.local.set({
-							'matches_v1' : matches_v1//,
-							// 'characters_v1' : characters_v1
-						}, function() {
-							if (debugMode) {
-								console.log("-\nmatch record saved");
-							}
-						});
-						chrome.storage.local.set({
-							// 'matches_v1' : matches_v1,
+							'matches_v1' : matches_v1,
 							'characters_v1' : characters_v1
 						}, function() {
 							if (debugMode) {
-								console.log("-\ncharacter records saved");
+								console.log("-\nmatch record saved");
 							}
 						});
 					});
