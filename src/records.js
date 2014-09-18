@@ -15,7 +15,7 @@ function dr() {
 			console.log("-\ncharacter records found\nnumber of character records: " + results.characters_v1.length + "-\n");
 			for (var i = 0; i < results.characters_v1.length; i++) {
 				var character = results.characters_v1[i];
-				console.log(character.name);
+				console.log(character.name+"\t\t\t\twins: "+character.wins+",\t\t\t\tlosses: "+character.losses);
 			}
 		}
 

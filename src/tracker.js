@@ -17,9 +17,18 @@ function Match(strategy) {
 	};
 
 	//Attempt to get character objects from storage, if they don't exist create them
-	chrome.storage.local.get(names, function(result) {
-		character1 = (result.hasOwnProperty(names[0])) ? result[names[0]] : new Character(names[0]);
-		character2 = (result.hasOwnProperty(names[1])) ? result[names[1]] : new Character(names[1]);
+	chrome.storage.local.get("characters_v1", function(result) {
+		for (var i = 0; i < result.length; i++) {
+			var c = result[i];
+			if (c.name == names[0]) {
+				character1 = c;
+			}
+			if (c.name == names[1]) {
+				character2 = c;
+			}
+		}
+		character1 = (character1==null) ? new Character(names[0]): character1;
+		character2 = (character2==null) ? new Character(names[1]): character2;
 		var prediction = strategy.execute({
 			"character1" : character1,
 			"character2" : character2

@@ -77,7 +77,7 @@ function MoreWins() {
 			return p;
 		} else {
 			p=(Math.random() > .5) ? c1.name : c2.name;
-			console.log("MW has no data; MW betting randomly");
+			console.log("MW has no data for "+c1.name +" and "+ c2.name+" or they're equal; MW betting randomly");
 			this.setPrediction(p);
 			return p; 
 		}
