@@ -1,6 +1,8 @@
-function dr() {
+var dr=function () {
 	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
 		console.log("-\ndebugging records...");
+
+		
 		//match records:
 		if (results.hasOwnProperty("matches_v1")) {
 			console.log("-\nmatch records found\nnumber of match records: " + results.matches_v1.length + "-\n");
@@ -20,7 +22,7 @@ function dr() {
 		}
 
 	});
-}
+};
 
 function pr() {
 	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
@@ -101,11 +103,12 @@ function pr() {
 	});
 }
 
-debugRecords = true;
-purifyRecords = true;
+var debugRecords = true;
+var purifyRecords = false;
 if (purifyRecords) {
 	pr();
 }
 if (debugRecords) {
 	dr();
 }
+

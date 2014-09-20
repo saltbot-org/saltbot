@@ -1,88 +1,69 @@
-function Strategy(sn) {
-	var btn10 = document.getElementById("interval1");
-	var btnRed = document.getElementById("player1");
-	var btnBlue = document.getElementById("player2");
-	var p1name = btnRed.getAttribute("value");
-	var p2name = btnBlue.getAttribute("value");
-	var sName = sn;
-	var prediction = null;
-	var totals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
-	this.execute = function(info) {
-		return null;
-	};
+var Strategy = function(sn) {
+	//<span class="dollar" id="balance" style="display: inline;">7,704</span>
+	//<span id="betstatus" style="display: inline;">Omega red mvc2 wins! Payouts to Team Red.</span>
+	//<span id="betstatus" style="display: inline;">Bets are locked until the next match.</span>
+	//<span id="betstatus" style="display: inline;">Bets are OPEN!</span>
+	this.btn10 = document.getElementById("interval1");
+	this.btnP1 = document.getElementById("player1");
+	this.btnP2 = document.getElementById("player2");
+	this.p1name = this.btnP1.getAttribute("value");
+	this.p2name = this.btnP2.getAttribute("value");
+	this.strategyName = sn;
+	this.prediction = null;
+	this.totals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
+	var s = this;
 	this.getWinner = function() {
+		var self = s;
 		var newTotals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
 		var winner = null;
-		if (newTotals > totals) {
-			winner = prediction;
-		} else if (newTotals < totals) {
-			winner = (prediction == p1name) ? p2name : p1name;
+		if (newTotals > this.totals) {
+			winner = self.prediction;
+		} else if (newTotals <= self.totals) {
+			winner = (self.prediction == self.p1name) ? self.p2name : self.p1name;
 		}
 		return winner;
 	};
-	this.getP1Name = function() {
-		return p1name;
-	};
-	this.getP2Name = function() {
-		return p2name;
-	};
-	this.getP1Button = function() {
-		return btnRed;
-	};
-	this.getP2Button = function() {
-		return btnBlue;
-	};
-	this.getMinimumBetButton = function() {
-		return btn10;
-	};
-	this.getStrategyName = function() {
-		return sName;
-	};
-	this.setPrediction = function(p) {
-		prediction = p;
-	};
-	this.getPrediction = function() {
-		return prediction;
-	};
+};
 
-}
-
-function CoinToss() {
+var CoinToss = function() {
 	this.base = Strategy;
 	this.base("ct");
-
+	var s = this;
 	this.execute = function(info) {
-		var pred = (Math.random() > .5) ? this.getP1Name() : this.getP2Name();
-		this.setPrediction(pred);
-		return pred;
+		var self = s;
+		var p = (Math.random() > .5) ? self.p1name : self.p2name;
+		self.prediction = p;
+		return p;
 	};
-}
+};
+CoinToss.prototype = Strategy;
 
-function MoreWins() {
+var MoreWins = function() {
 	this.base = Strategy;
 	this.base("mw");
+	var s = this;
 	this.execute = function(info) {
+		var self=s;
 		var c1 = info.character1;
 		var c2 = info.character2;
 		var p;
 		if (c1.wins != c2.wins) {
-			p=(c1.wins > c2.wins) ? c1.name : c2.name;
-			console.log(p+" has more wins; MW betting "+p);
-			this.setPrediction(p);
+			p = (c1.wins > c2.wins) ? c1.name : c2.name;
+			console.log(p + " has more wins; MW betting " + p);
+			self.prediction = p;
 			return p;
 		} else if (c1.losses != c2.losses) {
-			p=(c1.losses < c2.losses) ? c1.name : c2.name;
-			console.log(p+" has less losses; MW betting "+p);
-			this.setPrediction(p);
+			p = (c1.losses < c2.losses) ? c1.name : c2.name;
+			console.log(p + " has less losses; MW betting " + p);
+			self.prediction = p;
 			return p;
 		} else {
-			p=(Math.random() > .5) ? c1.name : c2.name;
-			console.log("MW has no data for "+c1.name +" and "+ c2.name+" or they're equal; MW betting randomly");
-			this.setPrediction(p);
-			return p; 
+			p = (Math.random() > .5) ? c1.name : c2.name;
+			console.log("MW has no data for " + c1.name + " and " + c2.name + " or they're equal; MW betting randomly");
+			self.prediction = p;
+			return p;
 		}
 	};
-}
-
-CoinToss.prototype = Strategy;
+};
 MoreWins.prototype = Strategy;
+

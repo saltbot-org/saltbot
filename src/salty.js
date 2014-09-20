@@ -1,4 +1,4 @@
-function Controller() {
+var Controller = function() {
 	var bettingAvailable = false;
 	var bettingEntered = false;
 	var bettingComplete = true;
@@ -12,10 +12,7 @@ function Controller() {
 		var styleObj = window.getComputedStyle(bettingTable, null);
 		var active = styleObj.display != "none";
 
-		//<span class="dollar" id="balance" style="display: inline;">7,704</span>
-		//<span id="betstatus" style="display: inline;">Omega red mvc2 wins! Payouts to Team Red.</span>
-		//<span id="betstatus" style="display: inline;">Bets are locked until the next match.</span>
-		//<span id="betstatus" style="display: inline;">Bets are OPEN!</span>
+		
 
 		if (!active) {
 			bettingAvailable = false;
@@ -30,9 +27,9 @@ function Controller() {
 
 			//Deal with old match
 			if (match != null) {
-				var result = match.getStrategy().getWinner();
-				if (result != null) {
-					var records = match.getRecords(result);
+				var winner = match.strategy.getWinner();
+				if (winner != null) {
+					var records = match.getRecords(winner);
 					var mr = records[0];
 					var c1 = records[1];
 					var c2 = records[2];
@@ -97,13 +94,8 @@ function Controller() {
 
 			}
 
-			if (Math.random() > 0.01) {//skip 1% of matches
-
-				match = new Match(new MoreWins());
-
-			} else {
-				match = null;
-			}
+			match = new Match(new MoreWins());// the hell with skipping matches
+			match.init();//this is asynchronous
 			bettingEntered = true;
 		}
 
@@ -114,6 +106,6 @@ function Controller() {
 
 	}, 3000);
 
-}
+};
 
-c = Controller();
+var ctrl = new Controller();
