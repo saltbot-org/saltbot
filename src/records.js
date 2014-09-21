@@ -1,8 +1,7 @@
-var dr=function () {
+var dr = function() {
 	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
 		console.log("-\ndebugging records...");
 
-		
 		//match records:
 		if (results.hasOwnProperty("matches_v1")) {
 			console.log("-\nmatch records found\nnumber of match records: " + results.matches_v1.length + "-\n");
@@ -17,7 +16,7 @@ var dr=function () {
 			console.log("-\ncharacter records found\nnumber of character records: " + results.characters_v1.length + "-\n");
 			for (var i = 0; i < results.characters_v1.length; i++) {
 				var character = results.characters_v1[i];
-				console.log(character.name+"\t\t\t\twins: "+character.wins+",\t\t\t\tlosses: "+character.losses);
+				console.log(character.name + "\t\t\t\twins: " + character.wins + ",\t\t\t\tlosses: " + character.losses);
 			}
 		}
 
@@ -73,30 +72,30 @@ function pr() {
 					}
 				}
 				// now get total wins and losses of involved characters
-				var c1totalWins=0;
-				var c1totalLosses=0;
-				var c2totalWins=0;
-				var c2totalLosses=0;
+				var c1totalWins = 0;
+				var c1totalLosses = 0;
+				var c2totalWins = 0;
+				var c2totalLosses = 0;
 				console.log("-\ninvestigating match: " + pdmatch.c1 + " vs " + pdmatch.c2 + " ... winner: " + pdmatch.w);
 				console.log("-\nprocessing...");
 				for (var k = 0; k < results.matches_v1.length; k++) {
 					var match = results.matches_v1[k];
-					
+
 					if (match.w == c1Object.name) {
-						c1totalWins+=1;
-						c2totalLosses+=1;
-						console.log("-\n in match"+k+": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
+						c1totalWins += 1;
+						c2totalLosses += 1;
+						console.log("-\n in match" + k + ": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
 					}
 					if (match.w == c2Object.name) {
-						c2totalWins+=1;
-						c1totalLosses+=1;
-						console.log("-\n in match"+k+": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
+						c2totalWins += 1;
+						c1totalLosses += 1;
+						console.log("-\n in match" + k + ": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
 					}
-					
+
 				}
 				console.log("-\nprocessing complete");
-				console.log("mr: "+pdmatch.c1+" has "+c1totalWins+" wins, "+c1totalLosses+" losses; cr: "+c1Object.wins+" wins, "+c1Object.losses+" losses");
-				console.log("mr: "+pdmatch.c2+" has "+c2totalWins+" wins, "+c2totalLosses+" losses; cr: "+c2Object.wins+" wins, "+c2Object.losses+" losses");
+				console.log("mr: " + pdmatch.c1 + " has " + c1totalWins + " wins, " + c1totalLosses + " losses; cr: " + c1Object.wins + " wins, " + c1Object.losses + " losses");
+				console.log("mr: " + pdmatch.c2 + " has " + c2totalWins + " wins, " + c2totalLosses + " losses; cr: " + c2Object.wins + " wins, " + c2Object.losses + " losses");
 			}
 		}
 
@@ -105,10 +104,16 @@ function pr() {
 
 var debugRecords = true;
 var purifyRecords = false;
+var backupRecords = false;
 if (purifyRecords) {
 	pr();
 }
 if (debugRecords) {
 	dr();
 }
-
+if (backupRecords) {
+	var blob = new Blob(["Hello, world!"], {
+		type : "text/plain;charset=utf-8"
+	});
+	saveAs(blob, "hello world.txt");
+}

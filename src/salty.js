@@ -2,7 +2,8 @@ var Controller = function() {
 	var bettingAvailable = false;
 	var bettingEntered = false;
 	var bettingComplete = true;
-
+	var matchesBeforeReset=25;
+	var matchesProcessed=0;
 	var match = null;
 
 	var debugMode = true;
@@ -37,6 +38,8 @@ var Controller = function() {
 					var matches_v1 = null;
 					var characters_v1 = null;
 					chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
+						var mbr=matchesBeforeReset;
+						var mp=matchesProcessed;
 						//store new match record
 						if (results.hasOwnProperty("matches_v1")) {
 							results.matches_v1.push(mr);
@@ -84,16 +87,19 @@ var Controller = function() {
 							'matches_v1' : matches_v1,
 							'characters_v1' : characters_v1
 						}, function() {
-							if (debugMode) {
-								console.log("-\nrecords saved");
+							if (debugMode) { 
+								console.log("-\nrecords saved, processed so far: "+mp);
+							}
+							if (mp>=mbr){
+								location.reload();					
 							}
 						});
 					});
 
 				}
-
+				matchesProcessed+=1;
 			}
-
+			
 			match = new Match(new MoreWins());// the hell with skipping matches
 			match.init();//this is asynchronous
 			bettingEntered = true;

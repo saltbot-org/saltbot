@@ -1,8 +1,14 @@
 var Strategy = function(sn) {
-	//<span class="dollar" id="balance" style="display: inline;">7,704</span>
-	//<span id="betstatus" style="display: inline;">Omega red mvc2 wins! Payouts to Team Red.</span>
-	//<span id="betstatus" style="display: inline;">Bets are locked until the next match.</span>
-	//<span id="betstatus" style="display: inline;">Bets are OPEN!</span>
+
+	// <div id="ember3235" class="ember-view chat-line">
+	// <div class="indicator"></div>
+	// <span class="timestamp">12:22</span>
+	// <span class="badges"><span class="badge-container tooltip" original-title="Moderator"><div class="badge moderator"></div></span> </span>
+	// <span class="from" style="color:#FF69B4">Waifu4u</span>
+	// <span class="colon">:</span>
+	// <span class="message" style="undefined">Bets are OPEN for Omanyte EX3 vs Shadowroo (pf 3)! (B Tier)  (matchmaking) <a href="http://www.saltybet.com" target="_blank">www.saltybet.com</a></span>
+	// </div>
+	
 	this.btn10 = document.getElementById("interval1");
 	this.btnP1 = document.getElementById("player1");
 	this.btnP2 = document.getElementById("player2");
