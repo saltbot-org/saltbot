@@ -23,12 +23,14 @@ var dr = function() {
 	});
 };
 
-function pr() {
+var pr = function() {
 	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
 		console.log("-\npurifying records...");
 		var potentialDuplicates = [];
 		if (results.hasOwnProperty("matches_v1") && results.hasOwnProperty("characters_v1")) {
 			console.log("-\ndetecting potential duplicate matches");
+
+			var goodMatches = [];
 
 			for (var i = 0; i < results.matches_v1.length; i++) {
 				var match = results.matches_v1[i];
@@ -52,68 +54,108 @@ function pr() {
 					if (!duplicateAlreadydetected) {
 						potentialDuplicates.push(match);
 						console.log("potential duplicate match: " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
+					} else {
+						goodMatches.push(match);
 					}
+				} else {
+					goodMatches.push(match);
 				}
 
 			}
-			//character records:
-			var characters = results.characters_v1;
-			for (var ii = 0; ii < potentialDuplicates.length; ii++) {
-				// check wins of characters involved
-				var pdmatch = potentialDuplicates[ii];
-				var c1Object = null;
-				var c2Object = null;
-				for (var j = 0; j < characters.length; j++) {
-					if (characters[j].name == pdmatch.c1) {
-						c1Object = characters[j];
-					}
-					if (characters[j].name == pdmatch.c2) {
-						c2Object = characters[j];
-					}
-				}
-				// now get total wins and losses of involved characters
-				var c1totalWins = 0;
-				var c1totalLosses = 0;
-				var c2totalWins = 0;
-				var c2totalLosses = 0;
-				console.log("-\ninvestigating match: " + pdmatch.c1 + " vs " + pdmatch.c2 + " ... winner: " + pdmatch.w);
-				console.log("-\nprocessing...");
-				for (var k = 0; k < results.matches_v1.length; k++) {
-					var match = results.matches_v1[k];
 
-					if (match.w == c1Object.name) {
-						c1totalWins += 1;
-						c2totalLosses += 1;
-						console.log("-\n in match" + k + ": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
-					}
-					if (match.w == c2Object.name) {
-						c2totalWins += 1;
-						c1totalLosses += 1;
-						console.log("-\n in match" + k + ": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
-					}
+			//remove all duplicates, then rebuild character records from match records
 
+			chrome.storage.local.set({
+				'matches_v1' : goodMatches//,
+				// 'characters_v1' : characters_v1
+			}, function() {
+				console.log("-\nrecords purified");
+			});
+
+			//examine character records:
+			var examineCharacterRecords = false;
+			if (examineCharacterRecords) {
+				var characters = results.characters_v1;
+				for (var ii = 0; ii < potentialDuplicates.length; ii++) {
+					// check wins of characters involved
+					var pdmatch = potentialDuplicates[ii];
+					var c1Object = null;
+					var c2Object = null;
+					for (var j = 0; j < characters.length; j++) {
+						if (characters[j].name == pdmatch.c1) {
+							c1Object = characters[j];
+						}
+						if (characters[j].name == pdmatch.c2) {
+							c2Object = characters[j];
+						}
+					}
+					// now get total wins and losses of involved characters
+					var c1totalWins = 0;
+					var c1totalLosses = 0;
+					var c2totalWins = 0;
+					var c2totalLosses = 0;
+					console.log("-\ninvestigating match: " + pdmatch.c1 + " vs " + pdmatch.c2 + " ... winner: " + pdmatch.w);
+					console.log("-\nprocessing...");
+					for (var k = 0; k < results.matches_v1.length; k++) {
+						var match = results.matches_v1[k];
+
+						if (match.w == c1Object.name) {
+							c1totalWins += 1;
+							c2totalLosses += 1;
+							console.log("-\n in match" + k + ": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
+						}
+						if (match.w == c2Object.name) {
+							c2totalWins += 1;
+							c1totalLosses += 1;
+							console.log("-\n in match" + k + ": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
+						}
+
+					}
+					console.log("-\nprocessing complete");
+					console.log("mr: " + pdmatch.c1 + " has " + c1totalWins + " wins, " + c1totalLosses + " losses; cr: " + c1Object.wins + " wins, " + c1Object.losses + " losses");
+					console.log("mr: " + pdmatch.c2 + " has " + c2totalWins + " wins, " + c2totalLosses + " losses; cr: " + c2Object.wins + " wins, " + c2Object.losses + " losses");
 				}
-				console.log("-\nprocessing complete");
-				console.log("mr: " + pdmatch.c1 + " has " + c1totalWins + " wins, " + c1totalLosses + " losses; cr: " + c1Object.wins + " wins, " + c1Object.losses + " losses");
-				console.log("mr: " + pdmatch.c2 + " has " + c2totalWins + " wins, " + c2totalLosses + " losses; cr: " + c2Object.wins + " wins, " + c2Object.losses + " losses");
 			}
 		}
 
 	});
-}
+};
 
-var debugRecords = true;
+var er = function() {
+	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
+		var lines = [];
+		for (var i = 0; i < results.matches_v1.length; i++) {
+			var match = results.matches_v1[i];
+			lines.push(match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + "\n");
+		}
+
+		var time = new Date();
+		var blob = new Blob(lines, {
+			type : "text/plain;charset=utf-8"
+		});
+		saveAs(blob, "saltyRecords--" + time.getFullYear() + "-" + time.getMonth() + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes() + ".txt");
+	});
+};
+
+var debugRecords = false;
 var purifyRecords = false;
-var backupRecords = false;
+var exportRecords = false;
 if (purifyRecords) {
 	pr();
 }
 if (debugRecords) {
 	dr();
 }
-if (backupRecords) {
-	var blob = new Blob(["Hello, world!"], {
-		type : "text/plain;charset=utf-8"
-	});
-	saveAs(blob, "hello world.txt");
+if (exportRecords) {
+	er();
 }
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	switch(request.type){
+		case "dr": dr();break;
+		case "pr": pr();break;
+		case "er": er();break;
+		
+	}
+	
+});
