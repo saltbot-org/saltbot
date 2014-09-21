@@ -137,25 +137,103 @@ var er = function() {
 	});
 };
 
-var debugRecords = false;
-var purifyRecords = false;
-var exportRecords = false;
-if (purifyRecords) {
-	pr();
-}
-if (debugRecords) {
-	dr();
-}
-if (exportRecords) {
-	er();
-}
+var ir = function(f) {
+	var matchRecords = [];
+	var characterRecords = [];
+	var namesOfCharactersWhoAlreadyHaveRecords = [];
+
+	var lines = f.split("\n");
+	for (var i = 0; i < lines.length; i++) {
+		var match = lines[i].split(",");
+		var c1 = null;
+		var c2 = null;
+		var w = null;
+		var sn = null;
+		var pw = false;
+		for (var j = 0; j < match.length; j++) {
+			switch(j % 5) {
+			case 0:
+				c1 = match[j];
+				break;
+			case 1:
+				c2 = match[j];
+				break;
+			case 2:
+				w = match[j];
+				break;
+			case 3:
+				sn = match[j];
+				break;
+			case 4:
+				pw = match[j] == "true";
+				var mObj = {
+					"c1" : c1,
+					"c2" : c2,
+					"w" : w,
+					"sn" : sn,
+					"pw" : pw
+				};
+				matchRecords.push(mObj);
+
+				var getCharacter = function(cname) {
+					var cobject = null;
+					if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
+						cobject = {
+							"name" : cname,
+							"wins" : 0,
+							"losses" : 0,
+							"tier" : null,
+							"extras" : []
+						};
+						characterRecords.push(cobject);
+						namesOfCharactersWhoAlreadyHaveRecords.push(cname);
+					} else {
+						for (var k = 0; k < characterRecords.length; k++) {
+							if (cname == characterRecords[k].name) {
+								cobject = characterRecords[k];
+							}
+						}
+					}
+					return cobject;
+				};
+				var c1Obj = getCharacter(c1);
+				var c2Obj = getCharacter(c2);
+				if (mObj.w == c1Obj.name) {
+					c1Obj.wins += 1;
+					c2Obj.losses += 1;
+				} else if (w == c2Obj.name) {
+					c2Obj.wins += 1;
+					c1Obj.losses += 1;
+				}
+
+				break;
+			}
+		}
+	}
+	var nmr = matchRecords.length;
+	var ncr = characterRecords.length;
+	//All records have been rebuilt, so update them
+	chrome.storage.local.set({
+		'matches_v1' : matchRecords,
+		'characters_v1' : characterRecords
+	}, function() {
+		console.log("-\nrecords imported:\n" + nmr + " match records\n" + ncr + " character records");
+	});
+};
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	switch(request.type){
-		case "dr": dr();break;
-		case "pr": pr();break;
-		case "er": er();break;
-		
+	switch(request.type) {
+	case "dr":
+		dr();
+		break;
+	case "pr":
+		pr();
+		break;
+	case "er":
+		er();
+		break;
+	case "ir":
+		ir(request.text);
+		break;
 	}
-	
 });
