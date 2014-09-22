@@ -1,14 +1,6 @@
-var Strategy = function(sn) {
 
-	// <div id="ember3235" class="ember-view chat-line">
-	// <div class="indicator"></div>
-	// <span class="timestamp">12:22</span>
-	// <span class="badges"><span class="badge-container tooltip" original-title="Moderator"><div class="badge moderator"></div></span> </span>
-	// <span class="from" style="color:#FF69B4">Waifu4u</span>
-	// <span class="colon">:</span>
-	// <span class="message" style="undefined">Bets are OPEN for Omanyte EX3 vs Shadowroo (pf 3)! (B Tier)  (matchmaking) <a href="http://www.saltybet.com" target="_blank">www.saltybet.com</a></span>
-	// </div>
-	
+
+var Strategy = function(sn) {
 	this.btn10 = document.getElementById("interval1");
 	this.btnP1 = document.getElementById("player1");
 	this.btnP2 = document.getElementById("player2");
@@ -18,10 +10,14 @@ var Strategy = function(sn) {
 	this.prediction = null;
 	this.totals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
 	var s = this;
-	this.getWinner = function() {
+	this.getWinner = function(ss) {
 		var self = s;
 		var newTotals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
 		var winner = null;
+		if (self.abstain == true) {
+			//special way to get winner for strategies which can abstain
+			return ss.getWinner();
+		}
 		if (newTotals > this.totals) {
 			winner = self.prediction;
 		} else if (newTotals <= self.totals) {
@@ -49,7 +45,7 @@ var MoreWins = function() {
 	this.base("mw");
 	var s = this;
 	this.execute = function(info) {
-		var self=s;
+		var self = s;
 		var c1 = info.character1;
 		var c2 = info.character2;
 		var p;
@@ -72,4 +68,38 @@ var MoreWins = function() {
 	};
 };
 MoreWins.prototype = Strategy;
+
+var MoreWinsCautious = function() {
+	this.base = Strategy;
+	this.base("mwc");
+	this.abstain = false;
+	var s = this;
+	this.execute = function(info) {
+		var self = s;
+		var c1 = info.character1;
+		var c2 = info.character2;
+		var p;
+		if ((c1.wins == 0 && c1.losses == 0) || (c2.wins == 0 && c2.losses == 0)) {
+			console.log("-\nMWC has insufficient information (1), canceling bet");
+			self.abstain = true;
+			return null;
+		}
+		if (c1.wins != c2.wins) {
+			p = (c1.wins > c2.wins) ? c1.name : c2.name;
+			console.log(p + " has more wins; MWC betting " + p);
+			self.prediction = p;
+			return p;
+		} else if (c1.losses != c2.losses) {
+			p = (c1.losses < c2.losses) ? c1.name : c2.name;
+			console.log(p + " has less losses; MWC betting " + p);
+			self.prediction = p;
+			return p;
+		} else {
+			console.log("-\nMWC has insufficient information (2), canceling bet");
+			self.abstain = true;
+			return null;
+		}
+	};
+};
+MoreWinsCautious.prototype = Strategy;
 

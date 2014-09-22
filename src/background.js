@@ -44,12 +44,13 @@ document.addEventListener('DOMContentLoaded', function() {
 			var matches = results.matches_v1;
 			var correct = 0;
 			for (var i = 0; i < matches.length; i++) {
+				if (matches[i].sn == "mwc" && matches[i].pw == "a")
+					continue;
 				var color = (matches[i].sn == "mw") ? "blue" : "red";
-				correct += (matches[i].pw) ? 1 : 0;
+				correct += (matches[i].pw == "t") ? 1 : 0;
 				var numberOfMatches = i + 1;
 				var percentCorrect = correct / numberOfMatches * 100;
 				data1.push([numberOfMatches, percentCorrect, color]);
-
 			}
 
 			// The datasets as shown on the chart. Each point is an array, described below.

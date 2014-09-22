@@ -1,3 +1,39 @@
+var StatusScanner = function() {
+	var self = this;
+	this.announcements = [];
+	// find element and create an observer instance
+	var status = document.getElementById("betstatus");
+	var observer = new MutationObserver(function(mutations) {
+		self.announcements.push(status.innerHTML);
+		// console.log("- status bar updated: " + status.innerHTML);
+		observer.takeRecords();
+	});
+	observer.observe(status, {
+		subtree : true,
+		childList : true,
+		attributes : true
+	});
+	var winIndicator = " wins";
+
+	this.getAnnouncements = function(preserve) {
+		var copy = self.announcements.slice(0);
+		if (!preserve) {
+			self.announcements = [];
+		}
+		return copy;
+	};
+	this.getWinner = function() {
+		var recent = self.getAnnouncements();
+		recent.reverse();
+		for (var i = 0; i < recent.length; i++) {
+			if (recent[i].indexOf(winIndicator) > -1) {
+				return recent[i].split(winIndicator)[0];
+			}
+		}
+		return null;
+	};
+};
+
 var Controller = function() {
 	var bettingAvailable = false;
 	var bettingEntered = false;
@@ -5,6 +41,8 @@ var Controller = function() {
 	var matchesBeforeReset = 25;
 	var matchesProcessed = 0;
 	var match = null;
+	this.statusScanner = new StatusScanner();
+	var self = this;
 
 	var debugMode = true;
 
@@ -12,6 +50,11 @@ var Controller = function() {
 		var bettingTable = document.getElementsByClassName("dynamic-view")[0];
 		var styleObj = window.getComputedStyle(bettingTable, null);
 		var active = styleObj.display != "none";
+
+		var iframe = document.getElementById('chat-frame-stream');
+		//var inne//rDoc = iframe.contentDocument || iframe.contentWindow.document;
+		var allChatLines = iframe.getElementsByClassName("chat-line");
+		var waifuAnnouncements = [];
 
 		if (!active) {
 			bettingAvailable = false;
@@ -26,7 +69,7 @@ var Controller = function() {
 
 			//Deal with old match
 			if (match != null) {
-				var winner = match.strategy.getWinner();
+				var winner = match.strategy.getWinner(self.statusScanner);
 				if (winner != null) {
 					var records = match.getRecords(winner);
 					var mr = records[0];
@@ -98,11 +141,10 @@ var Controller = function() {
 				matchesProcessed += 1;
 			}
 
-			match = new Match(new MoreWins());
-			// the hell with skipping matches
+			match = new Match(new MoreWinsCautious());
+			//skip team matches
 			if (match.names[0].toLowerCase().indexOf("team") == -1 && match.names[1].toLowerCase().indexOf("team") == -1) {
-				//this is asynchronous
-				match.init();				
+				match.init();
 			} else {
 				match = null;
 				console.log("-\nskipping team match");

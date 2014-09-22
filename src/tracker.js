@@ -25,12 +25,23 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 		}
 		this.winner = w;
 
+		var pw = null;
+		if (this.strategy instanceof MoreWinsCautious) {
+			if (this.strategy.abstain) {
+				pw = "a";
+			} else {
+				pw = (this.strategy.prediction == this.winner) ? "t" : "f";
+			}
+		} else {
+			pw = (this.strategy.prediction == this.winner) ? "t" : "f";
+		}
+
 		return [{
 			"c1" : this.character1.name,
 			"c2" : this.character2.name,
 			"w" : this.winner,
 			"sn" : this.strategy.strategyName,
-			"pw" : this.strategy.prediction == this.winner
+			"pw" : pw
 		}, this.character1, this.character2];
 	} else {
 		return null;
@@ -43,7 +54,7 @@ Match.prototype.init = function() {
 	chrome.storage.local.get("characters_v1", function(result) {
 		var self = s;
 		var baseSeconds = 2000;
-		var recs=result.characters_v1;
+		var recs = result.characters_v1;
 
 		//self.fillCharacters(result);//get character record objects or make new ones
 		for (var i = 0; i < recs.length; i++) {
@@ -65,16 +76,19 @@ Match.prototype.init = function() {
 			"character2" : self.character2
 		});
 
-		setTimeout(function() {
-			self.strategy.btn10.click();
-		}, Math.floor(Math.random() * baseSeconds));
-		setTimeout(function() {
-			if (prediction == self.strategy.p1name) {
-				self.strategy.btnP1.click();
-			} else {
-				self.strategy.btnP2.click();
-			}
-		}, (Math.floor(Math.random() * baseSeconds * 2) + baseSeconds));
+		if (prediction != null) {
+			setTimeout(function() {
+				self.strategy.btn10.click();
+			}, Math.floor(Math.random() * baseSeconds));
+			setTimeout(function() {
+				if (prediction == self.strategy.p1name) {
+					self.strategy.btnP1.click();
+				} else {
+					self.strategy.btnP2.click();
+				}
+			}, (Math.floor(Math.random() * baseSeconds * 2) + baseSeconds));
+		}
+
 	});
 };
 

@@ -168,7 +168,7 @@ var ir = function(f) {
 		var c2 = null;
 		var w = null;
 		var sn = null;
-		var pw = false;
+		var pw = null;
 		for (var j = 0; j < match.length; j++) {
 			switch(j % 5) {
 			case 0:
@@ -184,7 +184,7 @@ var ir = function(f) {
 				sn = match[j];
 				break;
 			case 4:
-				pw = match[j] == "true";
+				pw = match[j];
 				var mObj = {
 					"c1" : c1,
 					"c2" : c2,
@@ -256,3 +256,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		break;
 	}
 });
+
+
+
+
+
+
+
+
