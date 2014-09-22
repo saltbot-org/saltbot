@@ -8,7 +8,7 @@
 	"content_scripts": [
 		{
 			"matches": ["http://www.saltybet.com/*"],
-			"js": ["FileSaver.min.js", "records.js", "tracker.js", "mlearning.js", "strategy.js", "salty.js"]
+			"js": ["lib/FileSaver.min.js", "records.js", "tracker.js", "mlearning.js", "strategy.js", "salty.js"]
 		}
 	],
 	"browser_action": {

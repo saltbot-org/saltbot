@@ -4,18 +4,23 @@
     <title>SaltBot Controls</title>
     <style>
       body {
-        min-width: 357px;
+        min-width: 400px;
         overflow-x: hidden;
       }
     </style>
-    <script src="background.js"></script>
+    <script type="text/javascript" src="background.js"></script>
+    <script type="text/javascript" src="lib/jquery.min.js"></script>
+    <script type="text/javascript" src="lib/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="lib/RGraph.scatter.js" ></script>
   </head>
   <body>
   	<h1>SaltBot Controls</h1>
   	<input type="button" value="Debug Records" id="bdr"><br>
   	<input type="button" value="Purify Records" id="bpr"><br>
   	<input type="button" value="Export Records" id="ber"><br>
-  	<span>Import Records</span><input type="file" value="Import Records" id="bir">
+  	<span>Import Records</span><input type="file" value="Import Records" id="bir"><br>
+  	<input type="button" value="Charts" id="bsc">
+  	<canvas id="cvs" width="400" height="250">[No canvas support]</canvas>
   </body>
 </html>
 

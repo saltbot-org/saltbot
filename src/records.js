@@ -28,49 +28,77 @@ var pr = function() {
 		console.log("-\npurifying records...");
 		var potentialDuplicates = [];
 		if (results.hasOwnProperty("matches_v1") && results.hasOwnProperty("characters_v1")) {
-			console.log("-\ndetecting potential duplicate matches");
-
-			var goodMatches = [];
-
-			for (var i = 0; i < results.matches_v1.length; i++) {
-				var match = results.matches_v1[i];
-				var isPotentialDuplicate = 0;
-				for (var j = 0; j < results.matches_v1.length; j++) {
-					var matchd = results.matches_v1[j];
-					if (match.c1 == matchd.c1 && match.c2 == matchd.c2) {
-						isPotentialDuplicate += 1;
-					}
-				}
-				if (isPotentialDuplicate == 2) {
-					var duplicateAlreadydetected = false;
-					for (var k = 0; k < potentialDuplicates.length; k++) {
-						var matchd = potentialDuplicates[k];
-
-						if (match.c1 == matchd.c1 && match.c2 == matchd.c2) {
-							duplicateAlreadydetected = true;
+			var checkForFalseAnalysis = true;
+			if (checkForFalseAnalysis) {
+				var goodMatches = [];
+				var pastFalseMatches = false;
+				for (var i = 0; i < results.matches_v1.length; i++) {
+					var match = results.matches_v1[i];
+					if (match.sn == "mw") {
+						if (!pastFalseMatches) {
+							if (match.pw == true) {
+								goodMatches.push(match);
+								pastFalseMatches = true;
+							}
+						} else {
+							goodMatches.push(match);
 						}
-
-					}
-					if (!duplicateAlreadydetected) {
-						potentialDuplicates.push(match);
-						console.log("potential duplicate match: " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
 					} else {
 						goodMatches.push(match);
 					}
-				} else {
-					goodMatches.push(match);
 				}
-
+				chrome.storage.local.set({
+					'matches_v1' : goodMatches
+				}, function() {
+					console.log("-\nrecords purified (checkForFalseAnalysis)");
+				});
 			}
 
-			//remove all duplicates, then rebuild character records from match records
+			var checkForDuplicates = false;
+			if (checkForDuplicates) {
+				console.log("-\ndetecting potential duplicate matches");
+				var goodMatches = [];
 
-			chrome.storage.local.set({
-				'matches_v1' : goodMatches//,
-				// 'characters_v1' : characters_v1
-			}, function() {
-				console.log("-\nrecords purified");
-			});
+				for (var i = 0; i < results.matches_v1.length; i++) {
+					var match = results.matches_v1[i];
+					var isPotentialDuplicate = 0;
+					for (var j = 0; j < results.matches_v1.length; j++) {
+						var matchd = results.matches_v1[j];
+						if (match.c1 == matchd.c1 && match.c2 == matchd.c2) {
+							isPotentialDuplicate += 1;
+						}
+					}
+					if (isPotentialDuplicate == 2) {
+						var duplicateAlreadydetected = false;
+						for (var k = 0; k < potentialDuplicates.length; k++) {
+							var matchd = potentialDuplicates[k];
+
+							if (match.c1 == matchd.c1 && match.c2 == matchd.c2) {
+								duplicateAlreadydetected = true;
+							}
+
+						}
+						if (!duplicateAlreadydetected) {
+							potentialDuplicates.push(match);
+							console.log("potential duplicate match: " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
+						} else {
+							goodMatches.push(match);
+						}
+					} else {
+						goodMatches.push(match);
+					}
+
+				}
+				//remove all duplicates, then rebuild character records from match records
+
+				chrome.storage.local.set({
+					'matches_v1' : goodMatches//,
+					// 'characters_v1' : characters_v1
+				}, function() {
+					console.log("-\nrecords purified");
+				});
+
+			}
 
 			//examine character records:
 			var examineCharacterRecords = false;
