@@ -2,8 +2,8 @@ var Controller = function() {
 	var bettingAvailable = false;
 	var bettingEntered = false;
 	var bettingComplete = true;
-	var matchesBeforeReset=25;
-	var matchesProcessed=0;
+	var matchesBeforeReset = 25;
+	var matchesProcessed = 0;
 	var match = null;
 
 	var debugMode = true;
@@ -12,8 +12,6 @@ var Controller = function() {
 		var bettingTable = document.getElementsByClassName("dynamic-view")[0];
 		var styleObj = window.getComputedStyle(bettingTable, null);
 		var active = styleObj.display != "none";
-
-		
 
 		if (!active) {
 			bettingAvailable = false;
@@ -38,8 +36,8 @@ var Controller = function() {
 					var matches_v1 = null;
 					var characters_v1 = null;
 					chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
-						var mbr=matchesBeforeReset;
-						var mp=matchesProcessed;
+						var mbr = matchesBeforeReset;
+						var mp = matchesProcessed;
 						//store new match record
 						if (results.hasOwnProperty("matches_v1")) {
 							results.matches_v1.push(mr);
@@ -87,21 +85,29 @@ var Controller = function() {
 							'matches_v1' : matches_v1,
 							'characters_v1' : characters_v1
 						}, function() {
-							if (debugMode) { 
-								console.log("-\nrecords saved, processed so far: "+mp);
+							if (debugMode) {
+								console.log("-\nrecords saved, processed so far: " + mp);
 							}
-							if (mp>=mbr){
-								location.reload();					
+							if (mp >= mbr) {
+								location.reload();
 							}
 						});
 					});
 
 				}
-				matchesProcessed+=1;
+				matchesProcessed += 1;
 			}
-			
-			match = new Match(new MoreWins());// the hell with skipping matches
-			match.init();//this is asynchronous
+
+			match = new Match(new MoreWins());
+			// the hell with skipping matches
+			if (match.names[0].toLowerCase().indexOf("team") == -1 && match.names[1].toLowerCase().indexOf("team") == -1) {
+				//this is asynchronous
+				match.init();				
+			} else {
+				match = null;
+				console.log("-\nskipping team match");
+			}
+
 			bettingEntered = true;
 		}
 

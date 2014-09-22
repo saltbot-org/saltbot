@@ -28,22 +28,13 @@ var pr = function() {
 		console.log("-\npurifying records...");
 		var potentialDuplicates = [];
 		if (results.hasOwnProperty("matches_v1") && results.hasOwnProperty("characters_v1")) {
-			var checkForFalseAnalysis = true;
-			if (checkForFalseAnalysis) {
+			var removeTeamMatches = true;
+			if (removeTeamMatches) {
 				var goodMatches = [];
-				var pastFalseMatches = false;
+				
 				for (var i = 0; i < results.matches_v1.length; i++) {
 					var match = results.matches_v1[i];
-					if (match.sn == "mw") {
-						if (!pastFalseMatches) {
-							if (match.pw == true) {
-								goodMatches.push(match);
-								pastFalseMatches = true;
-							}
-						} else {
-							goodMatches.push(match);
-						}
-					} else {
+					if (match.c1.toLowerCase().indexOf("team")==-1 && match.c2.toLowerCase().indexOf("team")==-1 ) {
 						goodMatches.push(match);
 					}
 				}
