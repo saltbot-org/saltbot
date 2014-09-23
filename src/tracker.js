@@ -44,6 +44,7 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"pw" : pw
 		}, this.character1, this.character2];
 	} else {
+		console.log("salt robot error : name not in list : "+w+" names: "+names[0]+", "+names[1]);
 		return null;
 	}
 };

@@ -40,26 +40,42 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("bir").addEventListener("change", irClick);
 	document.getElementById("bsc").addEventListener("click", function() {
 		chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
-			var data1 = [];
+			var dataCT = [];
+			var dataMW = [];
+			var dataMWC = [];
 			var matches = results.matches_v1;
-			var correct = 0;
+			var correct = [0, 0, 0];
+			var totalBettedOn = [0, 0, 0];
 			for (var i = 0; i < matches.length; i++) {
-				if (matches[i].sn == "mwc" && matches[i].pw == "a")
-					continue;
-				var color = (matches[i].sn == "mw") ? "blue" : "red";
-				correct += (matches[i].pw == "t") ? 1 : 0;
-				var numberOfMatches = i + 1;
-				var percentCorrect = correct / numberOfMatches * 100;
-				data1.push([numberOfMatches, percentCorrect, color]);
+				var percentCorrect;
+				
+				switch(matches[i].sn) {
+				case "ct":
+					correct[0] += (matches[i].pw == "t") ? 1 : 0;
+					totalBettedOn[0] += 1;
+					percentCorrect = correct[0] / totalBettedOn[0] * 100;
+					dataCT.push([totalBettedOn[0], percentCorrect, "red"]);
+					break;
+				case "mw":
+					correct[1] += (matches[i].pw == "t") ? 1 : 0;
+					totalBettedOn[1] += 1;
+					percentCorrect = correct[1] / totalBettedOn[1] * 100;
+					dataMW.push([totalBettedOn[1], percentCorrect, "purple"]);
+					break;
+				case "mwc":
+					if (matches[i].pw == "a")
+					continue;correct[2] += (matches[i].pw == "t") ? 1 : 0;
+					totalBettedOn[2] += 1;
+					percentCorrect = correct[2] / totalBettedOn[2] * 100;
+					dataMWC.push([totalBettedOn[2], percentCorrect, "blue"]);
+					break;
+				}
 			}
-
-			// The datasets as shown on the chart. Each point is an array, described below.
-
 			// Create the Scatter chart.
 			var scatter = new RGraph.Scatter({
 
 				id : 'cvs',
-				data : data1,
+				data : [dataCT, dataMW, dataMWC],
 
 				options : {
 					background : {
