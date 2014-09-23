@@ -4,11 +4,11 @@
 	"name": "SaltBot",
 	"description": "This extension automates betting on SaltyBet.com.",
 	"version": "1.0",
-	"permissions": ["storage", "unlimitedStorage"],
+	"permissions": ["storage", "unlimitedStorage", "tabs"],
 	"content_scripts": [
 		{
-			"matches": ["http://www.saltybet.com/*"],
-			"js": ["lib/FileSaver.min.js", "records.js", "tracker.js", "mlearning.js", "strategy.js", "salty.js"]
+			"matches": ["http://www.saltybet.com/*","http://www.twitch.tv/saltybet"],
+			"js": ["lib/FileSaver.min.js", "records.js", "tracker.js", "mlearning.js", "strategy.js", "salty.js", "twitch_content.js"]
 		}
 	],
 	"browser_action": {

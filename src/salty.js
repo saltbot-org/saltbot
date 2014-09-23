@@ -162,4 +162,6 @@ var Controller = function() {
 
 };
 
-var ctrl = new Controller();
+var ctrl;
+if (window.location.href == "http://www.saltybet.com/")
+	ctrl = new Controller();
