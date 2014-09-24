@@ -40,7 +40,7 @@ var Controller = function() {
 	var bettingComplete = true;
 	var matchesBeforeReset = 25;
 	var matchesProcessed = 0;
-	var match = null;
+	this.currentMatch=null;
 	this.statusScanner = new StatusScanner();
 	var self = this;
 
@@ -68,10 +68,10 @@ var Controller = function() {
 		if (bettingAvailable && !bettingEntered) {
 
 			//Deal with old match
-			if (match != null) {
-				var winner = match.strategy.getWinner(self.statusScanner);
+			if (self.currentMatch != null) {
+				var winner = self.currentMatch.strategy.getWinner(self.statusScanner);
 				if (winner != null) {
-					var records = match.getRecords(winner);
+					var records = self.currentMatch.getRecords(winner);
 					var mr = records[0];
 					var c1 = records[1];
 					var c2 = records[2];
@@ -141,12 +141,12 @@ var Controller = function() {
 				matchesProcessed += 1;
 			}
 
-			match = new Match(new MoreWinsCautious());
+			self.currentMatch = new Match(new MoreWinsCautious());
 			//skip team matches
-			if (match.names[0].toLowerCase().indexOf("team") == -1 && match.names[1].toLowerCase().indexOf("team") == -1) {
-				match.init();
+			if (self.currentMatch.names[0].toLowerCase().indexOf("team") == -1 && self.currentMatch.names[1].toLowerCase().indexOf("team") == -1) {
+				self.currentMatch.init();
 			} else {
-				match = null;
+				self.currentMatch = null;
 				console.log("-\nskipping team match");
 			}
 
@@ -161,7 +161,31 @@ var Controller = function() {
 	}, 3000);
 
 };
+Controller.prototype.receiveMessageFromTwitch = function(message, sender, sendResponse) {
+	console.log("-\nmessage from Waifu:\t" + message);
+	if (typeof message === "string"){
+		var winMessageIndicator=" wins";
+		if (message.indexOf(winMessageIndicator)>-1){
+			var winnerName=message.split(winMessageIndicator)[0];
+			
+		}
+	}
+		
+	this.currentMatch;
+};
+Controller.prototype.ensureTwitch=function(){
+	chrome.runtime.sendMessage({
+		getTwitch : true
+	}, function(response) {
+		console.log("response received in salty");
+	});
+};
 
 var ctrl;
-if (window.location.href == "http://www.saltybet.com/")
+if (window.location.href == "http://www.saltybet.com/") {
 	ctrl = new Controller();
+	ctrl.ensureTwitch();
+	chrome.runtime.onMessage.addListener(ctrl.receiveMessageFromTwitch);
+
+}
+

@@ -10,7 +10,10 @@
 			"matches": ["http://www.saltybet.com/*","http://www.twitch.tv/saltybet"],
 			"js": ["lib/FileSaver.min.js", "records.js", "tracker.js", "mlearning.js", "strategy.js", "salty.js", "twitch_content.js"]
 		}
-	],
+	],"background": {
+		"scripts": ["twitch_background.js"],
+		"persistent": false
+	},
 	"browser_action": {
 		"default_icon": "dp_icon32.png",
 		"default_popup": "popup.html"

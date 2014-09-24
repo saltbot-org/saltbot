@@ -12,29 +12,34 @@ if (window.location.href == "http://www.twitch.tv/saltybet") {
 			chatWindow = document.getElementById("right_col");
 		var oldWaifuMessages = [];
 		var observer = new MutationObserver(function(mutations) {
-			
+
 			var chatLines = chatWindow.getElementsByClassName("ember-view chat-line");
 			var Waifu4uLines = [];
 			for (var i = 0; i < chatLines.length; i++) {
-				
+
 				var line = chatLines[i];
 				var from = line.getElementsByClassName("from")[0].innerHTML;
-				
+
 				if (from == "Waifu4u") {
-					
+
 					var message = line.getElementsByClassName("message")[0].innerHTML;
-					if (oldWaifuMessages.indexOf(message) == -1){
+					if (oldWaifuMessages.indexOf(message) == -1) {
 						oldWaifuMessages.push(message);
 						Waifu4uLines.push(message);
 					}
-						
+
 				}
 
 			}
-			
+
 			// at this point, we've captured input from Waifu
 			for (var j = 0; j < Waifu4uLines.length; j++) {
-				console.log("-\nnew message from Waifu:\n"+Waifu4uLines[j]);
+				chrome.runtime.sendMessage({
+					message : Waifu4uLines[j]
+				}, function(response) {
+					console.log("response received in twitch content");
+				});
+				console.log("-\nnew message from Waifu:\n" + Waifu4uLines[j]);
 			}
 			observer.takeRecords();
 		});
