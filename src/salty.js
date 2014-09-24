@@ -40,25 +40,21 @@ var Controller = function() {
 	var bettingComplete = true;
 	var matchesBeforeReset = 25;
 	var matchesProcessed = 0;
-	this.currentMatch=null;
+	this.currentMatch = null;
 	this.statusScanner = new StatusScanner();
+	this.infoFromWaifu = [];
 	var self = this;
 
 	var debugMode = true;
 
 	setInterval(function() {
+		//check to see if the betting buttons are visible
 		var bettingTable = document.getElementsByClassName("dynamic-view")[0];
 		var styleObj = window.getComputedStyle(bettingTable, null);
 		var active = styleObj.display != "none";
-
-		var iframe = document.getElementById('chat-frame-stream');
-		//var inne//rDoc = iframe.contentDocument || iframe.contentWindow.document;
-		var allChatLines = iframe.getElementsByClassName("chat-line");
-		var waifuAnnouncements = [];
-
-		if (!active) {
+		if (!active)
 			bettingAvailable = false;
-		}
+
 		if (active && bettingComplete == true) {
 			bettingAvailable = true;
 			bettingEntered = false;
@@ -69,13 +65,15 @@ var Controller = function() {
 
 			//Deal with old match
 			if (self.currentMatch != null) {
-				var winner = self.currentMatch.strategy.getWinner(self.statusScanner);
+				var winner = self.statusScanner.getWinner();
 				if (winner != null) {
+					//before processing match, add tier information if we have it
+					self.currentMatch.updateFromWaifu(self.infoFromWaifu);
 					var records = self.currentMatch.getRecords(winner);
 					var mr = records[0];
 					var c1 = records[1];
 					var c2 = records[2];
-					console.log("match results: " + "\n" + "character 1: " + mr.c1 + "\n" + "character 2: " + mr.c2 + "\n" + "winner: " + mr.w + "\n" + "strategy: " + mr.sn + "\n" + "prediction: " + mr.pw + "\n");
+					console.log("match results: " + "\ncharacter 1: " + mr.c1 + "\ncharacter 2: " + mr.c2 + "\nwinner: " + mr.w + "\nstrategy: " + mr.sn + "\nprediction: " + mr.pw + "\ntier: " + mr.t + "\nmode: " + mr.m);
 					var matches_v1 = null;
 					var characters_v1 = null;
 					chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
@@ -161,19 +159,8 @@ var Controller = function() {
 	}, 3000);
 
 };
-Controller.prototype.receiveMessageFromTwitch = function(message, sender, sendResponse) {
-	console.log("-\nmessage from Waifu:\t" + message);
-	if (typeof message === "string"){
-		var winMessageIndicator=" wins";
-		if (message.indexOf(winMessageIndicator)>-1){
-			var winnerName=message.split(winMessageIndicator)[0];
-			
-		}
-	}
-		
-	this.currentMatch;
-};
-Controller.prototype.ensureTwitch=function(){
+// Controller.prototype.receiveMessageFromTwitch = ;
+Controller.prototype.ensureTwitch = function() {
 	chrome.runtime.sendMessage({
 		getTwitch : true
 	}, function(response) {
@@ -185,7 +172,47 @@ var ctrl;
 if (window.location.href == "http://www.saltybet.com/") {
 	ctrl = new Controller();
 	ctrl.ensureTwitch();
-	chrome.runtime.onMessage.addListener(ctrl.receiveMessageFromTwitch);
+	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+		var self = ctrl;
+		// console.log("-\nmessage from Waifu:\t" + message);
+		if ( typeof message === "string") {
+			var winMessageIndicator = " wins";
+			var newMatchIndicator = "Bets are OPEN for ";
 
+			//check for new match
+			if (message.indexOf(newMatchIndicator) > -1) {
+				//Bets are OPEN for Rydia of mist vs Zatanna EX3! (B Tier) (matchmaking) www.saltybet.com
+				// Bets are OPEN for Valdoll vs Adam! (A Tier) tournament bracket
+				//Bets are OPEN for Team RyokoAndHerTrainingPartner vs Team Aliens! (S / S Tier) (Requested by Pendaflex) (exhibitions) www.saltybet.com
+				var regex = /(?:Bets are OPEN for )(.*)(?: vs )(.*)(?:! \()(X|S|A|B|P|NEW)(?: Tier\))(.*)/g;
+				var matches = regex.exec(message);
+				if (matches == null) {
+					var regexLoose = /(?:Bets are OPEN for )(.*)(?: vs )(.*)!/g;
+					matches = regexLoose.exec(message);
+					matches.push("U", "U");
+				}
+				if (matches[4].indexOf("matchmaking") > -1)
+					matches[4] = "m";
+				else if (matches[4].indexOf("tournament") > -1)
+					matches[4] = "t";
+				else if (matches[4].indexOf("exhibition") > -1)
+					matches[4] = "e";
+
+				self.infoFromWaifu.push({
+					"c1" : matches[1],
+					"c2" : matches[2],
+					"tier" : matches[3],
+					"mode" : matches[4]
+				});
+				while (self.infoFromWaifu.length > 2) {
+					self.infoFromWaifu.splice(0, 1);
+				}
+			} else if (message.indexOf(winMessageIndicator) > -1) {
+				var winnerName = message.split(winMessageIndicator)[0];
+				//do stuff
+			}
+		}
+	});
+	setInterval(ctrl.ensureTwitch, 60000);
 }
 

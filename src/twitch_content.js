@@ -1,10 +1,14 @@
 if (window.location.href == "http://www.twitch.tv/saltybet") {
 	window.onload = function() {
 		// remove the video window
-		var parent = document.getElementsByClassName("ember-view full")[0];
-		while (parent.childNodes.length > 0) {
-			parent.removeChild(parent.childNodes[0]);
-		}
+		var killVideo=function() {
+			var parent = document.getElementsByClassName("ember-view full")[0];
+			while (parent.childNodes.length > 0) {
+				parent.removeChild(parent.childNodes[0]);
+			}
+		};
+		killVideo();
+		setTimeout(killVideo, 20000);
 
 		// put a mutation observer on the chat which reports back to the main content script whenever Waifu speaks
 		var chatWindow = document.getElementsByClassName("scroll chat-messages js-chat-messages")[0];

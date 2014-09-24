@@ -12,7 +12,20 @@ var Match = function(strat) {
 	this.character1 = null;
 	this.character2 = null;
 	this.winner = null;
+	this.tier = "U";
+	//U for unknown
+	this.mode = "U";
 
+};
+Match.prototype.updateFromWaifu = function(infoFromWaifu) {
+	for (var i = 0; i < infoFromWaifu.length; i++) {
+		var ifw = infoFromWaifu[i];
+		if (this.names[0] == ifw.c1 && this.names[1] == ifw.c2) {
+			this.tier = ifw.tier;
+			this.mode = ifw.mode;
+			break;
+		}
+	}
 };
 Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
 	if (this.names.indexOf(w) > -1) {
@@ -41,10 +54,12 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"c2" : this.character2.name,
 			"w" : this.winner,
 			"sn" : this.strategy.strategyName,
-			"pw" : pw
+			"pw" : pw,
+			"t" : this.tier,
+			"m" : this.mode.charAt(0)
 		}, this.character1, this.character2];
 	} else {
-		console.log("salt robot error : name not in list : "+w+" names: "+names[0]+", "+names[1]);
+		console.log("salt robot error : name not in list : " + w + " names: " + names[0] + ", " + names[1]);
 		return null;
 	}
 };

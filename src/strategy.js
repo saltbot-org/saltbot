@@ -11,19 +11,20 @@ var Strategy = function(sn) {
 	this.totals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
 	var s = this;
 	this.getWinner = function(ss) {
-		var self = s;
-		var newTotals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
-		var winner = null;
-		if (self.abstain == true) {
-			//special way to get winner for strategies which can abstain
-			return ss.getWinner();
-		}
-		if (newTotals > this.totals) {
-			winner = self.prediction;
-		} else if (newTotals <= self.totals) {
-			winner = (self.prediction == self.p1name) ? self.p2name : self.p1name;
-		}
-		return winner;
+		// var self = s;
+		// var newTotals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
+		// var winner = null;
+		// if (self.abstain == true) {
+		//	// special way to get winner for strategies which can abstain
+			// return ss.getWinner();
+		// }
+		return ss.getWinner();
+		// if (newTotals > this.totals) {
+			// winner = self.prediction;
+		// } else if (newTotals <= self.totals) {
+			// winner = (self.prediction == self.p1name) ? self.p2name : self.p1name;
+		// }
+		// return winner;
 	};
 };
 
