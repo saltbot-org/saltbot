@@ -59,7 +59,7 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"m" : this.mode.charAt(0)
 		}, this.character1, this.character2];
 	} else {
-		console.log("salt robot error : name not in list : " + w + " names: " + names[0] + ", " + names[1]);
+		console.log("-\nsalt robot error : name not in list : " + w + " names: " + this.names[0] + ", " + this.names[1]);
 		return null;
 	}
 };

@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				id : 'cvs',
 				data : [dataCT, dataMW, dataMWC],
-
 				options : {
 					background : {
 						barcolor1 : 'white',

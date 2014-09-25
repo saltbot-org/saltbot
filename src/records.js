@@ -31,10 +31,10 @@ var pr = function() {
 			var removeTeamMatches = true;
 			if (removeTeamMatches) {
 				var goodMatches = [];
-				
+
 				for (var i = 0; i < results.matches_v1.length; i++) {
 					var match = results.matches_v1[i];
-					if (match.c1.toLowerCase().indexOf("team")==-1 && match.c2.toLowerCase().indexOf("team")==-1 ) {
+					if (match.c1.toLowerCase().indexOf("team") == -1 && match.c2.toLowerCase().indexOf("team") == -1) {
 						goodMatches.push(match);
 					}
 				}
@@ -145,7 +145,12 @@ var er = function() {
 		var lines = [];
 		for (var i = 0; i < results.matches_v1.length; i++) {
 			var match = results.matches_v1[i];
-			lines.push(match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + "\n");
+			var record = match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + ",";
+			record += (match.hasOwnProperty("t")) ? match.t : "U";
+			record += ",";
+			record += (match.hasOwnProperty("m")) ? match.m : "U";
+			record += "\n";
+			lines.push(record);
 		}
 
 		var time = new Date();
@@ -160,6 +165,7 @@ var ir = function(f) {
 	var matchRecords = [];
 	var characterRecords = [];
 	var namesOfCharactersWhoAlreadyHaveRecords = [];
+	var numberOfProperties = 7;
 
 	var lines = f.split("\n");
 	for (var i = 0; i < lines.length; i++) {
@@ -169,8 +175,10 @@ var ir = function(f) {
 		var w = null;
 		var sn = null;
 		var pw = null;
+		var t = null;
+		var m = null;
 		for (var j = 0; j < match.length; j++) {
-			switch(j % 5) {
+			switch(j % numberOfProperties) {
 			case 0:
 				c1 = match[j];
 				break;
@@ -185,12 +193,20 @@ var ir = function(f) {
 				break;
 			case 4:
 				pw = match[j];
+				break;
+			case 5:
+				t = match[j];
+				break;
+			case 6:
+				m = match[j];
 				var mObj = {
 					"c1" : c1,
 					"c2" : c2,
 					"w" : w,
 					"sn" : sn,
-					"pw" : pw
+					"pw" : pw,
+					"t" : t,
+					"m" : m
 				};
 				matchRecords.push(mObj);
 
@@ -256,11 +272,4 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		break;
 	}
 });
-
-
-
-
-
-
-
 

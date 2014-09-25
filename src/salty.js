@@ -43,6 +43,11 @@ var Controller = function() {
 	this.currentMatch = null;
 	this.statusScanner = new StatusScanner();
 	this.infoFromWaifu = [];
+	this.lastWinnerFromWaifuAnnouncement = null;
+	var attemptsToProcess = 0;
+	var maxAttempts = 3;
+	var timerInterval = 3000;
+
 	var self = this;
 
 	var debugMode = true;
@@ -66,7 +71,17 @@ var Controller = function() {
 			//Deal with old match
 			if (self.currentMatch != null) {
 				var winner = self.statusScanner.getWinner();
+				//backup method to get winner is scanning the chat
+				if (winner == null)
+					if (self.lastWinnerFromWaifuAnnouncement == self.currentMatch.names[0] || self.lastWinnerFromWaifuAnnouncement == self.currentMatch.names[1])
+						winner = self.lastWinnerFromWaifuAnnouncement;
+				//wait a little bit longer before giving up on this match getting processed
+				if (winner == null && attemptsToProcess < maxAttempts) {
+					attemptsToProcess += 1;
+					return;
+				}
 				if (winner != null) {
+					attemptsToProcess = 0;
 					//before processing match, add tier information if we have it
 					self.currentMatch.updateFromWaifu(self.infoFromWaifu);
 					var records = self.currentMatch.getRecords(winner);
@@ -127,7 +142,7 @@ var Controller = function() {
 							'characters_v1' : characters_v1
 						}, function() {
 							if (debugMode) {
-								console.log("-\nrecords saved, processed so far: " + mp);
+								console.log("-\nrecords saved, matches this cycle: " + mp);
 							}
 							if (mp >= mbr) {
 								location.reload();
@@ -135,7 +150,13 @@ var Controller = function() {
 						});
 					});
 
+				} else {
+					//if we failed to get a winner and record the match, still count the match towards the reset number
+					console.log("-\nfailed to determine winner, matches this cycle: " + matchesProcessed);
+					if (matchesProcessed >= matchesBeforeReset)
+						location.reload();
 				}
+				//
 				matchesProcessed += 1;
 			}
 
@@ -156,7 +177,7 @@ var Controller = function() {
 			bettingAvailable = false;
 		}
 
-	}, 3000);
+	}, timerInterval);
 
 };
 // Controller.prototype.receiveMessageFromTwitch = ;
@@ -208,8 +229,7 @@ if (window.location.href == "http://www.saltybet.com/") {
 					self.infoFromWaifu.splice(0, 1);
 				}
 			} else if (message.indexOf(winMessageIndicator) > -1) {
-				var winnerName = message.split(winMessageIndicator)[0];
-				//do stuff
+				self.lastWinnerFromWaifuAnnouncement = message.split(winMessageIndicator)[0];
 			}
 		}
 	});
