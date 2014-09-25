@@ -44,6 +44,7 @@ var Controller = function() {
 	this.statusScanner = new StatusScanner();
 	this.infoFromWaifu = [];
 	this.lastWinnerFromWaifuAnnouncement = null;
+	this.odds = null;
 	var attemptsToProcess = 0;
 	var maxAttempts = 3;
 	var timerInterval = 3000;
@@ -73,8 +74,10 @@ var Controller = function() {
 				var winner = self.statusScanner.getWinner();
 				//backup method to get winner is scanning the chat
 				if (winner == null)
-					if (self.lastWinnerFromWaifuAnnouncement == self.currentMatch.names[0] || self.lastWinnerFromWaifuAnnouncement == self.currentMatch.names[1])
-						winner = self.lastWinnerFromWaifuAnnouncement;
+					winner = self.lastWinnerFromWaifuAnnouncement;
+				//safety check
+				if (winner != self.currentMatch.names[0] && winner != self.currentMatch.names[1])
+					winner = null;
 				//wait a little bit longer before giving up on this match getting processed
 				if (winner == null && attemptsToProcess < maxAttempts) {
 					attemptsToProcess += 1;
@@ -83,15 +86,17 @@ var Controller = function() {
 				if (winner != null) {
 					attemptsToProcess = 0;
 					//before processing match, add tier information if we have it
-					self.currentMatch.updateFromWaifu(self.infoFromWaifu);
+					self.currentMatch.update(self.infoFromWaifu, self.odds);
 					var records = self.currentMatch.getRecords(winner);
 					var mr = records[0];
 					var c1 = records[1];
 					var c2 = records[2];
-					console.log("match results: " + "\ncharacter 1: " + mr.c1 + "\ncharacter 2: " + mr.c2 + "\nwinner: " + mr.w + "\nstrategy: " + mr.sn + "\nprediction: " + mr.pw + "\ntier: " + mr.t + "\nmode: " + mr.m);
-					var matches_v1 = null;
-					var characters_v1 = null;
+
+					console.log("match results: " + "\ncharacter 1: " + mr.c1 + "\ncharacter 2: " + mr.c2 + "\nwinner: " + mr.w + "\nstrategy: " + mr.sn + "\nprediction: " + mr.pw + "\ntier: " + mr.t + "\nmode: " + mr.m + "\nodds: " + mr.o);
+
 					chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
+						var matches_v1 = null;
+						var characters_v1 = null;
 						var mbr = matchesBeforeReset;
 						var mp = matchesProcessed;
 						//store new match record
@@ -199,9 +204,11 @@ if (window.location.href == "http://www.saltybet.com/") {
 		if ( typeof message === "string") {
 			var winMessageIndicator = " wins";
 			var newMatchIndicator = "Bets are OPEN for ";
+			var betsLockedIndicator = "Bets are locked";
 
 			//check for new match
 			if (message.indexOf(newMatchIndicator) > -1) {
+				//examples:
 				//Bets are OPEN for Rydia of mist vs Zatanna EX3! (B Tier) (matchmaking) www.saltybet.com
 				// Bets are OPEN for Valdoll vs Adam! (A Tier) tournament bracket
 				//Bets are OPEN for Team RyokoAndHerTrainingPartner vs Team Aliens! (S / S Tier) (Requested by Pendaflex) (exhibitions) www.saltybet.com
@@ -230,6 +237,18 @@ if (window.location.href == "http://www.saltybet.com/") {
 				}
 			} else if (message.indexOf(winMessageIndicator) > -1) {
 				self.lastWinnerFromWaifuAnnouncement = message.split(winMessageIndicator)[0];
+			} else if (message.indexOf(betsLockedIndicator) > -1) {
+				setTimeout(function() {
+					//save the odds
+					try {
+						var oddsBox = document.getElementById("lastbet");
+						var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 1].innerHTML;
+						var c2Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
+						self.odds = "" + c1Odds + ":" + c2Odds;
+					} catch(e) {
+						self.odds = null;
+					}
+				}, 10000);
 			}
 		}
 	});

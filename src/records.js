@@ -145,10 +145,16 @@ var er = function() {
 		var lines = [];
 		for (var i = 0; i < results.matches_v1.length; i++) {
 			var match = results.matches_v1[i];
+			//Temporary upgrade code:
+			if (match.w != 0 && match.w != 1) {
+				match.w = (match.w == match.c1) ? 0 : 1;
+			}
 			var record = match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + ",";
 			record += (match.hasOwnProperty("t")) ? match.t : "U";
 			record += ",";
 			record += (match.hasOwnProperty("m")) ? match.m : "U";
+			record += ",";
+			record += (match.hasOwnProperty("o")) ? match.o : "U";
 			record += "\n";
 			lines.push(record);
 		}
@@ -165,7 +171,8 @@ var ir = function(f) {
 	var matchRecords = [];
 	var characterRecords = [];
 	var namesOfCharactersWhoAlreadyHaveRecords = [];
-	var numberOfProperties = 7;
+	//numberOfProperties refers to c1, c2, w, sn, etc.
+	var numberOfProperties = 8;
 
 	var lines = f.split("\n");
 	for (var i = 0; i < lines.length; i++) {
@@ -177,6 +184,7 @@ var ir = function(f) {
 		var pw = null;
 		var t = null;
 		var m = null;
+		var o = null;
 		for (var j = 0; j < match.length; j++) {
 			switch(j % numberOfProperties) {
 			case 0:
@@ -199,6 +207,9 @@ var ir = function(f) {
 				break;
 			case 6:
 				m = match[j];
+				break;
+			case 7:
+				o = match[j];
 				var mObj = {
 					"c1" : c1,
 					"c2" : c2,
@@ -206,7 +217,8 @@ var ir = function(f) {
 					"sn" : sn,
 					"pw" : pw,
 					"t" : t,
-					"m" : m
+					"m" : m,
+					"o" : o
 				};
 				matchRecords.push(mObj);
 
@@ -215,10 +227,8 @@ var ir = function(f) {
 					if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
 						cobject = {
 							"name" : cname,
-							"wins" : 0,
-							"losses" : 0,
-							"tier" : null,
-							"extras" : []
+							"wins" : [],
+							"losses" : []
 						};
 						characterRecords.push(cobject);
 						namesOfCharactersWhoAlreadyHaveRecords.push(cname);
@@ -233,12 +243,12 @@ var ir = function(f) {
 				};
 				var c1Obj = getCharacter(c1);
 				var c2Obj = getCharacter(c2);
-				if (mObj.w == c1Obj.name) {
-					c1Obj.wins += 1;
-					c2Obj.losses += 1;
-				} else if (w == c2Obj.name) {
-					c2Obj.wins += 1;
-					c1Obj.losses += 1;
+				if (mObj.w == 0) {
+					c1Obj.wins.push(mObj.t);
+					c2Obj.losses.push(mObj.t);
+				} else if (w == 1) {
+					c2Obj.wins.push(mObj.t);
+					c1Obj.losses.push(mObj.t);
 				}
 
 				break;

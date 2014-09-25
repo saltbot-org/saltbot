@@ -1,5 +1,3 @@
-
-
 var Strategy = function(sn) {
 	this.btn10 = document.getElementById("interval1");
 	this.btnP1 = document.getElementById("player1");
@@ -11,20 +9,7 @@ var Strategy = function(sn) {
 	this.totals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
 	var s = this;
 	this.getWinner = function(ss) {
-		// var self = s;
-		// var newTotals = parseInt(document.getElementById("balance").innerHTML.replace(/,/g, ''));
-		// var winner = null;
-		// if (self.abstain == true) {
-		//	// special way to get winner for strategies which can abstain
-			// return ss.getWinner();
-		// }
 		return ss.getWinner();
-		// if (newTotals > this.totals) {
-			// winner = self.prediction;
-		// } else if (newTotals <= self.totals) {
-			// winner = (self.prediction == self.p1name) ? self.p2name : self.p1name;
-		// }
-		// return winner;
 	};
 };
 
@@ -50,14 +35,14 @@ var MoreWins = function() {
 		var c1 = info.character1;
 		var c2 = info.character2;
 		var p;
-		if (c1.wins != c2.wins) {
-			p = (c1.wins > c2.wins) ? c1.name : c2.name;
-			console.log(p + " has more wins; MW betting " + p);
+		if (c1.wins.length != c2.wins.length) {
+			p = (c1.wins.length > c2.wins.length) ? c1.name : c2.name;
+			console.log(p + " has more wins (" + c1.wins.length + ":" + c2.wins.length + "); MW betting " + p);
 			self.prediction = p;
 			return p;
-		} else if (c1.losses != c2.losses) {
-			p = (c1.losses < c2.losses) ? c1.name : c2.name;
-			console.log(p + " has less losses; MW betting " + p);
+		} else if (c1.losses.length != c2.losses.length) {
+			p = (c1.losses.length < c2.losses.length) ? c1.name : c2.name;
+			console.log(p + " has less losses (" + c1.losses.length + ":" + c2.losses.length + "); MW betting " + p);
 			self.prediction = p;
 			return p;
 		} else {
@@ -80,23 +65,23 @@ var MoreWinsCautious = function() {
 		var c1 = info.character1;
 		var c2 = info.character2;
 		var p;
-		if ((c1.wins == 0 && c1.losses == 0) || (c2.wins == 0 && c2.losses == 0)) {
-			console.log("-\nMWC has insufficient information (1), canceling bet");
+		if ((c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
+			console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c2.wins.length + ")(" + c1.losses.length + ":" + c2.losses.length + "), canceling bet");
 			self.abstain = true;
 			return null;
 		}
-		if (c1.wins != c2.wins) {
-			p = (c1.wins > c2.wins) ? c1.name : c2.name;
-			console.log(p + " has more wins; MWC betting " + p);
+		if (c1.wins.length != c2.wins.length) {
+			p = (c1.wins.length > c2.wins.length) ? c1.name : c2.name;
+			console.log(p + " has more wins (" + c1.wins.length + ":" + c2.wins.length + "); MWC betting " + p);
 			self.prediction = p;
 			return p;
-		} else if (c1.losses != c2.losses) {
-			p = (c1.losses < c2.losses) ? c1.name : c2.name;
-			console.log(p + " has less losses; MWC betting " + p);
+		} else if (c1.losses.length != c2.losses.length) {
+			p = (c1.losses.length < c2.losses.length) ? c1.name : c2.name;
+			console.log(p + " has less losses (" + c1.losses.length + ":" + c2.losses.length + "); MWC betting " + p);
 			self.prediction = p;
 			return p;
 		} else {
-			console.log("-\nMWC has insufficient information (2), canceling bet");
+			console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c2.wins.length + ")(" + c1.losses.length + ":" + c2.losses.length + "), canceling bet");
 			self.abstain = true;
 			return null;
 		}
@@ -104,3 +89,13 @@ var MoreWinsCautious = function() {
 };
 MoreWinsCautious.prototype = Strategy;
 
+var Observer = function() {
+	this.base = Strategy;
+	this.base("obs");
+	this.abstain = true;
+	this.execute = function(info) {
+		console.log("-\nOBS does not bet");
+		return null;
+	};
+};
+Observer.prototype = Strategy;

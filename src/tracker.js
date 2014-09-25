@@ -1,9 +1,7 @@
 var Character = function(name) {
 	this.name = name;
-	this.wins = 0;
-	this.losses = 0;
-	this.tier = null;
-	this.extras = [];
+	this.wins = [];
+	this.losses = [];
 };
 
 var Match = function(strat) {
@@ -15,9 +13,10 @@ var Match = function(strat) {
 	this.tier = "U";
 	//U for unknown
 	this.mode = "U";
+	this.odds = "U";
 
 };
-Match.prototype.updateFromWaifu = function(infoFromWaifu) {
+Match.prototype.update = function(infoFromWaifu, odds) {
 	for (var i = 0; i < infoFromWaifu.length; i++) {
 		var ifw = infoFromWaifu[i];
 		if (this.names[0] == ifw.c1 && this.names[1] == ifw.c2) {
@@ -26,20 +25,22 @@ Match.prototype.updateFromWaifu = function(infoFromWaifu) {
 			break;
 		}
 	}
+	if (odds != null)
+		this.odds = odds;
 };
 Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
 	if (this.names.indexOf(w) > -1) {
 		if (w == this.character1.name) {
-			this.character1.wins += 1;
-			this.character2.losses += 1;
+			this.character1.wins.push(this.tier);
+			this.character2.losses.push(this.tier);
 		} else if (w == this.character2.name) {
-			this.character2.wins += 1;
-			this.character1.losses += 1;
+			this.character2.wins.push(this.tier);
+			this.character1.losses.push(this.tier);
 		}
-		this.winner = w;
+		this.winner = (w == this.character1.name)?0:1;
 
 		var pw = null;
-		if (this.strategy instanceof MoreWinsCautious) {
+		if (this.strategy instanceof MoreWinsCautious || this.strategy instanceof Observer) {
 			if (this.strategy.abstain) {
 				pw = "a";
 			} else {
@@ -56,7 +57,8 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"sn" : this.strategy.strategyName,
 			"pw" : pw,
 			"t" : this.tier,
-			"m" : this.mode.charAt(0)
+			"m" : this.mode.charAt(0), 
+			"o": this.odds
 		}, this.character1, this.character2];
 	} else {
 		console.log("-\nsalt robot error : name not in list : " + w + " names: " + this.names[0] + ", " + this.names[1]);
