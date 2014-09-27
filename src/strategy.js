@@ -37,12 +37,12 @@ var MoreWins = function() {
 		var p;
 		if (c1.wins.length != c2.wins.length) {
 			p = (c1.wins.length > c2.wins.length) ? c1.name : c2.name;
-			console.log(p + " has more wins (" + c1.wins.length + ":" + c2.wins.length + "); MW betting " + p);
+			console.log(p + " has more wins (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MW betting " + p);
 			self.prediction = p;
 			return p;
 		} else if (c1.losses.length != c2.losses.length) {
 			p = (c1.losses.length < c2.losses.length) ? c1.name : c2.name;
-			console.log(p + " has less losses (" + c1.losses.length + ":" + c2.losses.length + "); MW betting " + p);
+			console.log(p + " has less losses (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MW betting " + p);
 			self.prediction = p;
 			return p;
 		} else {
@@ -66,22 +66,22 @@ var MoreWinsCautious = function() {
 		var c2 = info.character2;
 		var p;
 		if ((c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
-			console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c2.wins.length + ")(" + c1.losses.length + ":" + c2.losses.length + "), canceling bet");
+			console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
 			self.abstain = true;
 			return null;
 		}
 		if (c1.wins.length != c2.wins.length) {
 			p = (c1.wins.length > c2.wins.length) ? c1.name : c2.name;
-			console.log(p + " has more wins (" + c1.wins.length + ":" + c2.wins.length + "); MWC betting " + p);
+			console.log(p + " has more wins (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MWC betting " + p);
 			self.prediction = p;
 			return p;
 		} else if (c1.losses.length != c2.losses.length) {
 			p = (c1.losses.length < c2.losses.length) ? c1.name : c2.name;
-			console.log(p + " has less losses (" + c1.losses.length + ":" + c2.losses.length + "); MWC betting " + p);
+			console.log(p + " has less losses (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MWC betting " + p);
 			self.prediction = p;
 			return p;
 		} else {
-			console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c2.wins.length + ")(" + c1.losses.length + ":" + c2.losses.length + "), canceling bet");
+			console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
 			self.abstain = true;
 			return null;
 		}

@@ -16,7 +16,7 @@ var Match = function(strat) {
 	this.odds = "U";
 
 };
-Match.prototype.update = function(infoFromWaifu, odds) {
+Match.prototype.update = function(infoFromWaifu, odds) { 
 	for (var i = 0; i < infoFromWaifu.length; i++) {
 		var ifw = infoFromWaifu[i];
 		if (this.names[0] == ifw.c1 && this.names[1] == ifw.c2) {
@@ -44,10 +44,10 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			if (this.strategy.abstain) {
 				pw = "a";
 			} else {
-				pw = (this.strategy.prediction == this.winner) ? "t" : "f";
+				pw = (this.strategy.prediction == this.names[this.winner]) ? "t" : "f";
 			}
 		} else {
-			pw = (this.strategy.prediction == this.winner) ? "t" : "f";
+			pw = (this.strategy.prediction == this.names[this.winner]) ? "t" : "f";
 		}
 
 		return [{

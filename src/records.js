@@ -16,7 +16,7 @@ var dr = function() {
 			console.log("-\ncharacter records found\nnumber of character records: " + results.characters_v1.length + "-\n");
 			for (var i = 0; i < results.characters_v1.length; i++) {
 				var character = results.characters_v1[i];
-				console.log(character.name + "\t\t\t\twins: " + character.wins + ",\t\t\t\tlosses: " + character.losses);
+				console.log(character.name + "\t\t\t\twins: " + character.wins.length + ",\t\t\t\tlosses: " + character.losses.length);
 			}
 		}
 
@@ -28,7 +28,23 @@ var pr = function() {
 		console.log("-\npurifying records...");
 		var potentialDuplicates = [];
 		if (results.hasOwnProperty("matches_v1") && results.hasOwnProperty("characters_v1")) {
-			var removeTeamMatches = true;
+			var correctReverseOdds=true;
+			if (correctReverseOdds){
+					for (var i = 0; i < results.matches_v1.length; i++) {
+					var odds=results.matches_v1[i].o;
+					if(odds!="U"){
+						var oddsArr=odds.split(":");
+						results.matches_v1[i].o=oddsArr[1]+":"+oddsArr[0];
+					}
+				}
+				chrome.storage.local.set({
+					'matches_v1' : results.matches_v1
+				}, function() {
+					console.log("-\nrecords purified (correctReverseOdds)");
+				});		
+			}
+			
+			var removeTeamMatches = false;
 			if (removeTeamMatches) {
 				var goodMatches = [];
 
@@ -118,12 +134,12 @@ var pr = function() {
 					for (var k = 0; k < results.matches_v1.length; k++) {
 						var match = results.matches_v1[k];
 
-						if (match.w == c1Object.name) {
+						if (match.w == 0) {
 							c1totalWins += 1;
 							c2totalLosses += 1;
 							console.log("-\n in match" + k + ": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
 						}
-						if (match.w == c2Object.name) {
+						if (match.w == 1) {
 							c2totalWins += 1;
 							c1totalLosses += 1;
 							console.log("-\n in match" + k + ": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);

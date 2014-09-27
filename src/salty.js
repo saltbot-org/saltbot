@@ -165,7 +165,7 @@ var Controller = function() {
 				matchesProcessed += 1;
 			}
 
-			self.currentMatch = new Match(new MoreWinsCautious());
+			self.currentMatch = new Match(new CoinToss());
 			//skip team matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") == -1 && self.currentMatch.names[1].toLowerCase().indexOf("team") == -1) {
 				self.currentMatch.init();
@@ -242,8 +242,8 @@ if (window.location.href == "http://www.saltybet.com/") {
 					//save the odds
 					try {
 						var oddsBox = document.getElementById("lastbet");
-						var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 1].innerHTML;
-						var c2Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
+						var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
+						var c2Odds = oddsBox.childNodes[oddsBox.childNodes.length - 1].innerHTML;
 						self.odds = "" + c1Odds + ":" + c2Odds;
 					} catch(e) {
 						self.odds = null;
