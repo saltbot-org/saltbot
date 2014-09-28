@@ -7,7 +7,11 @@
 				min-width:400px;
 				overflow-x:hidden;
 			}
+			#player1, #player2 {
+				display:none;
+			}
 		</style>
+		<script type="text/javascript" src="strategy.js"></script>
 		<script type="text/javascript" src="popup.js"></script>
 		<script type="text/javascript" src="lib/jquery.min.js"></script>
 		<script type="text/javascript" src="lib/RGraph.common.core.js" ></script>
@@ -15,16 +19,28 @@
 	</head>
 	<body>
 		<h1>SaltBot Controls</h1>
+		<span id="player1" value="1337">These are here for compatibility</span>
+		<span id="player2" value="1337">with records.js.</span>
 		<input type="button" value="Debug Records" id="bdr">
-		<br>
 		<input type="button" value="Purify Records" id="bpr">
 		<br>
 		<input type="button" value="Export Records" id="ber">
-		<br>
 		<span>Import Records</span>
 		<input type="file" value="Import Records" id="bir">
 		<br>
 		<input type="button" value="Charts" id="bsc">
+		<label>
+			<input type="checkbox" id="ct" checked>
+			ct</label>
+		<label>
+			<input type="checkbox" id="mw" checked>
+			mw</label>
+		<label>
+			<input type="checkbox" id="mwc" checked>
+			mwc</label>
+		<label>
+			<input type="checkbox" id="rb" checked>
+			rb</label>
 		<canvas id="cvs" width="400" height="250">
 			[No canvas support]
 		</canvas>

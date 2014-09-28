@@ -28,22 +28,22 @@ var pr = function() {
 		console.log("-\npurifying records...");
 		var potentialDuplicates = [];
 		if (results.hasOwnProperty("matches_v1") && results.hasOwnProperty("characters_v1")) {
-			var correctReverseOdds=true;
-			if (correctReverseOdds){
-					for (var i = 0; i < results.matches_v1.length; i++) {
-					var odds=results.matches_v1[i].o;
-					if(odds!="U"){
-						var oddsArr=odds.split(":");
-						results.matches_v1[i].o=oddsArr[1]+":"+oddsArr[0];
+			var correctReverseOdds = true;
+			if (correctReverseOdds) {
+				for (var i = 0; i < results.matches_v1.length; i++) {
+					var odds = results.matches_v1[i].o;
+					if (odds != "U") {
+						var oddsArr = odds.split(":");
+						results.matches_v1[i].o = oddsArr[1] + ":" + oddsArr[0];
 					}
 				}
 				chrome.storage.local.set({
 					'matches_v1' : results.matches_v1
 				}, function() {
 					console.log("-\nrecords purified (correctReverseOdds)");
-				});		
+				});
 			}
-			
+
 			var removeTeamMatches = false;
 			if (removeTeamMatches) {
 				var goodMatches = [];
@@ -186,9 +186,28 @@ var ir = function(f) {
 	var matchRecords = [];
 	var characterRecords = [];
 	var namesOfCharactersWhoAlreadyHaveRecords = [];
+	var getCharacter = function(cname) {
+		var cobject = null;
+		if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
+			cobject = {
+				"name" : cname,
+				"wins" : [],
+				"losses" : []
+			};
+			characterRecords.push(cobject);
+			namesOfCharactersWhoAlreadyHaveRecords.push(cname);
+		} else {
+			for (var k = 0; k < characterRecords.length; k++) {
+				if (cname == characterRecords[k].name) {
+					cobject = characterRecords[k];
+				}
+			}
+		}
+		return cobject;
+	};
 	//numberOfProperties refers to c1, c2, w, sn, etc.
 	var numberOfProperties = 9;
-
+	
 	var lines = f.split("\n");
 	for (var i = 0; i < lines.length; i++) {
 		var match = lines[i].split(",");
@@ -200,7 +219,7 @@ var ir = function(f) {
 		var t = null;
 		var m = null;
 		var o = null;
-		var ts=null;
+		var ts = null;
 		for (var j = 0; j < match.length; j++) {
 			switch(j % numberOfProperties) {
 			case 0:
@@ -227,7 +246,7 @@ var ir = function(f) {
 			case 7:
 				o = parseInt(match[j]);
 				break;
-				case 8:
+			case 8:
 				ts = match[j];
 				var mObj = {
 					"c1" : c1,
@@ -237,30 +256,11 @@ var ir = function(f) {
 					"pw" : pw,
 					"t" : t,
 					"m" : m,
-					"o" : o, 
+					"o" : o,
 					"ts" : ts
 				};
 				matchRecords.push(mObj);
 
-				var getCharacter = function(cname) {
-					var cobject = null;
-					if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
-						cobject = {
-							"name" : cname,
-							"wins" : [],
-							"losses" : []
-						};
-						characterRecords.push(cobject);
-						namesOfCharactersWhoAlreadyHaveRecords.push(cname);
-					} else {
-						for (var k = 0; k < characterRecords.length; k++) {
-							if (cname == characterRecords[k].name) {
-								cobject = characterRecords[k];
-							}
-						}
-					}
-					return cobject;
-				};
 				var c1Obj = getCharacter(c1);
 				var c2Obj = getCharacter(c2);
 				if (mObj.w == 0) {

@@ -96,7 +96,7 @@ var Controller = function() {
 					var c2 = records[2];
 
 					console.log("match results: " + "\ncharacter 1: " + mr.c1 + "\ncharacter 2: " + mr.c2 + "\nwinner: " + mr.w + "\nstrategy: " + mr.sn + "\tprediction: " + mr.pw + "\ntier: " + mr.t + 
-					"\tmode: " + mr.m + "\nodds: " + mr.o+ "\ttime: " + mr.ts);
+					"\t\tmode: " + mr.m + "\nodds: " + mr.o+ "\ttime: " + mr.ts);
 
 					chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
 						var matches_v1 = null;

@@ -43,39 +43,138 @@ document.addEventListener('DOMContentLoaded', function() {
 			var dataCT = [];
 			var dataMW = [];
 			var dataMWC = [];
+			var dataRB = [];
 			var matches = results.matches_v1;
-			var correct = [0, 0, 0];
-			var totalBettedOn = [0, 0, 0];
+			var correct = [0, 0, 0, 0];
+			var totalBettedOn = [0, 0, 0, 0];
+			//A single instance of each strategy will work just fine
+			var ct = new CoinToss();
+			ct.debug = false;
+			var mw = new MoreWins();
+			mw.debug = false;
+			var mwc = new MoreWinsCautious();
+			mwc.debug = false;
+			var rb = new RatioBasic();
+			rb.debug = false;
+			var ctChecked = document.getElementById("ct").checked;
+			var mwChecked = document.getElementById("mw").checked;
+			var mwcChecked = document.getElementById("mwc").checked;
+			var rbChecked = document.getElementById("rb").checked;
+			var ctTotalPercentCorrect=0;
+			var mwTotalPercentCorrect=0;
+			var mwcTotalPercentCorrect=0;
+			var rbTotalPercentCorrect=0;
+			// setup for the graph
+			var arrayOfArrays = [];
+			if (ctChecked)
+				arrayOfArrays.push(dataCT);
+			if (mwChecked)
+				arrayOfArrays.push(dataMW);
+			if (mwcChecked)
+				arrayOfArrays.push(dataMWC);
+			if (rbChecked)
+				arrayOfArrays.push(dataRB);
+
+			// this is copied from records.js, do something about that
+			var characterRecords = [];
+			var namesOfCharactersWhoAlreadyHaveRecords = [];
+			var getCharacter = function(cname) {
+				var cobject = null;
+				if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
+					cobject = {
+						"name" : cname,
+						"wins" : [],
+						"losses" : []
+					};
+					characterRecords.push(cobject);
+					namesOfCharactersWhoAlreadyHaveRecords.push(cname);
+				} else {
+					for (var k = 0; k < characterRecords.length; k++) {
+						if (cname == characterRecords[k].name) {
+							cobject = characterRecords[k];
+						}
+					}
+				}
+				return cobject;
+			};
+
+			// process matches
 			for (var i = 0; i < matches.length; i++) {
-				var percentCorrect;
+				var info = {
+					"character1" : getCharacter(matches[i].c1),
+					"character2" : getCharacter(matches[i].c2)
+				};
+
+				mwc.abstain = false;
+				rb.abstain = false;
+				var actualWinner = (matches[i].w == 0) ? matches[i].c1 : matches[i].c2;
+
+				var ctp = null;
+				var mwp = null;
+				var mwcp = null;
+				var rbp = null;
+				if (ctChecked)
+					ctp = ct.execute(info);
+				if (mwChecked)
+					mwp = mw.execute(info);
+				if (mwcChecked)
+					mwcp = mwc.execute(info);
+				if (rbChecked)
+					rbp = rb.execute(info);
+
+				// now update characters
+				if (matches[i].w == 0) {
+					info.character1.wins.push(matches[i].t);
+					info.character2.losses.push(matches[i].t);
+				} else if (matches[i].w == 1) {
+					info.character2.wins.push(matches[i].t);
+					info.character1.losses.push(matches[i].t);
+				}
+
 				
-				switch(matches[i].sn) {
-				case "ct":
-					correct[0] += (matches[i].pw == "t") ? 1 : 0;
+
+				// coin toss
+				if (ctChecked) {
+					correct[0] += (ctp == actualWinner) ? 1 : 0;
 					totalBettedOn[0] += 1;
-					percentCorrect = correct[0] / totalBettedOn[0] * 100;
-					dataCT.push([totalBettedOn[0], percentCorrect, "red"]);
-					break;
-				case "mw":
-					correct[1] += (matches[i].pw == "t") ? 1 : 0;
+					ctTotalPercentCorrect = correct[0] / totalBettedOn[0] * 100;
+					dataCT.push([totalBettedOn[0], ctTotalPercentCorrect, "red"]);
+				}
+				// more wins
+				if (mwChecked) {
+					correct[1] += (mwp == actualWinner) ? 1 : 0;
 					totalBettedOn[1] += 1;
-					percentCorrect = correct[1] / totalBettedOn[1] * 100;
-					dataMW.push([totalBettedOn[1], percentCorrect, "purple"]);
-					break;
-				case "mwc":
-					if (matches[i].pw == "a")
-					continue;correct[2] += (matches[i].pw == "t") ? 1 : 0;
-					totalBettedOn[2] += 1;
-					percentCorrect = correct[2] / totalBettedOn[2] * 100;
-					dataMWC.push([totalBettedOn[2], percentCorrect, "blue"]);
-					break;
+					mwTotalPercentCorrect = correct[1] / totalBettedOn[1] * 100;
+					dataMW.push([totalBettedOn[1], mwTotalPercentCorrect, "purple"]);
+				}
+				// more wins  cautious
+				if (mwcChecked) {
+					if (!mwc.abstain) {
+						correct[2] += (mwcp == actualWinner) ? 1 : 0;
+						totalBettedOn[2] += 1;
+						mwcTotalPercentCorrect = correct[2] / totalBettedOn[2] * 100;
+						dataMWC.push([totalBettedOn[2], mwcTotalPercentCorrect, "blue"]);
+					}
+				}
+				// ratio basic
+				if (rbChecked) {
+					if (!rb.abstain) {
+						correct[3] += (rbp == actualWinner) ? 1 : 0;
+						totalBettedOn[3] += 1;
+						rbTotalPercentCorrect = correct[3] / totalBettedOn[3] * 100;
+						dataMWC.push([totalBettedOn[3], rbTotalPercentCorrect, "green"]);
+					}
 				}
 			}
+			console.log("ct: "+ctTotalPercentCorrect);
+			console.log("mw: "+mwTotalPercentCorrect);
+			console.log("mwc: "+mwcTotalPercentCorrect);
+			console.log("rb: "+rbTotalPercentCorrect);
 			// Create the Scatter chart.
 			var scatter = new RGraph.Scatter({
 
 				id : 'cvs',
-				data : [dataCT, dataMW, dataMWC],
+				data : [dataCT, dataMW, dataMWC, dataRB],
 				options : {
 					background : {
 						barcolor1 : 'white',

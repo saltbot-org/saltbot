@@ -7,6 +7,7 @@ var Strategy = function(sn) {
 	this.p2name = this.btnP2.getAttribute("value");
 	this.strategyName = sn;
 	this.prediction = null;
+	this.debug = true;
 	var s = this;
 	this.getWinner = function(ss) {
 		return ss.getWinner();
@@ -16,10 +17,10 @@ var Strategy = function(sn) {
 var CoinToss = function() {
 	this.base = Strategy;
 	this.base("ct");
-	var s = this;
 	this.execute = function(info) {
-		var self = s;
-		var p = (Math.random() > .5) ? self.p1name : self.p2name;
+		var c1 = info.character1;
+		var c2 = info.character2;
+		var p = (Math.random() > .5) ? c1.name : c2.name;
 		self.prediction = p;
 		return p;
 	};
@@ -37,17 +38,20 @@ var MoreWins = function() {
 		var p;
 		if (c1.wins.length != c2.wins.length) {
 			p = (c1.wins.length > c2.wins.length) ? c1.name : c2.name;
-			console.log(p + " has more wins (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MW betting " + p);
+			if (this.debug)
+				console.log(p + " has more wins (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MW betting " + p);
 			self.prediction = p;
 			return p;
 		} else if (c1.losses.length != c2.losses.length) {
 			p = (c1.losses.length < c2.losses.length) ? c1.name : c2.name;
-			console.log(p + " has less losses (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MW betting " + p);
+			if (this.debug)
+				console.log(p + " has less losses (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MW betting " + p);
 			self.prediction = p;
 			return p;
 		} else {
 			p = (Math.random() > .5) ? c1.name : c2.name;
-			console.log("MW has no data for " + c1.name + " and " + c2.name + " or they're equal; MW betting randomly");
+			if (this.debug)
+				console.log("MW has no data for " + c1.name + " and " + c2.name + " or they're equal; MW betting randomly");
 			self.prediction = p;
 			return p;
 		}
@@ -66,22 +70,26 @@ var MoreWinsCautious = function() {
 		var c2 = info.character2;
 		var p;
 		if ((c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
-			console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
+			if (this.debug)
+				console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
 			self.abstain = true;
 			return null;
 		}
 		if (c1.wins.length != c2.wins.length) {
 			p = (c1.wins.length > c2.wins.length) ? c1.name : c2.name;
-			console.log(p + " has more wins (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MWC betting " + p);
+			if (this.debug)
+				console.log(p + " has more wins (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MWC betting " + p);
 			self.prediction = p;
 			return p;
 		} else if (c1.losses.length != c2.losses.length) {
 			p = (c1.losses.length < c2.losses.length) ? c1.name : c2.name;
-			console.log(p + " has less losses (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MWC betting " + p);
+			if (this.debug)
+				console.log(p + " has less losses (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "); MWC betting " + p);
 			self.prediction = p;
 			return p;
 		} else {
-			console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
+			if (this.debug)
+				console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
 			self.abstain = true;
 			return null;
 		}
@@ -103,7 +111,8 @@ var RatioBasic = function() {
 		var p;
 
 		if (c1TotalMatches < 2 || c2TotalMatches < 2) {
-			console.log("-\nRB has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
+			if (this.debug)
+				console.log("-\nRB has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
 			self.abstain = true;
 			return null;
 		}
@@ -115,17 +124,21 @@ var RatioBasic = function() {
 			c2.ratio = c2Ratio;
 			var pChar = (c1.ratio > c2.ratio) ? c1 : c2;
 			var npChar = (c1.ratio < c2.ratio) ? c1 : c2;
-			if (pChar.ratio <= 0.5 || (npChar.ratio == 0.5 && (npChar.wins.length + npChar.losses.length == 2))) {
-				console.log("-\nRB prohibited from betting on or against <51% (" + c1Ratio + "%:" + c2Ratio + "%), canceling bet");
+			// 
+			if (pChar.ratio <= 0.5|| (npChar.ratio == 0.5 && (npChar.wins.length + npChar.losses.length == 2))) {
+				if (this.debug)
+					console.log("-\nRB prohibited from betting on or against <51% (" + (c1Ratio * 100) + "% : " + (c2Ratio * 100) + "%), canceling bet");
 				self.abstain = true;
 				return null;
 			}
 			p = pChar.name;
-			console.log("-\n" + p + " has a better win percentage (" + c1Ratio + "%:" + c2Ratio + "%); RB betting " + p);
+			if (this.debug)
+				console.log("-\n" + p + " has a better win percentage (" + (c1Ratio * 100) + "% : " + (c2Ratio * 100) + "%); RB betting " + p);
 			self.prediction = p;
 			return p;
 		} else if (c1Ratio == c2Ratio) {
-			console.log("-\nRB has insufficient information (" + c1Ratio + "%:" + c2Ratio + "%), canceling bet");
+			if (this.debug)
+				console.log("-\nRB has insufficient information (" + (c1Ratio * 100) + "% : " + (c2Ratio * 100) + "%), canceling bet");
 			self.abstain = true;
 			return null;
 		}
@@ -138,7 +151,8 @@ var Observer = function() {
 	this.base("obs");
 	this.abstain = true;
 	this.execute = function(info) {
-		console.log("-\nOBS does not bet");
+		if (this.debug)
+			console.log("-\nOBS does not bet");
 		return null;
 	};
 };

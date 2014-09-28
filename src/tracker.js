@@ -28,8 +28,15 @@ Match.prototype.update = function(infoFromWaifu, odds, timeInfo) {
 	}
 	if (odds != null)
 		this.odds = odds;
+
 	if (timeInfo.ticks > 0)
 		this.time = timeInfo.ticks * timeInfo.interval / 1000;
+	//Ignore times from matches that occurred before changing modes; 350 is the maximum time that can occur
+	if (this.time >= 350)
+		this.time = 0;
+	//add more time to matches that are recognized as being in exhibition mode, proportional to the amount of required matches missing
+	if (this.mode == "e")
+		this.time = Math.round(this.time * 1.5);
 };
 Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
 	if (this.names.indexOf(w) > -1) {
