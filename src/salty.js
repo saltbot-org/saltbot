@@ -48,12 +48,15 @@ var Controller = function() {
 	var attemptsToProcess = 0;
 	var maxAttempts = 3;
 	var timerInterval = 3000;
+	this.ticksSinceMatchBegan=-999;
 
 	var self = this;
 
 	var debugMode = true;
 
 	setInterval(function() {
+		self.ticksSinceMatchBegan+=1;
+		
 		//check to see if the betting buttons are visible
 		var bettingTable = document.getElementsByClassName("dynamic-view")[0];
 		var styleObj = window.getComputedStyle(bettingTable, null);
@@ -86,13 +89,14 @@ var Controller = function() {
 				if (winner != null) {
 					attemptsToProcess = 0;
 					//before processing match, add tier information if we have it
-					self.currentMatch.update(self.infoFromWaifu, self.odds);
+					self.currentMatch.update(self.infoFromWaifu, self.odds, {"ticks": self.ticksSinceMatchBegan, "interval": timerInterval});
 					var records = self.currentMatch.getRecords(winner);
 					var mr = records[0];
 					var c1 = records[1];
 					var c2 = records[2];
 
-					console.log("match results: " + "\ncharacter 1: " + mr.c1 + "\ncharacter 2: " + mr.c2 + "\nwinner: " + mr.w + "\nstrategy: " + mr.sn + "\nprediction: " + mr.pw + "\ntier: " + mr.t + "\nmode: " + mr.m + "\nodds: " + mr.o);
+					console.log("match results: " + "\ncharacter 1: " + mr.c1 + "\ncharacter 2: " + mr.c2 + "\nwinner: " + mr.w + "\nstrategy: " + mr.sn + "\tprediction: " + mr.pw + "\ntier: " + mr.t + 
+					"\tmode: " + mr.m + "\nodds: " + mr.o+ "\ttime: " + mr.ts);
 
 					chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
 						var matches_v1 = null;
@@ -241,6 +245,8 @@ if (window.location.href == "http://www.saltybet.com/") {
 			} else if (message.indexOf(winMessageIndicator) > -1) {
 				self.lastWinnerFromWaifuAnnouncement = message.split(winMessageIndicator)[0];
 			} else if (message.indexOf(betsLockedIndicator) > -1) {
+				//reset timer
+				self.ticksSinceMatchBegan =0;
 				setTimeout(function() {
 					//save the odds
 					try {

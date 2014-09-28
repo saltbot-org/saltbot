@@ -161,16 +161,15 @@ var er = function() {
 		var lines = [];
 		for (var i = 0; i < results.matches_v1.length; i++) {
 			var match = results.matches_v1[i];
-			//Temporary upgrade code:
-			if (match.w != 0 && match.w != 1) {
-				match.w = (match.w == match.c1) ? 0 : 1;
-			}
+
 			var record = match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + ",";
 			record += (match.hasOwnProperty("t")) ? match.t : "U";
 			record += ",";
 			record += (match.hasOwnProperty("m")) ? match.m : "U";
 			record += ",";
 			record += (match.hasOwnProperty("o")) ? match.o : "U";
+			record += ",";
+			record += (match.hasOwnProperty("ts")) ? match.ts : 0;
 			record += "\n";
 			lines.push(record);
 		}
@@ -188,7 +187,7 @@ var ir = function(f) {
 	var characterRecords = [];
 	var namesOfCharactersWhoAlreadyHaveRecords = [];
 	//numberOfProperties refers to c1, c2, w, sn, etc.
-	var numberOfProperties = 8;
+	var numberOfProperties = 9;
 
 	var lines = f.split("\n");
 	for (var i = 0; i < lines.length; i++) {
@@ -201,6 +200,7 @@ var ir = function(f) {
 		var t = null;
 		var m = null;
 		var o = null;
+		var ts=null;
 		for (var j = 0; j < match.length; j++) {
 			switch(j % numberOfProperties) {
 			case 0:
@@ -210,7 +210,7 @@ var ir = function(f) {
 				c2 = match[j];
 				break;
 			case 2:
-				w = match[j];
+				w = parseInt(match[j]);
 				break;
 			case 3:
 				sn = match[j];
@@ -225,7 +225,10 @@ var ir = function(f) {
 				m = match[j];
 				break;
 			case 7:
-				o = match[j];
+				o = parseInt(match[j]);
+				break;
+				case 8:
+				ts = match[j];
 				var mObj = {
 					"c1" : c1,
 					"c2" : c2,
@@ -234,7 +237,8 @@ var ir = function(f) {
 					"pw" : pw,
 					"t" : t,
 					"m" : m,
-					"o" : o
+					"o" : o, 
+					"ts" : ts
 				};
 				matchRecords.push(mObj);
 
@@ -262,7 +266,7 @@ var ir = function(f) {
 				if (mObj.w == 0) {
 					c1Obj.wins.push(mObj.t);
 					c2Obj.losses.push(mObj.t);
-				} else if (w == 1) {
+				} else if (mObj.w == 1) {
 					c2Obj.wins.push(mObj.t);
 					c1Obj.losses.push(mObj.t);
 				}

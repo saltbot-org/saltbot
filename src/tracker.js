@@ -14,9 +14,10 @@ var Match = function(strat) {
 	//U for unknown
 	this.mode = "U";
 	this.odds = "U";
+	this.time = 0;
 
 };
-Match.prototype.update = function(infoFromWaifu, odds) {
+Match.prototype.update = function(infoFromWaifu, odds, timeInfo) {
 	for (var i = 0; i < infoFromWaifu.length; i++) {
 		var ifw = infoFromWaifu[i];
 		if (this.names[0] == ifw.c1 && this.names[1] == ifw.c2) {
@@ -27,6 +28,8 @@ Match.prototype.update = function(infoFromWaifu, odds) {
 	}
 	if (odds != null)
 		this.odds = odds;
+	if (timeInfo.ticks > 0)
+		this.time = timeInfo.ticks * timeInfo.interval / 1000;
 };
 Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
 	if (this.names.indexOf(w) > -1) {
@@ -58,7 +61,8 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"pw" : pw,
 			"t" : this.tier,
 			"m" : this.mode.charAt(0),
-			"o" : this.odds
+			"o" : this.odds,
+			"ts" : this.time
 		}, this.character1, this.character2];
 	} else {
 		console.log("-\nsalt robot error : name not in list : " + w + " names: " + this.names[0] + ", " + this.names[1]);
