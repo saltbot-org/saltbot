@@ -166,12 +166,15 @@ var Controller = function() {
 			}
 
 			self.currentMatch = new Match(new RatioBasic());
-			//skip team matches
-			if (self.currentMatch.names[0].toLowerCase().indexOf("team") == -1 && self.currentMatch.names[1].toLowerCase().indexOf("team") == -1) {
-				self.currentMatch.init();
-			} else {
+			//skip team matches, mirror matches
+			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
 				self.currentMatch = null;
 				console.log("-\nskipping team match");
+			} else if (self.currentMatch.names[0] == self.currentMatch.names[1]) {
+				self.currentMatch = null;
+				console.log("-\nskipping mirror match");
+			} else {
+				self.currentMatch.init();
 			}
 
 			bettingEntered = true;
