@@ -115,7 +115,7 @@ var RatioBasic = function() {
 			c2.ratio = c2Ratio;
 			var pChar = (c1.ratio > c2.ratio) ? c1 : c2;
 			if (pChar.ratio <= 0.5) {
-				console.log("-\nRB prohibited from betting on <51% (" + c1Ratio + "%:" + c2Ratio + "%), canceling bet");
+				console.log("-\nRB prohibited from betting on or against <51% (" + c1Ratio + "%:" + c2Ratio + "%), canceling bet");
 				self.abstain = true;
 				return null;
 			}

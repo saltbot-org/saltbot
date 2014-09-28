@@ -16,7 +16,7 @@ var Match = function(strat) {
 	this.odds = "U";
 
 };
-Match.prototype.update = function(infoFromWaifu, odds) { 
+Match.prototype.update = function(infoFromWaifu, odds) {
 	for (var i = 0; i < infoFromWaifu.length; i++) {
 		var ifw = infoFromWaifu[i];
 		if (this.names[0] == ifw.c1 && this.names[1] == ifw.c2) {
@@ -37,7 +37,7 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			this.character2.wins.push(this.tier);
 			this.character1.losses.push(this.tier);
 		}
-		this.winner = (w == this.character1.name)?0:1;
+		this.winner = (w == this.character1.name) ? 0 : 1;
 
 		var pw = null;
 		if (this.strategy instanceof MoreWinsCautious || this.strategy instanceof Observer) {
@@ -57,8 +57,8 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"sn" : this.strategy.strategyName,
 			"pw" : pw,
 			"t" : this.tier,
-			"m" : this.mode.charAt(0), 
-			"o": this.odds
+			"m" : this.mode.charAt(0),
+			"o" : this.odds
 		}, this.character1, this.character2];
 	} else {
 		console.log("-\nsalt robot error : name not in list : " + w + " names: " + this.names[0] + ", " + this.names[1]);
@@ -96,7 +96,14 @@ Match.prototype.init = function() {
 
 		if (prediction != null) {
 			setTimeout(function() {
-				self.strategy.btn10.click();
+				var tournamentModeIndicator = "characters are left in the bracket!";
+				var footer = document.getElementById("footer-alert");
+				if (footer != null && footer.innerHTML.indexOf(tournamentModeIndicator) > -1) {
+					//bet more in tournaments
+					self.strategy.btn50.click();
+				} else {
+					self.strategy.btn10.click();
+				}
 			}, Math.floor(Math.random() * baseSeconds));
 			setTimeout(function() {
 				if (prediction == self.strategy.p1name) {
