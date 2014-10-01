@@ -146,7 +146,7 @@ var RatioBasic = function() {
 };
 RatioBasic.prototype = Strategy;
 
-var CSStats = function(){
+var CSStats = function() {
 	this.oddsSum = 0;
 	this.oddsCount = 0;
 	this.winTimesTotal = 0;
@@ -173,7 +173,8 @@ var ConfidenceScore = function() {
 		"la" : 3,
 		"lb" : 4,
 		"lp" : 5,
-
+		"lU" : 0.5,
+		"wU" : 0.5
 	};
 	var s = this;
 	this.extractMatchInfo = function(c, m, stats) {
@@ -181,7 +182,7 @@ var ConfidenceScore = function() {
 		var wonMatch = (wasPlayer1 && m.w == 0) || (!wasPlayer1 && m.w == 1);
 		if (m.o != "U") {
 			var odds = m.o.split(":");
-			stats.oddsCount += (wasPlayer1) ? parseInt(odds[0]) / parseInt(odds[1]) : parseInt(odds[1]) / parseInt(odds[0]);
+			stats.oddsSum += (wasPlayer1) ? parseInt(odds[0]) / parseInt(odds[1]) : parseInt(odds[1]) / parseInt(odds[0]);
 			stats.oddsCount += 1;
 		}
 		if (m.ts != 0) {
@@ -200,25 +201,25 @@ var ConfidenceScore = function() {
 		var losses = 0;
 		for (var i = 0; i < tierCharacters.length; i++) {
 			for (var j = 0; j < c.wins.length; j++) {
-				wins += self["w" + c.wins[j]] * modifier;
+				wins += self.tierScoring["w" + c.wins[j]] * modifier;
 			}
 			for (var k = 0; k < c.losses.length; k++) {
-				losses += self["l" + c.losses[j]] * modifier;
+				losses += self.tierScoring["l" + c.losses[j]] * modifier;
 			}
 		}
-		return [score, losses];
+		return [wins, losses];
 	};
 	this.getWeightedScores = function(c, hasTiered, hasUntiered) {
 		var self = s;
 		if (hasTiered && !hasUntiered) {
 			// best case scenario, only comparing tiered matches
-			return self.countFromRecord(["p", "b", "a", "s", "x"], 1);
+			return self.countFromRecord(c, ["p", "b", "a", "s", "x"], 1);
 		} else if (!hasTiered && hasUntiered) {
 			// next best case
-			return self.countFromRecord(["U"], 0.5);
+			return self.countFromRecord(c, ["U"], 0.5);
 		} else {
 			// worst-case
-			return self.countFromRecord(["U", "p", "b", "a", "s", "x"], 0.25);
+			return self.countFromRecord(c, ["U", "p", "b", "a", "s", "x"], 0.25);
 		}
 	};
 	this.execute = function(info) {
@@ -291,8 +292,8 @@ var ConfidenceScore = function() {
 		var hasTiered = hasTieredMatchesRE.test(c1WinsAndLosses) && hasTieredMatchesRE.test(c2WinsAndLosses);
 		var hasUntiered = hasUntieredMatchesRE.test(c1WinsAndLosses) && hasUntieredMatchesRE.test(c2WinsAndLosses);
 
-		var c1WLScores = self.getWinScore(c1, hasTiered, hasUntiered);
-		var c2WLScores = self.getWinScore(c2, hasTiered, hasUntiered);
+		var c1WLScores = self.getWeightedScores(c1, hasTiered, hasUntiered);
+		var c2WLScores = self.getWeightedScores(c2, hasTiered, hasUntiered);
 		var c1WWinPercentage = c1WLScores[0] / (c1WLScores[0] + c1WLScores[1]);
 		var c2WWinPercentage = c2WLScores[0] / (c2WLScores[0] + c2WLScores[1]);
 

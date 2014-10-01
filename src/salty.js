@@ -169,7 +169,7 @@ var Controller = function() {
 				matchesProcessed += 1;
 			}
 
-			self.currentMatch = new Match(new RatioBasic());
+			self.currentMatch = new Match(new ConfidenceScore());
 			//skip team matches, mirror matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
 				self.currentMatch = null;
