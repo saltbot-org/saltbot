@@ -44,9 +44,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			var dataMW = [];
 			var dataMWC = [];
 			var dataRB = [];
+			var dataCS = [];
 			var matches = results.matches_v1;
-			var correct = [0, 0, 0, 0];
-			var totalBettedOn = [0, 0, 0, 0];
+			var correct = [0, 0, 0, 0, 0];
+			var totalBettedOn = [0, 0, 0, 0, 0];
 			//A single instance of each strategy will work just fine
 			var ct = new CoinToss();
 			ct.debug = false;
@@ -56,14 +57,18 @@ document.addEventListener('DOMContentLoaded', function() {
 			mwc.debug = false;
 			var rb = new RatioBasic();
 			rb.debug = false;
+			var cs = new ConfidenceScore();
+			cs.debug = false;
 			var ctChecked = document.getElementById("ct").checked;
 			var mwChecked = document.getElementById("mw").checked;
 			var mwcChecked = document.getElementById("mwc").checked;
 			var rbChecked = document.getElementById("rb").checked;
-			var ctTotalPercentCorrect=0;
-			var mwTotalPercentCorrect=0;
-			var mwcTotalPercentCorrect=0;
-			var rbTotalPercentCorrect=0;
+			var csChecked = document.getElementById("cs").checked;
+			var ctTotalPercentCorrect = 0;
+			var mwTotalPercentCorrect = 0;
+			var mwcTotalPercentCorrect = 0;
+			var rbTotalPercentCorrect = 0;
+			var csTotalPercentCorrect = 0;
 			// setup for the graph
 			var arrayOfArrays = [];
 			if (ctChecked)
@@ -74,6 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				arrayOfArrays.push(dataMWC);
 			if (rbChecked)
 				arrayOfArrays.push(dataRB);
+			if (csChecked)
+				arrayOfArrays.push(dataCS);
 
 			// this is copied from records.js, do something about that
 			var characterRecords = [];
@@ -102,17 +109,20 @@ document.addEventListener('DOMContentLoaded', function() {
 			for (var i = 0; i < matches.length; i++) {
 				var info = {
 					"character1" : getCharacter(matches[i].c1),
-					"character2" : getCharacter(matches[i].c2)
+					"character2" : getCharacter(matches[i].c2),
+					"matches" : results.matches_v1
 				};
 
 				mwc.abstain = false;
 				rb.abstain = false;
+				cs.abstain = false;
 				var actualWinner = (matches[i].w == 0) ? matches[i].c1 : matches[i].c2;
 
 				var ctp = null;
 				var mwp = null;
 				var mwcp = null;
 				var rbp = null;
+				var csp = null;
 				if (ctChecked)
 					ctp = ct.execute(info);
 				if (mwChecked)
@@ -121,6 +131,8 @@ document.addEventListener('DOMContentLoaded', function() {
 					mwcp = mwc.execute(info);
 				if (rbChecked)
 					rbp = rb.execute(info);
+				if (csChecked)
+					csp = cs.execute(info);
 
 				// now update characters
 				if (matches[i].w == 0) {
@@ -130,8 +142,6 @@ document.addEventListener('DOMContentLoaded', function() {
 					info.character2.wins.push(matches[i].t);
 					info.character1.losses.push(matches[i].t);
 				}
-
-				
 
 				// coin toss
 				if (ctChecked) {
@@ -165,16 +175,26 @@ document.addEventListener('DOMContentLoaded', function() {
 						dataMWC.push([totalBettedOn[3], rbTotalPercentCorrect, "green"]);
 					}
 				}
+				// confidence score
+				if (csChecked) {
+					if (!cs.abstain) {
+						correct[4] += (csp == actualWinner) ? 1 : 0;
+						totalBettedOn[4] += 1;
+						csTotalPercentCorrect = correct[4] / totalBettedOn[4] * 100;
+						dataMWC.push([totalBettedOn[4], csTotalPercentCorrect, "black"]);
+					}
+				}
 			}
-			console.log("ct: "+ctTotalPercentCorrect);
-			console.log("mw: "+mwTotalPercentCorrect);
-			console.log("mwc: "+mwcTotalPercentCorrect);
-			console.log("rb: "+rbTotalPercentCorrect);
+			console.log("ct: " + ctTotalPercentCorrect);
+			console.log("mw: " + mwTotalPercentCorrect);
+			console.log("mwc: " + mwcTotalPercentCorrect);
+			console.log("rb: " + rbTotalPercentCorrect);
+			console.log("cs: " + csTotalPercentCorrect);
 			// Create the Scatter chart.
 			var scatter = new RGraph.Scatter({
 
 				id : 'cvs',
-				data : [dataCT, dataMW, dataMWC, dataRB],
+				data : [dataCT, dataMW, dataMWC, dataRB, dataCS],
 				options : {
 					background : {
 						barcolor1 : 'white',

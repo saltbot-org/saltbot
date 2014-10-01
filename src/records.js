@@ -244,10 +244,10 @@ var ir = function(f) {
 				m = match[j];
 				break;
 			case 7:
-				o = parseInt(match[j]);
+				o = match[j];
 				break;
 			case 8:
-				ts = match[j];
+				ts = parseInt(match[j]);
 				var mObj = {
 					"c1" : c1,
 					"c2" : c2,

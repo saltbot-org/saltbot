@@ -80,7 +80,7 @@ Match.prototype.init = function() {
 	var s = this;
 
 	//Attempt to get character objects from storage, if they don't exist create them
-	chrome.storage.local.get("characters_v1", function(result) {
+	chrome.storage.local.get(["matches_v1", "characters_v1"], function(result) {
 		var self = s;
 		var baseSeconds = 2000;
 		var recs = result.characters_v1;
@@ -102,7 +102,8 @@ Match.prototype.init = function() {
 
 		var prediction = self.strategy.execute({
 			"character1" : self.character1,
-			"character2" : self.character2
+			"character2" : self.character2, 
+			"matches": result.matches_v1
 		});
 
 		if (prediction != null) {
