@@ -1,3 +1,44 @@
+var Character = function(name) {
+	this.name = name;
+	this.wins = [];
+	this.losses = [];
+	this.winTimes = [];
+	this.lossTimes = [];
+	this.odds = [];
+};
+
+var Updater = function() {
+
+};
+Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
+	// alters mutable character records only
+	if (mObj.w == 0) {
+		c1Obj.wins.push(mObj.t);
+		c2Obj.losses.push(mObj.t);
+		if (mObj.ts != 0) {
+			c1Obj.winTimes.push(mObj.ts);
+			c2Obj.lossTimes.push(mObj.ts);
+		}
+	} else if (mObj.w == 1) {
+		c2Obj.wins.push(mObj.t);
+		c1Obj.losses.push(mObj.t);
+		if (mObj.ts != 0) {
+			c2Obj.winTimes.push(mObj.ts);
+			c1Obj.lossTimes.push(mObj.ts);
+		}
+	}
+	if (mObj.o != null && mObj.o != "U") {
+		var oc1 = parseFloat(mObj.o.split(":")[0]);
+		var oc2 = parseFloat(mObj.o.split(":")[1]);
+		c1Obj.odds.push(parseFloat((oc1 / oc2).toFixed(2)));
+		c2Obj.odds.push(parseFloat((oc2 / oc1).toFixed(2)));
+	}
+};
+
+var changeStrategy = function(sn) {
+	console.log(sn);
+};
+
 var dr = function() {
 	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
 		console.log("-\ndebugging records...");
@@ -55,34 +96,6 @@ var er = function() {
 	});
 };
 
-var Updater = function() {
-
-};
-Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
-	// alters mutable character records only
-	if (mObj.w == 0) {
-		c1Obj.wins.push(mObj.t);
-		c2Obj.losses.push(mObj.t);
-		if (mObj.time != 0) {
-			c1Obj.winTimes.push(mObj.time);
-			c2Obj.lossTimes.push(mObj.time);
-		}
-	} else if (mObj.w == 1) {
-		c2Obj.wins.push(mObj.t);
-		c1Obj.losses.push(mObj.t);
-		if (mObj.time != 0) {
-			c2Obj.winTimes.push(mObj.time);
-			c1Obj.lossTimes.push(mObj.time);
-		}
-	}
-	if (mObj.odds != null && mObj.odds != "U") {
-		var oc1 = parseFloat(mObj.odds.split(":")[0]);
-		var oc2 = parseFloat(mObj.odds.split(":")[1]);
-		c1Obj.odds.push((oc1 / oc2).toFixed(2));
-		c2Obj.odds.push((oc2 / oc1).toFixed(2));
-	}
-};
-
 var ir = function(f) {
 	var updater = new Updater();
 	var matchRecords = [];
@@ -91,14 +104,7 @@ var ir = function(f) {
 	var getCharacter = function(cname) {
 		var cobject = null;
 		if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
-			cobject = {
-				"name" : cname,
-				"wins" : [],
-				"losses" : [],
-				"winTimes" : [],
-				"lossTimes" : [],
-				"odds" : []
-			};
+			cobject = new Character(cname);
 			characterRecords.push(cobject);
 			namesOfCharactersWhoAlreadyHaveRecords.push(cname);
 		} else {
@@ -147,8 +153,8 @@ var ir = function(f) {
 			case 8:
 				mObj.ts = parseInt(match[j]);
 				matchRecords.push(mObj);
-				var c1Obj = getCharacter(c1);
-				var c2Obj = getCharacter(c2);
+				var c1Obj = getCharacter(mObj.c1);
+				var c2Obj = getCharacter(mObj.c2);
 				updater.updateCharactersFromMatch(mObj, c1Obj, c2Obj);
 
 				break;
@@ -180,6 +186,9 @@ if (window.location.href == "http://www.saltybet.com/")
 			break;
 		case "ir":
 			ir(request.text);
+			break;
+		case "cs_o":
+			ctrl.changeStrategy(request.type);
 			break;
 		}
 	});

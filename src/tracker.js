@@ -1,12 +1,3 @@
-var Character = function(name) {
-	this.name = name;
-	this.wins = [];
-	this.losses = [];
-	this.winTimes = [];
-	this.lossTimes = [];
-	this.odds = [];
-};
-
 var Match = function(strat) {
 	this.names = [strat.p1name, strat.p2name];
 	this.strategy = strat;

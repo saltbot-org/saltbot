@@ -168,8 +168,9 @@ var Controller = function() {
 				//
 				matchesProcessed += 1;
 			}
-
-			self.currentMatch = new Match(new ConfidenceScore(self.best_chromosome));
+			
+			//new ConfidenceScore(self.best_chromosome)
+			self.currentMatch = new Match(new Observer());
 			//skip team matches, mirror matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
 				self.currentMatch = null;
@@ -177,6 +178,9 @@ var Controller = function() {
 			} else if (self.currentMatch.names[0] == self.currentMatch.names[1]) {
 				self.currentMatch = null;
 				console.log("-\nskipping mirror match");
+			} else if (self.currentMatch.names[0].indexOf(",")>-1 || self.currentMatch.names[1].indexOf(",")>-1) {
+				self.currentMatch = null;
+				console.log("-\nskipping match, comma in name");
 			} else {
 				self.currentMatch.init();
 			}
@@ -200,8 +204,11 @@ Controller.prototype.ensureTwitch = function() {
 		console.log("response received in salty");
 	});
 };
+Controller.prototype.changeStrategy=function(sn){
+	console.log("-\nchanging strategy to "+sn);
+};
 
-var ctrl;
+ctrl=null;
 if (window.location.href == "http://www.saltybet.com/") {
 	ctrl = new Controller();
 	ctrl.ensureTwitch();
