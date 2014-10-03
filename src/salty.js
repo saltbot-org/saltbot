@@ -49,7 +49,8 @@ var Controller = function() {
 	var maxAttempts = 3;
 	var timerInterval = 3000;
 	this.ticksSinceMatchBegan = -999;
-	this.best_chromosome = new Chromosome();
+	this.bestChromosome = new Chromosome();
+	this.nextStrategy = "o";
 
 	var self = this;
 
@@ -168,9 +169,23 @@ var Controller = function() {
 				//
 				matchesProcessed += 1;
 			}
-			
-			//new ConfidenceScore(self.best_chromosome)
-			self.currentMatch = new Match(new Observer());
+
+			//set up next strategy
+			switch(self.nextStrategy) {
+			case "o":
+				self.currentMatch = new Match(new Observer());
+				break;
+			case "rb":
+				self.currentMatch = new Match(new RatioBasic());
+				break;
+			case "cs":
+				self.currentMatch = new Match(new ConfidenceScore(self.bestChromosome));
+				break;
+			default:
+				self.currentMatch = new Match(new Observer());
+				break;
+			}
+
 			//skip team matches, mirror matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
 				self.currentMatch = null;
@@ -178,7 +193,7 @@ var Controller = function() {
 			} else if (self.currentMatch.names[0] == self.currentMatch.names[1]) {
 				self.currentMatch = null;
 				console.log("-\nskipping mirror match");
-			} else if (self.currentMatch.names[0].indexOf(",")>-1 || self.currentMatch.names[1].indexOf(",")>-1) {
+			} else if (self.currentMatch.names[0].indexOf(",") > -1 || self.currentMatch.names[1].indexOf(",") > -1) {
 				self.currentMatch = null;
 				console.log("-\nskipping match, comma in name");
 			} else {
@@ -204,11 +219,24 @@ Controller.prototype.ensureTwitch = function() {
 		console.log("response received in salty");
 	});
 };
-Controller.prototype.changeStrategy=function(sn){
-	console.log("-\nchanging strategy to "+sn);
+Controller.prototype.changeStrategy = function(sn, data) {
+	console.log("-\nchanging strategy to " + sn);
+	switch(sn) {
+	case "cs_o":
+		this.nextStrategy = "o";
+		break;
+	case "cs_rb":
+		this.nextStrategy = "rb";
+		break;
+	case "cs_cs":
+		this.nextStrategy = "cs";
+		var chromosome = new Chromosome().loadFromJSON(data);
+		this.bestChromosome = chromosome;
+		break;
+	}
 };
 
-ctrl=null;
+ctrl = null;
 if (window.location.href == "http://www.saltybet.com/") {
 	ctrl = new Controller();
 	ctrl.ensureTwitch();

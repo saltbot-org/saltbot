@@ -35,10 +35,6 @@ Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
 	}
 };
 
-var changeStrategy = function(sn) {
-	console.log(sn);
-};
-
 var dr = function() {
 	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
 		console.log("-\ndebugging records...");
@@ -189,6 +185,12 @@ if (window.location.href == "http://www.saltybet.com/")
 			break;
 		case "cs_o":
 			ctrl.changeStrategy(request.type);
+			break;
+		case "cs_rb":
+			ctrl.changeStrategy(request.type);
+			break;
+		case "cs_cs":
+			ctrl.changeStrategy(request.type, request.text);
 			break;
 		}
 	});

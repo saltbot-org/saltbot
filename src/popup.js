@@ -26,7 +26,11 @@ var changeStrategyClickO = function() {
 	btnClicked("cs_o");
 };
 var changeStrategyClickCS = function() {
-	btnClicked("cs_cs");
+	chrome.storage.local.get(["chromosomes_v1"], function(results) {
+		var data = JSON.stringify(results.chromosomes_v1[0]);
+		//new Chromosome().loadFromObject(results.chromosomes_v1[0]).toJSON();
+		btnClicked("cs_cs", data);
+	});
 };
 var changeStrategyClickRB = function() {
 	btnClicked("cs_rb");
@@ -80,10 +84,14 @@ Simulator.prototype.evalMutations = function(evolutionMode) {
 		} else {
 			// queue up the entire last batch of chromosomes
 			var chromosomes = results.chromosomes_v1;
-			if (chromosomes)
-				for (var z = 0; z < chromosomes.length; z++) {
+			if (chromosomes) {
+				for (var z = 0; z < chromosomes.length; z++)
 					orders.push(new Order("cs", new Chromosome().loadFromObject(chromosomes[z])));
-				}
+			} else {
+				var msg = "Pool not initialized."
+				document.getElementById('msgbox').value = msg;
+				throw msg;
+			}
 		}
 
 		// process orders for strategy creation
