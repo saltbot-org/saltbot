@@ -192,7 +192,10 @@ var ir = function(f) {
 			cobject = {
 				"name" : cname,
 				"wins" : [],
-				"losses" : []
+				"losses" : [],
+				"winTimes" : [],
+				"lossTimes" : [],
+				"odds" : []
 			};
 			characterRecords.push(cobject);
 			namesOfCharactersWhoAlreadyHaveRecords.push(cname);
@@ -207,7 +210,7 @@ var ir = function(f) {
 	};
 	//numberOfProperties refers to c1, c2, w, sn, etc.
 	var numberOfProperties = 9;
-	
+
 	var lines = f.split("\n");
 	for (var i = 0; i < lines.length; i++) {
 		var match = lines[i].split(",");
@@ -266,9 +269,23 @@ var ir = function(f) {
 				if (mObj.w == 0) {
 					c1Obj.wins.push(mObj.t);
 					c2Obj.losses.push(mObj.t);
+					if (mObj.time != 0) {
+						c1Obj.winTimes.push(mObj.time);
+						c2Obj.lossTimes.push(mObj.time);
+					}
 				} else if (mObj.w == 1) {
 					c2Obj.wins.push(mObj.t);
 					c1Obj.losses.push(mObj.t);
+					if (mObj.time != 0) {
+						c2Obj.push(mObj.time);
+						c1Obj.lossTimes.push(mObj.time);
+					}
+				}
+				if (mObj.odds != null && mObj.odds != "U") {
+					var oc1 = parseFloat(mObj.odds.split(":")[0]);
+					var oc2 = parseFloat(mObj.odds.split(":")[1]);
+					c1Obj.odds.push((oc1 / oc2).toFixed(2));
+					c2Obj.odds.push((oc2 / oc1).toFixed(2));
 				}
 
 				break;

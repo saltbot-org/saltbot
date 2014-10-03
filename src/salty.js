@@ -48,15 +48,16 @@ var Controller = function() {
 	var attemptsToProcess = 0;
 	var maxAttempts = 3;
 	var timerInterval = 3000;
-	this.ticksSinceMatchBegan=-999;
+	this.ticksSinceMatchBegan = -999;
+	this.best_chromosome = new Chromosome();
 
 	var self = this;
 
 	var debugMode = true;
 
 	setInterval(function() {
-		self.ticksSinceMatchBegan+=1;
-		
+		self.ticksSinceMatchBegan += 1;
+
 		//check to see if the betting buttons are visible
 		var bettingTable = document.getElementsByClassName("dynamic-view")[0];
 		var styleObj = window.getComputedStyle(bettingTable, null);
@@ -89,20 +90,22 @@ var Controller = function() {
 				if (winner != null) {
 					attemptsToProcess = 0;
 					//before processing match, add tier information if we have it
-					self.currentMatch.update(self.infoFromWaifu, self.odds, {"ticks": self.ticksSinceMatchBegan, "interval": timerInterval});
+					self.currentMatch.update(self.infoFromWaifu, self.odds, {
+						"ticks" : self.ticksSinceMatchBegan,
+						"interval" : timerInterval
+					});
 					var records = self.currentMatch.getRecords(winner);
 					var mr = records[0];
 					var c1 = records[1];
 					var c2 = records[2];
 
-					console.log("match results: " + "\ncharacter 1: " + mr.c1 + "\ncharacter 2: " + mr.c2 + "\nwinner: " + mr.w + "\nstrategy: " + mr.sn + "\tprediction: " + mr.pw + "\ntier: " + mr.t + 
-					"\t\tmode: " + mr.m + "\nodds: " + mr.o+ "\ttime: " + mr.ts);
+					console.log("match results: " + "\ncharacter 1: " + mr.c1 + "\ncharacter 2: " + mr.c2 + "\nwinner: " + mr.w + "\nstrategy: " + mr.sn + "\tprediction: " + mr.pw + "\ntier: " + mr.t + "\t\tmode: " + mr.m + "\nodds: " + mr.o + "\ttime: " + mr.ts);
 
-					chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
+					chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1", "best_chromosome"], function(results) {
 						var matches_v1 = null;
 						var characters_v1 = null;
-						var mbr = matchesBeforeReset;
-						var mp = matchesProcessed;
+						// self.best_chromosome=results.best_chromosome;
+
 						//store new match record
 						if (results.hasOwnProperty("matches_v1")) {
 							results.matches_v1.push(mr);
@@ -111,41 +114,38 @@ var Controller = function() {
 							matches_v1 = [];
 							matches_v1.push(mr);
 						}
-						if (debugMode) {
+						if (debugMode)
 							console.log("-\nnumber of match records: " + matches_v1.length);
-						}
+
 						//character records:
-						if (results.hasOwnProperty("characters_v1")) {
+						if (results.hasOwnProperty("characters_v1"))
 							characters_v1 = results.characters_v1;
-						} else {
+						else
 							characters_v1 = [];
-						}
 						//find if characters are already in local storage
 						var c1_index = -1;
 						var c2_index = -1;
 						for (var i = 0; i < characters_v1.length; i++) {
-							if (characters_v1[i].name == c1.name) {
+							if (characters_v1[i].name == c1.name)
 								c1_index = i;
-							}
-							if (characters_v1[i].name == c2.name) {
+							if (characters_v1[i].name == c2.name)
 								c2_index = i;
-							}
 						}
 						//update records accordingly
-						if (c1_index != -1) {
+						if (c1_index != -1)
 							characters_v1[c1_index] = c1;
-						} else {
+						else
 							characters_v1.push(c1);
-						}
-						if (c2_index != -1) {
+						if (c2_index != -1)
 							characters_v1[c2_index] = c2;
-						} else {
+						else
 							characters_v1.push(c2);
-						}
-						if (debugMode) {
+						if (debugMode)
 							console.log("-\nnumber of character records: " + characters_v1.length);
-						}
-						//
+
+						//do aliasing for closure
+						var mbr = matchesBeforeReset;
+						var mp = matchesProcessed;
 						chrome.storage.local.set({
 							'matches_v1' : matches_v1,
 							'characters_v1' : characters_v1
@@ -169,7 +169,7 @@ var Controller = function() {
 				matchesProcessed += 1;
 			}
 
-			self.currentMatch = new Match(new ConfidenceScore());
+			self.currentMatch = new Match(new ConfidenceScore(self.best_chromosome));
 			//skip team matches, mirror matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
 				self.currentMatch = null;
@@ -180,7 +180,7 @@ var Controller = function() {
 			} else {
 				self.currentMatch.init();
 			}
-
+			//this may be a little out of asynch but I don't think it matters
 			bettingEntered = true;
 		}
 
@@ -246,7 +246,7 @@ if (window.location.href == "http://www.saltybet.com/") {
 				self.lastWinnerFromWaifuAnnouncement = message.split(winMessageIndicator)[0];
 			} else if (message.indexOf(betsLockedIndicator) > -1) {
 				//reset timer
-				self.ticksSinceMatchBegan =0;
+				self.ticksSinceMatchBegan = 0;
 				setTimeout(function() {
 					//save the odds
 					try {
@@ -263,4 +263,3 @@ if (window.location.href == "http://www.saltybet.com/") {
 	});
 	setInterval(ctrl.ensureTwitch, 60000);
 }
-

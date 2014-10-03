@@ -2,6 +2,9 @@ var Character = function(name) {
 	this.name = name;
 	this.wins = [];
 	this.losses = [];
+	this.winTimes = [];
+	this.lossTimes = [];
+	this.odds = [];
 };
 
 var Match = function(strat) {
@@ -43,22 +46,32 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 		if (w == this.character1.name) {
 			this.character1.wins.push(this.tier);
 			this.character2.losses.push(this.tier);
+			if (this.time != 0) {
+				this.character1.winTimes.push(this.time);
+				this.character2.lossTimes.push(this.time);
+			}
 		} else if (w == this.character2.name) {
 			this.character2.wins.push(this.tier);
 			this.character1.losses.push(this.tier);
+			if (this.time != 0) {
+				this.character2.winTimes.push(this.time);
+				this.character1.lossTimes.push(this.time);
+			}
 		}
+		if (this.odds != null && this.odds != "U") {
+			var oc1 = parseFloat(this.odds.split(":")[0]);
+			var oc2 = parseFloat(this.odds.split(":")[1]);
+			this.character1.odds.push((oc1 / oc2).toFixed(2));
+			this.character2.odds.push((oc2 / oc1).toFixed(2));
+		}
+
 		this.winner = (w == this.character1.name) ? 0 : 1;
 
 		var pw = null;
-		if (this.strategy instanceof MoreWinsCautious || this.strategy instanceof Observer) {
-			if (this.strategy.abstain) {
-				pw = "a";
-			} else {
-				pw = (this.strategy.prediction == this.names[this.winner]) ? "t" : "f";
-			}
-		} else {
+		if (this.strategy.abstain)
+			pw = "a";
+		else
 			pw = (this.strategy.prediction == this.names[this.winner]) ? "t" : "f";
-		}
 
 		return [{
 			"c1" : this.character1.name,
@@ -102,8 +115,8 @@ Match.prototype.init = function() {
 
 		var prediction = self.strategy.execute({
 			"character1" : self.character1,
-			"character2" : self.character2, 
-			"matches": result.matches_v1
+			"character2" : self.character2,
+			"matches" : result.matches_v1
 		});
 
 		if (prediction != null) {

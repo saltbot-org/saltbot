@@ -33,188 +33,271 @@ var irClick = function() {
 	reader.readAsText(file);
 };
 
+var Order = function(typeStr, chromosome) {
+	this.type = typeStr;
+	this.chromosome = chromosome;
+};
+var Simulator = function() {
+	this.data = [];
+};
+Simulator.prototype.evalMutations = function(evolutionMode) {
+	var self = this;
+	chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1"], function(results) {
+		var matches = results.matches_v1;
+		var data = [];
+		var correct = [];
+		var totalBettedOn = [];
+		var strategies = [];
+		var totalPercentCorrect = [];
+
+		// create orders from string passed in
+		var orders = [];
+		if (!evolutionMode) {
+			if (document.getElementById("ct").checked)
+				orders.push(new Order("ct"));
+			if (document.getElementById("mw").checked)
+				orders.push(new Order("mw"));
+			if (document.getElementById("mwc").checked)
+				orders.push(new Order("mwc"));
+			if (document.getElementById("rb").checked)
+				orders.push(new Order("rb"));
+			// add a ConfidenceScore with the strongest known chromosome
+		} else {
+			// queue up the entire last batch of chromosomes
+			var chromosomes = results.chromosomes_v1;
+			if (chromosomes)
+				for (var z = 0; z < chromosomes.length; z++) {
+					orders.push(new Order("cs", new Chromosome().loadFromObject(chromosomes[z])));
+				}
+		}
+
+		// process orders for strategy creation
+		for (var h = 0; h < orders.length; h++) {
+			var order = orders[h];
+			var strategy;
+			switch(order.type) {
+			case "ct":
+				strategy = new CoinToss();
+				break;
+			case "mw":
+				strategy = new MoreWins();
+				break;
+			case "mwc":
+				strategy = new MoreWinsCautious();
+				break;
+			case "rb":
+				strategy = new RatioBasic();
+				break;
+			case "cs":
+				strategy = new ConfidenceScore(order.chromosome);
+				break;
+			}
+			strategy.debug = false;
+
+			data.push([]);
+			correct.push(0);
+			totalBettedOn.push(0);
+			strategies.push(strategy);
+			totalPercentCorrect.push(0);
+		}
+
+		// this is copied from records.js, do something about that
+		var characterRecords = [];
+		var namesOfCharactersWhoAlreadyHaveRecords = [];
+		var getCharacter = function(cname) {
+			var cobject = null;
+			if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
+				cobject = {
+					"name" : cname,
+					"wins" : [],
+					"losses" : []
+				};
+				characterRecords.push(cobject);
+				namesOfCharactersWhoAlreadyHaveRecords.push(cname);
+			} else {
+				for (var k = 0; k < characterRecords.length; k++) {
+					if (cname == characterRecords[k].name) {
+						cobject = characterRecords[k];
+					}
+				}
+			}
+			return cobject;
+		};
+
+		// process matches
+		for (var i = 0; i < matches.length; i++) {
+			var info = {
+				"character1" : getCharacter(matches[i].c1),
+				"character2" : getCharacter(matches[i].c2),
+				"matches" : results.matches_v1
+			};
+
+			for (var n = 0; n < strategies.length; n++) {
+				//reset abstain every time
+				strategies[n].abstain = false;
+			}
+
+			var actualWinner = (matches[i].w == 0) ? matches[i].c1 : matches[i].c2;
+
+			var predictions = [];
+			for (var j = 0; j < strategies.length; j++) {
+				predictions.push(strategies[j].execute(info));
+			}
+
+			// now update characters
+			if (matches[i].w == 0) {
+				info.character1.wins.push(matches[i].t);
+				info.character2.losses.push(matches[i].t);
+			} else if (matches[i].w == 1) {
+				info.character2.wins.push(matches[i].t);
+				info.character1.losses.push(matches[i].t);
+			}
+
+			// check results
+			if (strategies.length != predictions.length)
+				throw "Strategies and predictions are not the same length.";
+			for (var k = 0; k < strategies.length; k++) {
+				var prediction = predictions[k];
+				var strategy = strategies[k];
+				if (!strategy.abstain) {
+					correct[k] += (prediction == actualWinner) ? 1 : 0;
+					totalBettedOn[k] += 1;
+					totalPercentCorrect[k] = correct[k] / totalBettedOn[k] * 100;
+					data[k].push([totalBettedOn[k], totalPercentCorrect[k]]);
+				}
+
+			}
+		}
+
+		if (evolutionMode) {
+			//go through totalPercentCorrect, weed out the top 10, breed them, save them
+			var sortingArray = [];
+			var parents = [];
+			var nextGeneration = [];
+			for (var l = 0; l < orders.length; l++) {
+				sortingArray.push([orders[l].chromosome, totalPercentCorrect[l]]);
+			}
+			sortingArray.sort(function(a, b) {
+				return b[1] - a[1];
+			});
+			var topHalf = 8;//Math.round(sortingArray.length / 2);
+			for (var o = 0; o < topHalf; o++) {
+				console.log(sortingArray[o][0].toDisplayString() + " -> " + sortingArray[o][1]);
+				parents.push(sortingArray[o][0]);
+				nextGeneration.push(sortingArray[o][0]);
+			}
+			for (var mf = 0; mf < parents.length; mf++) {
+				var parent1 = null;
+				var parent2 = null;
+				var child = null;
+				if (mf == 0) {
+					parent1 = parents[0];
+					parent2 = parents[parents.length - 1];
+				} else {
+					parent1 = parents[mf - 1];
+					parent2 = parents[mf];
+				}
+				child = parent1.mate(parent2);
+				nextGeneration.push(child);
+			}
+			var best=sortingArray[0][1];
+			
+			chrome.storage.local.set({
+				'chromosomes_v1' : nextGeneration, 
+				'best_chromosome': sortingArray[0][0]
+			}, function() {
+				roundsOfEvolution+=1;
+				document.getElementById('msgbox').value = "rounds: "+roundsOfEvolution+", best: " + best;
+				setTimeout(function (){
+					simulator.evalMutations(true);
+				}, 5000);
+			});
+		}
+
+		// setup for drawing on the chart
+		self.data = data;
+	});
+};
+Simulator.prototype.draw = function() {
+	// Create the Scatter chart.
+	var scatter = new RGraph.Scatter({
+
+		id : 'cvs',
+		data : this.data,
+		options : {
+			background : {
+				barcolor1 : 'white',
+				barcolor2 : 'white',
+				grid : {
+					color : 'rgba(238,238,238,1)'
+				}
+			},
+			gutter : {
+				left : 30
+			},
+			title : {
+				xaxis : "# matches",
+				yaxis : "% correct"
+			},
+			xmax : 1000,
+			ymax : 100
+		}
+	}).draw();
+};
+Simulator.prototype.initializePool = function() {
+	var pool = [new Chromosome(), new Chromosome()];
+	while (pool.length < 100) {
+		if (pool.length < 20) {
+			var offspring = pool[0].mate(pool[1]);
+			var foundDuplicate = false;
+			for (var i in pool) {
+				var ch = pool[i];
+				if (ch.equals(offspring))
+					foundDuplicate = true;
+			}
+			if (!foundDuplicate)
+				pool.push(offspring);
+		} else {
+			var chromosome1 = pool[Math.floor(Math.random() * pool.length)];
+			var chromosome2 = pool[Math.floor(Math.random() * pool.length)];
+			pool.push(chromosome1.mate(chromosome2));
+		}
+
+	}
+	var newPool = [];
+	for (var i = 0; i < pool.length; i++) {
+		if (i % 5 == 0) {
+			console.log(pool[i].toDisplayString());
+			newPool.push(pool[i]);
+		}
+	}
+	chrome.storage.local.set({
+		'chromosomes_v1' : newPool
+	}, function() {
+		document.getElementById('msgbox').value = "initial pool population complete";
+	});
+
+};
+
+simulator = new Simulator();
+roundsOfEvolution=0;
+
 document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("bdr").addEventListener("click", drClick);
 	document.getElementById("bpr").addEventListener("click", prClick);
 	document.getElementById("ber").addEventListener("click", erClick);
 	document.getElementById("bir").addEventListener("change", irClick);
 	document.getElementById("bsc").addEventListener("click", function() {
-		chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
-			var dataCT = [];
-			var dataMW = [];
-			var dataMWC = [];
-			var dataRB = [];
-			var dataCS = [];
-			var matches = results.matches_v1;
-			var correct = [0, 0, 0, 0, 0];
-			var totalBettedOn = [0, 0, 0, 0, 0];
-			//A single instance of each strategy will work just fine
-			var ct = new CoinToss();
-			ct.debug = false;
-			var mw = new MoreWins();
-			mw.debug = false;
-			var mwc = new MoreWinsCautious();
-			mwc.debug = false;
-			var rb = new RatioBasic();
-			rb.debug = false;
-			var cs = new ConfidenceScore();
-			cs.debug = false;
-			var ctChecked = document.getElementById("ct").checked;
-			var mwChecked = document.getElementById("mw").checked;
-			var mwcChecked = document.getElementById("mwc").checked;
-			var rbChecked = document.getElementById("rb").checked;
-			var csChecked = document.getElementById("cs").checked;
-			var ctTotalPercentCorrect = 0;
-			var mwTotalPercentCorrect = 0;
-			var mwcTotalPercentCorrect = 0;
-			var rbTotalPercentCorrect = 0;
-			var csTotalPercentCorrect = 0;
-			// setup for the graph
-			var arrayOfArrays = [];
-			if (ctChecked)
-				arrayOfArrays.push(dataCT);
-			if (mwChecked)
-				arrayOfArrays.push(dataMW);
-			if (mwcChecked)
-				arrayOfArrays.push(dataMWC);
-			if (rbChecked)
-				arrayOfArrays.push(dataRB);
-			if (csChecked)
-				arrayOfArrays.push(dataCS);
-
-			// this is copied from records.js, do something about that
-			var characterRecords = [];
-			var namesOfCharactersWhoAlreadyHaveRecords = [];
-			var getCharacter = function(cname) {
-				var cobject = null;
-				if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
-					cobject = {
-						"name" : cname,
-						"wins" : [],
-						"losses" : []
-					};
-					characterRecords.push(cobject);
-					namesOfCharactersWhoAlreadyHaveRecords.push(cname);
-				} else {
-					for (var k = 0; k < characterRecords.length; k++) {
-						if (cname == characterRecords[k].name) {
-							cobject = characterRecords[k];
-						}
-					}
-				}
-				return cobject;
-			};
-
-			// process matches
-			for (var i = 0; i < matches.length; i++) {
-				var info = {
-					"character1" : getCharacter(matches[i].c1),
-					"character2" : getCharacter(matches[i].c2),
-					"matches" : results.matches_v1
-				};
-
-				mwc.abstain = false;
-				rb.abstain = false;
-				cs.abstain = false;
-				var actualWinner = (matches[i].w == 0) ? matches[i].c1 : matches[i].c2;
-
-				var ctp = null;
-				var mwp = null;
-				var mwcp = null;
-				var rbp = null;
-				var csp = null;
-				if (ctChecked)
-					ctp = ct.execute(info);
-				if (mwChecked)
-					mwp = mw.execute(info);
-				if (mwcChecked)
-					mwcp = mwc.execute(info);
-				if (rbChecked)
-					rbp = rb.execute(info);
-				if (csChecked)
-					csp = cs.execute(info);
-
-				// now update characters
-				if (matches[i].w == 0) {
-					info.character1.wins.push(matches[i].t);
-					info.character2.losses.push(matches[i].t);
-				} else if (matches[i].w == 1) {
-					info.character2.wins.push(matches[i].t);
-					info.character1.losses.push(matches[i].t);
-				}
-
-				// coin toss
-				if (ctChecked) {
-					correct[0] += (ctp == actualWinner) ? 1 : 0;
-					totalBettedOn[0] += 1;
-					ctTotalPercentCorrect = correct[0] / totalBettedOn[0] * 100;
-					dataCT.push([totalBettedOn[0], ctTotalPercentCorrect, "red"]);
-				}
-				// more wins
-				if (mwChecked) {
-					correct[1] += (mwp == actualWinner) ? 1 : 0;
-					totalBettedOn[1] += 1;
-					mwTotalPercentCorrect = correct[1] / totalBettedOn[1] * 100;
-					dataMW.push([totalBettedOn[1], mwTotalPercentCorrect, "purple"]);
-				}
-				// more wins  cautious
-				if (mwcChecked) {
-					if (!mwc.abstain) {
-						correct[2] += (mwcp == actualWinner) ? 1 : 0;
-						totalBettedOn[2] += 1;
-						mwcTotalPercentCorrect = correct[2] / totalBettedOn[2] * 100;
-						dataMWC.push([totalBettedOn[2], mwcTotalPercentCorrect, "blue"]);
-					}
-				}
-				// ratio basic
-				if (rbChecked) {
-					if (!rb.abstain) {
-						correct[3] += (rbp == actualWinner) ? 1 : 0;
-						totalBettedOn[3] += 1;
-						rbTotalPercentCorrect = correct[3] / totalBettedOn[3] * 100;
-						dataMWC.push([totalBettedOn[3], rbTotalPercentCorrect, "green"]);
-					}
-				}
-				// confidence score
-				if (csChecked) {
-					if (!cs.abstain) {
-						correct[4] += (csp == actualWinner) ? 1 : 0;
-						totalBettedOn[4] += 1;
-						csTotalPercentCorrect = correct[4] / totalBettedOn[4] * 100;
-						dataMWC.push([totalBettedOn[4], csTotalPercentCorrect, "black"]);
-					}
-				}
-			}
-			console.log("ct: " + ctTotalPercentCorrect);
-			console.log("mw: " + mwTotalPercentCorrect);
-			console.log("mwc: " + mwcTotalPercentCorrect);
-			console.log("rb: " + rbTotalPercentCorrect);
-			console.log("cs: " + csTotalPercentCorrect);
-			// Create the Scatter chart.
-			var scatter = new RGraph.Scatter({
-
-				id : 'cvs',
-				data : [dataCT, dataMW, dataMWC, dataRB, dataCS],
-				options : {
-					background : {
-						barcolor1 : 'white',
-						barcolor2 : 'white',
-						grid : {
-							color : 'rgba(238,238,238,1)'
-						}
-					},
-					gutter : {
-						left : 30
-					},
-					title : {
-						xaxis : "# matches",
-						yaxis : "% correct"
-					},
-					xmax : 1000,
-					ymax : 100
-				}
-			}).draw();
-		});
+		simulator.evalMutations(false);
+		simulator.draw();
 
 	});
+	document.getElementById("ugw").addEventListener("click", function() {
+		simulator.evalMutations(true);
+	});
+	document.getElementById("rgw").addEventListener("click", function() {
+		simulator.initializePool();
+	});
+
 });
+
