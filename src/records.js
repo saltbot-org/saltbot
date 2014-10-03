@@ -25,139 +25,12 @@ var dr = function() {
 
 var pr = function() {
 	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
-		console.log("-\npurifying records...");
-		var potentialDuplicates = [];
-		if (results.hasOwnProperty("matches_v1") && results.hasOwnProperty("characters_v1")) {
-			var correctReverseOdds = true;
-			if (correctReverseOdds) {
-				for (var i = 0; i < results.matches_v1.length; i++) {
-					var odds = results.matches_v1[i].o;
-					if (odds != "U") {
-						var oddsArr = odds.split(":");
-						results.matches_v1[i].o = oddsArr[1] + ":" + oddsArr[0];
-					}
-				}
-				chrome.storage.local.set({
-					'matches_v1' : results.matches_v1
-				}, function() {
-					console.log("-\nrecords purified (correctReverseOdds)");
-				});
-			}
-
-			var removeTeamMatches = false;
-			if (removeTeamMatches) {
-				var goodMatches = [];
-
-				for (var i = 0; i < results.matches_v1.length; i++) {
-					var match = results.matches_v1[i];
-					if (match.c1.toLowerCase().indexOf("team") == -1 && match.c2.toLowerCase().indexOf("team") == -1) {
-						goodMatches.push(match);
-					}
-				}
-				chrome.storage.local.set({
-					'matches_v1' : goodMatches
-				}, function() {
-					console.log("-\nrecords purified (checkForFalseAnalysis)");
-				});
-			}
-
-			var checkForDuplicates = false;
-			if (checkForDuplicates) {
-				console.log("-\ndetecting potential duplicate matches");
-				var goodMatches = [];
-
-				for (var i = 0; i < results.matches_v1.length; i++) {
-					var match = results.matches_v1[i];
-					var isPotentialDuplicate = 0;
-					for (var j = 0; j < results.matches_v1.length; j++) {
-						var matchd = results.matches_v1[j];
-						if (match.c1 == matchd.c1 && match.c2 == matchd.c2) {
-							isPotentialDuplicate += 1;
-						}
-					}
-					if (isPotentialDuplicate == 2) {
-						var duplicateAlreadydetected = false;
-						for (var k = 0; k < potentialDuplicates.length; k++) {
-							var matchd = potentialDuplicates[k];
-
-							if (match.c1 == matchd.c1 && match.c2 == matchd.c2) {
-								duplicateAlreadydetected = true;
-							}
-
-						}
-						if (!duplicateAlreadydetected) {
-							potentialDuplicates.push(match);
-							console.log("potential duplicate match: " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
-						} else {
-							goodMatches.push(match);
-						}
-					} else {
-						goodMatches.push(match);
-					}
-
-				}
-				//remove all duplicates, then rebuild character records from match records
-
-				chrome.storage.local.set({
-					'matches_v1' : goodMatches//,
-					// 'characters_v1' : characters_v1
-				}, function() {
-					console.log("-\nrecords purified");
-				});
-
-			}
-
-			//examine character records:
-			var examineCharacterRecords = false;
-			if (examineCharacterRecords) {
-				var characters = results.characters_v1;
-				for (var ii = 0; ii < potentialDuplicates.length; ii++) {
-					// check wins of characters involved
-					var pdmatch = potentialDuplicates[ii];
-					var c1Object = null;
-					var c2Object = null;
-					for (var j = 0; j < characters.length; j++) {
-						if (characters[j].name == pdmatch.c1) {
-							c1Object = characters[j];
-						}
-						if (characters[j].name == pdmatch.c2) {
-							c2Object = characters[j];
-						}
-					}
-					// now get total wins and losses of involved characters
-					var c1totalWins = 0;
-					var c1totalLosses = 0;
-					var c2totalWins = 0;
-					var c2totalLosses = 0;
-					console.log("-\ninvestigating match: " + pdmatch.c1 + " vs " + pdmatch.c2 + " ... winner: " + pdmatch.w);
-					console.log("-\nprocessing...");
-					for (var k = 0; k < results.matches_v1.length; k++) {
-						var match = results.matches_v1[k];
-
-						if (match.w == 0) {
-							c1totalWins += 1;
-							c2totalLosses += 1;
-							console.log("-\n in match" + k + ": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
-						}
-						if (match.w == 1) {
-							c2totalWins += 1;
-							c1totalLosses += 1;
-							console.log("-\n in match" + k + ": " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
-						}
-
-					}
-					console.log("-\nprocessing complete");
-					console.log("mr: " + pdmatch.c1 + " has " + c1totalWins + " wins, " + c1totalLosses + " losses; cr: " + c1Object.wins + " wins, " + c1Object.losses + " losses");
-					console.log("mr: " + pdmatch.c2 + " has " + c2totalWins + " wins, " + c2totalLosses + " losses; cr: " + c2Object.wins + " wins, " + c2Object.losses + " losses");
-				}
-			}
-		}
-
+		console.log("-\nrecord verification stuff deleted...");
 	});
 };
 
 var er = function() {
-	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
+	chrome.storage.local.get(["matches_v1"], function(results) {
 		var lines = [];
 		for (var i = 0; i < results.matches_v1.length; i++) {
 			var match = results.matches_v1[i];
@@ -182,7 +55,36 @@ var er = function() {
 	});
 };
 
+var Updater = function() {
+
+};
+Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
+	// alters mutable character records only
+	if (mObj.w == 0) {
+		c1Obj.wins.push(mObj.t);
+		c2Obj.losses.push(mObj.t);
+		if (mObj.time != 0) {
+			c1Obj.winTimes.push(mObj.time);
+			c2Obj.lossTimes.push(mObj.time);
+		}
+	} else if (mObj.w == 1) {
+		c2Obj.wins.push(mObj.t);
+		c1Obj.losses.push(mObj.t);
+		if (mObj.time != 0) {
+			c2Obj.winTimes.push(mObj.time);
+			c1Obj.lossTimes.push(mObj.time);
+		}
+	}
+	if (mObj.odds != null && mObj.odds != "U") {
+		var oc1 = parseFloat(mObj.odds.split(":")[0]);
+		var oc2 = parseFloat(mObj.odds.split(":")[1]);
+		c1Obj.odds.push((oc1 / oc2).toFixed(2));
+		c2Obj.odds.push((oc2 / oc1).toFixed(2));
+	}
+};
+
 var ir = function(f) {
+	var updater = new Updater();
 	var matchRecords = [];
 	var characterRecords = [];
 	var namesOfCharactersWhoAlreadyHaveRecords = [];
@@ -210,83 +112,44 @@ var ir = function(f) {
 	};
 	//numberOfProperties refers to c1, c2, w, sn, etc.
 	var numberOfProperties = 9;
-
+	var mObj = null;
 	var lines = f.split("\n");
 	for (var i = 0; i < lines.length; i++) {
 		var match = lines[i].split(",");
-		var c1 = null;
-		var c2 = null;
-		var w = null;
-		var sn = null;
-		var pw = null;
-		var t = null;
-		var m = null;
-		var o = null;
-		var ts = null;
+
 		for (var j = 0; j < match.length; j++) {
 			switch(j % numberOfProperties) {
 			case 0:
-				c1 = match[j];
+				mObj = {};
+				mObj.c1 = match[j];
 				break;
 			case 1:
-				c2 = match[j];
+				mObj.c2 = match[j];
 				break;
 			case 2:
-				w = parseInt(match[j]);
+				mObj.w = parseInt(match[j]);
 				break;
 			case 3:
-				sn = match[j];
+				mObj.sn = match[j];
 				break;
 			case 4:
-				pw = match[j];
+				mObj.pw = match[j];
 				break;
 			case 5:
-				t = match[j];
+				mObj.t = match[j];
 				break;
 			case 6:
-				m = match[j];
+				mObj.m = match[j];
 				break;
 			case 7:
-				o = match[j];
+				mObj.o = match[j];
 				break;
 			case 8:
-				ts = parseInt(match[j]);
-				var mObj = {
-					"c1" : c1,
-					"c2" : c2,
-					"w" : w,
-					"sn" : sn,
-					"pw" : pw,
-					"t" : t,
-					"m" : m,
-					"o" : o,
-					"ts" : ts
-				};
+				mObj.ts = parseInt(match[j]);
 				matchRecords.push(mObj);
-
 				var c1Obj = getCharacter(c1);
 				var c2Obj = getCharacter(c2);
-				if (mObj.w == 0) {
-					c1Obj.wins.push(mObj.t);
-					c2Obj.losses.push(mObj.t);
-					if (mObj.time != 0) {
-						c1Obj.winTimes.push(mObj.time);
-						c2Obj.lossTimes.push(mObj.time);
-					}
-				} else if (mObj.w == 1) {
-					c2Obj.wins.push(mObj.t);
-					c1Obj.losses.push(mObj.t);
-					if (mObj.time != 0) {
-						c2Obj.push(mObj.time);
-						c1Obj.lossTimes.push(mObj.time);
-					}
-				}
-				if (mObj.odds != null && mObj.odds != "U") {
-					var oc1 = parseFloat(mObj.odds.split(":")[0]);
-					var oc2 = parseFloat(mObj.odds.split(":")[1]);
-					c1Obj.odds.push((oc1 / oc2).toFixed(2));
-					c2Obj.odds.push((oc2 / oc1).toFixed(2));
-				}
+				updater.updateCharactersFromMatch(mObj, c1Obj, c2Obj);
 
 				break;
 			}
@@ -303,20 +166,21 @@ var ir = function(f) {
 	});
 };
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	switch(request.type) {
-	case "dr":
-		dr();
-		break;
-	case "pr":
-		pr();
-		break;
-	case "er":
-		er();
-		break;
-	case "ir":
-		ir(request.text);
-		break;
-	}
-});
+if (window.location.href == "http://www.saltybet.com/")
+	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+		switch(request.type) {
+		case "dr":
+			dr();
+			break;
+		case "pr":
+			pr();
+			break;
+		case "er":
+			er();
+			break;
+		case "ir":
+			ir(request.text);
+			break;
+		}
+	});
 

@@ -49,6 +49,7 @@ Simulator.prototype.evalMutations = function(evolutionMode) {
 		var totalBettedOn = [];
 		var strategies = [];
 		var totalPercentCorrect = [];
+		var updater=new Updater();
 
 		// create orders from string passed in
 		var orders = [];
@@ -145,13 +146,7 @@ Simulator.prototype.evalMutations = function(evolutionMode) {
 			}
 
 			// now update characters
-			if (matches[i].w == 0) {
-				info.character1.wins.push(matches[i].t);
-				info.character2.losses.push(matches[i].t);
-			} else if (matches[i].w == 1) {
-				info.character2.wins.push(matches[i].t);
-				info.character1.losses.push(matches[i].t);
-			}
+			updater.updateCharactersFromMatch(matches[i], info.character1, info.character2);
 
 			// check results
 			if (strategies.length != predictions.length)

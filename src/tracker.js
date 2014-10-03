@@ -43,37 +43,14 @@ Match.prototype.update = function(infoFromWaifu, odds, timeInfo) {
 };
 Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
 	if (this.names.indexOf(w) > -1) {
-		if (w == this.character1.name) {
-			this.character1.wins.push(this.tier);
-			this.character2.losses.push(this.tier);
-			if (this.time != 0) {
-				this.character1.winTimes.push(this.time);
-				this.character2.lossTimes.push(this.time);
-			}
-		} else if (w == this.character2.name) {
-			this.character2.wins.push(this.tier);
-			this.character1.losses.push(this.tier);
-			if (this.time != 0) {
-				this.character2.winTimes.push(this.time);
-				this.character1.lossTimes.push(this.time);
-			}
-		}
-		if (this.odds != null && this.odds != "U") {
-			var oc1 = parseFloat(this.odds.split(":")[0]);
-			var oc2 = parseFloat(this.odds.split(":")[1]);
-			this.character1.odds.push((oc1 / oc2).toFixed(2));
-			this.character2.odds.push((oc2 / oc1).toFixed(2));
-		}
-
+		var updater=new Updater();
 		this.winner = (w == this.character1.name) ? 0 : 1;
-
 		var pw = null;
 		if (this.strategy.abstain)
 			pw = "a";
 		else
 			pw = (this.strategy.prediction == this.names[this.winner]) ? "t" : "f";
-
-		return [{
+		var mr={
 			"c1" : this.character1.name,
 			"c2" : this.character2.name,
 			"w" : this.winner,
@@ -83,7 +60,10 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"m" : this.mode.charAt(0),
 			"o" : this.odds,
 			"ts" : this.time
-		}, this.character1, this.character2];
+		};
+		
+		updater.updateCharactersFromMatch(mr, this.character1, this.character2);
+		return [mr, this.character1, this.character2];
 	} else {
 		console.log("-\nsalt robot error : name not in list : " + w + " names: " + this.names[0] + ", " + this.names[1]);
 		return null;
