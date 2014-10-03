@@ -32,8 +32,8 @@ var changeStrategyClickCS = function() {
 		btnClicked("cs_cs", data);
 	});
 };
-var changeStrategyClickRB = function() {
-	btnClicked("cs_rb");
+var changeStrategyClickRC = function() {
+	btnClicked("cs_rc");
 };
 var onFileRead = function(e) {
 	var t = e.target.result;
@@ -53,7 +53,7 @@ var Order = function(typeStr, chromosome) {
 var Simulator = function() {
 	this.data = [];
 };
-Simulator.prototype.evalMutations = function(evolutionMode) {
+Simulator.prototype.evalMutations = function(mode) {
 	var self = this;
 	chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1"], function(results) {
 		var matches = results.matches_v1;
@@ -69,7 +69,21 @@ Simulator.prototype.evalMutations = function(evolutionMode) {
 
 		// create orders from string passed in
 		var orders = [];
-		if (!evolutionMode) {
+		if (mode == "evolution") {
+			// queue up the entire last batch of chromosomes
+			var chromosomes = results.chromosomes_v1;
+			if (chromosomes) {
+				for (var z = 0; z < chromosomes.length; z++)
+					orders.push(new Order("cs", new Chromosome().loadFromObject(chromosomes[z])));
+			} else {
+				var msg = "Pool not initialized.";
+				document.getElementById('msgbox').value = msg;
+				throw msg;
+			}
+		} else if (mode == "mass") {
+			orders.push(new Order("rc"));
+			orders.push(new Order("rb"));
+		} else {
 			if (document.getElementById("ct").checked)
 				orders.push(new Order("ct"));
 			if (document.getElementById("mw").checked)
@@ -80,18 +94,8 @@ Simulator.prototype.evalMutations = function(evolutionMode) {
 				orders.push(new Order("rb"));
 			if (document.getElementById("cs").checked)
 				orders.push(new Order("cs", new Chromosome().loadFromObject(results.chromosomes_v1[0])));
-			// add a ConfidenceScore with the strongest known chromosome
-		} else {
-			// queue up the entire last batch of chromosomes
-			var chromosomes = results.chromosomes_v1;
-			if (chromosomes) {
-				for (var z = 0; z < chromosomes.length; z++)
-					orders.push(new Order("cs", new Chromosome().loadFromObject(chromosomes[z])));
-			} else {
-				var msg = "Pool not initialized."
-				document.getElementById('msgbox').value = msg;
-				throw msg;
-			}
+			if (document.getElementById("rc").checked)
+				orders.push(new Order("rc"));
 		}
 
 		// process orders for strategy creation
@@ -113,6 +117,9 @@ Simulator.prototype.evalMutations = function(evolutionMode) {
 				break;
 			case "cs":
 				strategy = new ConfidenceScore(order.chromosome);
+				break;
+			case "rc":
+				strategy = new RatioConfidence();
 				break;
 			}
 			strategy.debug = false;
@@ -177,7 +184,7 @@ Simulator.prototype.evalMutations = function(evolutionMode) {
 					correct[k] += (predictionWasCorrect) ? 1 : 0;
 					if (predictionWasCorrect && strategy.confidence)
 						confidencesLedToWin.push(strategy.confidence);
-					else
+					else if (strategy.confidence)
 						confidencesLedToLoss.push(strategy.confidence);
 
 					totalBettedOn[k] += 1;
@@ -188,36 +195,39 @@ Simulator.prototype.evalMutations = function(evolutionMode) {
 			}
 		}
 
-		if (evolutionMode) {
+		if (mode == "evolution" || mode == "mass") {
 			//go through totalPercentCorrect, weed out the top 10, breed them, save them
 			var sortingArray = [];
 			var parents = [];
 			var nextGeneration = [];
-			for (var l = 0; l < orders.length; l++) {
-				sortingArray.push([orders[l].chromosome, totalPercentCorrect[l]]);
-			}
-			sortingArray.sort(function(a, b) {
-				return b[1] - a[1];
-			});
-			var top = Math.round(sortingArray.length / 2);
-			for (var o = 0; o < top; o++) {
-				console.log(sortingArray[o][0].toDisplayString() + " -> " + sortingArray[o][1]);
-				parents.push(sortingArray[o][0]);
-				nextGeneration.push(sortingArray[o][0]);
-			}
-			for (var mf = 0; mf < parents.length; mf++) {
-				var parent1 = null;
-				var parent2 = null;
-				var child = null;
-				if (mf == 0) {
-					parent1 = parents[0];
-					parent2 = parents[parents.length - 1];
-				} else {
-					parent1 = parents[mf - 1];
-					parent2 = parents[mf];
+
+			if (mode == "evolution") {
+				for (var l = 0; l < orders.length; l++) {
+					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l]]);
 				}
-				child = parent1.mate(parent2);
-				nextGeneration.push(child);
+				sortingArray.sort(function(a, b) {
+					return b[1] - a[1];
+				});
+				var top = Math.round(sortingArray.length / 2);
+				for (var o = 0; o < top; o++) {
+					console.log(sortingArray[o][0].toDisplayString() + " -> " + sortingArray[o][1]);
+					parents.push(sortingArray[o][0]);
+					nextGeneration.push(sortingArray[o][0]);
+				}
+				for (var mf = 0; mf < parents.length; mf++) {
+					var parent1 = null;
+					var parent2 = null;
+					var child = null;
+					if (mf == 0) {
+						parent1 = parents[0];
+						parent2 = parents[parents.length - 1];
+					} else {
+						parent1 = parents[mf - 1];
+						parent2 = parents[mf];
+					}
+					child = parent1.mate(parent2);
+					nextGeneration.push(child);
+				}
 			}
 
 			//figure out confidence thresholds
@@ -230,19 +240,29 @@ Simulator.prototype.evalMutations = function(evolutionMode) {
 				lConfidenceSum += confidencesLedToLoss[wl];
 			var lConfidenceAvg = (lConfidenceSum / confidencesLedToLoss.length * 100).toFixed(4);
 
-			var best = sortingArray[0][1];
+			var best;
+			if (mode == "evolution") {
+				best = sortingArray[0][1];
 
-			chrome.storage.local.set({
-				'chromosomes_v1' : nextGeneration,
-				'best_chromosome' : sortingArray[0][0]
-			}, function() {
-				roundsOfEvolution += 1;
-				console.log("\n\n--------------- end of generation " + roundsOfEvolution + ", " + best.toFixed(4) + "%, wC: " + wConfidenceAvg + ", lC: " + lConfidenceAvg + "-------------------\n\n");
-				document.getElementById('msgbox').value = "rounds: " + roundsOfEvolution + ", best: " + best;
-				setTimeout(function() {
-					simulator.evalMutations(true);
-				}, 5000);
-			});
+				chrome.storage.local.set({
+					'chromosomes_v1' : nextGeneration,
+					'best_chromosome' : sortingArray[0][0]
+				}, function() {
+					roundsOfEvolution += 1;
+					console.log("\n\n-------- end of generation " + roundsOfEvolution + ", matches processed with ConfidenceScore " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "% -> " + best.toFixed(4) + "%, wC: " + wConfidenceAvg + ", lC: " + lConfidenceAvg + "-------------------\n\n");
+					document.getElementById('msgbox').value = "rounds: " + roundsOfEvolution + ", best: " + best;
+					setTimeout(function() {
+						simulator.evalMutations("evolution");
+					}, 5000);
+				});
+			} else if (mode == "mass") {
+				console.log("\n\n--------------- matches processed with RatioConfidence " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "% -> wC: " + wConfidenceAvg + ", lC: " + lConfidenceAvg + "-------------------\n\n");
+
+				for (var l = 0; l < orders.length; l++) {
+					console.log(orders[l].type + ": " + totalPercentCorrect[l]);
+				}
+			}
+
 		} else {
 			self.data = data;
 			for (var l = 0; l < orders.length; l++) {
@@ -323,18 +343,21 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("ber").addEventListener("click", erClick);
 	document.getElementById("bir").addEventListener("change", irClick);
 	document.getElementById("bsc").addEventListener("click", function() {
-		simulator.evalMutations(false);
+		simulator.evalMutations();
 		simulator.draw();
 	});
 	document.getElementById("ugw").addEventListener("click", function() {
-		simulator.evalMutations(true);
+		simulator.evalMutations("evolution");
 	});
 	document.getElementById("rgw").addEventListener("click", function() {
 		simulator.initializePool();
 	});
+	document.getElementById("mrc").addEventListener("click", function() {
+		simulator.evalMutations("mass");
+	});
 	document.getElementById("cs_o").addEventListener("click", changeStrategyClickO);
 	document.getElementById("cs_cs").addEventListener("click", changeStrategyClickCS);
-	document.getElementById("cs_rb").addEventListener("click", changeStrategyClickRB);
+	document.getElementById("cs_rc").addEventListener("click", changeStrategyClickRC);
 
 });
 

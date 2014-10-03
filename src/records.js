@@ -186,7 +186,7 @@ if (window.location.href == "http://www.saltybet.com/")
 		case "cs_o":
 			ctrl.changeStrategy(request.type);
 			break;
-		case "cs_rb":
+		case "cs_rc":
 			ctrl.changeStrategy(request.type);
 			break;
 		case "cs_cs":

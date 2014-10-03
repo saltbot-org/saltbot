@@ -123,8 +123,8 @@ var RatioBasic = function() {
 			self.abstain = true;
 			return null;
 		}
-		var c1Ratio = c1.wins.length / c1TotalMatches;
-		var c2Ratio = c2.wins.length / c2TotalMatches;
+		var c1Ratio = (c1TotalMatches) ? c1.wins.length / c1TotalMatches : 0;
+		var c2Ratio = (c2TotalMatches) ? c2.wins.length / c2TotalMatches : 0;
 
 		if (c1Ratio != c2Ratio) {
 			c1.ratio = c1Ratio;
@@ -161,18 +161,19 @@ var Chromosome = function() {
 	this.oddsWeight = 1;
 	this.timeWeight = 0.5;
 	this.winPercentageWeight = 1;
+	//1;
 	this.totalWinsWeight = 0.1;
 	// tier Scoring
-	this.wx = 5;
-	this.ws = 4;
-	this.wa = 3;
-	this.wb = 2;
-	this.wp = 1;
-	this.lx = 1;
-	this.ls = 2;
-	this.la = 3;
-	this.lb = 4;
-	this.lp = 5;
+	this.wX = 5;
+	this.wS = 4;
+	this.wA = 3;
+	this.wB = 2;
+	this.wP = 1;
+	this.lX = 1;
+	this.lS = 2;
+	this.lA = 3;
+	this.lB = 4;
+	this.lP = 5;
 	this.lU = 0.5;
 	this.wU = 0.5;
 	return this;
@@ -256,7 +257,8 @@ var ConfidenceScore = function(chromosome) {
 	this.abstain = false;
 	this.confidence = null;
 	this.possibleConfidence = 0;
-	// this.fallback1 = new RatioBasic();// this.fallback1.debug = false;
+	this.fallback1 = new RatioConfidence();
+	this.fallback1.debug = false;
 	this.chromosome = chromosome || this.chromosome;
 };
 ConfidenceScore.prototype = Intermediary;
@@ -277,13 +279,13 @@ ConfidenceScore.prototype.getWeightedScores = function(c, hasTiered, hasUntiered
 
 	if (hasTiered && !hasUntiered) {
 		// best case scenario, only comparing tiered matches
-		return this.countFromRecord(c, ["p", "b", "a", "s", "x"], this.chromosome.wModBest);
+		return this.countFromRecord(c, ["P", "B", "A", "S", "X"], this.chromosome.wModBest);
 	} else if (!hasTiered && hasUntiered) {
 		// next best case
 		return this.countFromRecord(c, ["U"], this.chromosome.wModMiddle);
 	} else {
 		// worst-case
-		return this.countFromRecord(c, ["U", "p", "b", "a", "s", "x"], this.chromosome.wModWorst);
+		return this.countFromRecord(c, ["U", "P", "B", "A", "S", "X"], this.chromosome.wModWorst);
 	}
 };
 ConfidenceScore.prototype.execute = function(info) {
@@ -322,8 +324,8 @@ ConfidenceScore.prototype.execute = function(info) {
 	// tier weighting section
 	var hasTieredMatchesRE = /[pbasx]/g;
 	var hasUntieredMatchesRE = /[u]/g;
-	var c1WinsAndLosses = c1.wins.toString() + c1.losses.toString();
-	var c2WinsAndLosses = c2.wins.toString() + c2.losses.toString();
+	var c1WinsAndLosses = c1.wins.toString() + "," + c1.losses.toString();
+	var c2WinsAndLosses = c2.wins.toString() + "," + c2.losses.toString();
 	var hasTiered = hasTieredMatchesRE.test(c1WinsAndLosses) && hasTieredMatchesRE.test(c2WinsAndLosses);
 	var hasUntiered = hasUntieredMatchesRE.test(c1WinsAndLosses) && hasUntieredMatchesRE.test(c2WinsAndLosses);
 
@@ -356,6 +358,7 @@ ConfidenceScore.prototype.execute = function(info) {
 		if (this.debug)
 			console.log("-\nCS has insufficient information (scores: " + c1Score + ":" + c2Score + ")(" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
 		this.abstain = true;
+		this.lowBet = true;
 		return null;
 	}
 
@@ -367,10 +370,73 @@ ConfidenceScore.prototype.execute = function(info) {
 	var totalAvailablePoints = c1Score + c2Score;
 	this.confidence = parseFloat((winnerPoints / totalAvailablePoints).toFixed(2));
 
+	// the point scoring in this makes for a terrible confidence predictor; rely on this for betting amount instead
+	this.fallback1.execute(info);
+
 	if (this.debug)
 		console.log("-\n" + this.prediction + " has a better W score (scores: " + c1Score + ":" + c2Score + ")(" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), betting " + this.prediction);
 	return this.prediction;
 };
+
+var RatioConfidence = function() {
+	this.base = Strategy;
+	this.base("rc");
+	this.abstain = false;
+	var s = this;
+	this.execute = function(info) {
+		var self = s;
+		var c1 = info.character1;
+		var c2 = info.character2;
+		var c1TotalMatches = c1.wins.length + c1.losses.length;
+		var c2TotalMatches = c2.wins.length + c2.losses.length;
+		var p;
+
+		if (c1TotalMatches < 2 || c2TotalMatches < 2) {
+			if (this.debug)
+				console.log("-\nRC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
+			self.abstain = true;
+			self.lowBet = true;
+			return null;
+		}
+		var c1Ratio = (c1TotalMatches) ? c1.wins.length / c1TotalMatches : 0;
+		var c2Ratio = (c2TotalMatches) ? c2.wins.length / c2TotalMatches : 0;
+
+		if (c1Ratio != c2Ratio) {
+			c1.ratio = c1Ratio;
+			c2.ratio = c2Ratio;
+			var pChar = (c1.ratio > c2.ratio) ? c1 : c2;
+			var npChar = (c1.ratio < c2.ratio) ? c1 : c2;
+			//confidence score
+			self.confidence = (pChar.name == c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
+			if (self.confidence < 0.6) {
+				if (this.debug)
+					console.log("-\nRC has insufficient confidence (confidence: " + self.confidence.toFixed(2) + ")(" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
+				self.abstain = true;
+				self.lowBet = true;
+				return null;
+			}
+			if (pChar.ratio <= 0.5 || (npChar.ratio == 0.5 && (npChar.wins.length + npChar.losses.length == 2))) {
+				if (this.debug)
+					console.log("-\nRC prohibited from betting on or against <51% (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%), canceling bet");
+				self.abstain = true;
+				self.lowBet = true;
+				return null;
+			}
+			p = pChar.name;
+			if (this.debug)
+				console.log("-\n" + p + " has a better win percentage (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%); RB betting " + p + " confidence: " + self.confidence);
+			self.prediction = p;
+			return p;
+		} else if (c1Ratio == c2Ratio) {
+			if (this.debug)
+				console.log("-\nRC has insufficient information (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%), canceling bet");
+			self.abstain = true;
+			self.lowBet = true;
+			return null;
+		}
+	};
+};
+RatioConfidence.prototype = Strategy;
 
 var Observer = function() {
 	this.base = Strategy;

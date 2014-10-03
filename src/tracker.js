@@ -9,7 +9,6 @@ var Match = function(strat) {
 	this.mode = "U";
 	this.odds = "U";
 	this.time = 0;
-
 };
 Match.prototype.update = function(infoFromWaifu, odds, timeInfo) {
 	for (var i = 0; i < infoFromWaifu.length; i++) {
@@ -34,14 +33,14 @@ Match.prototype.update = function(infoFromWaifu, odds, timeInfo) {
 };
 Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
 	if (this.names.indexOf(w) > -1) {
-		var updater=new Updater();
+		var updater = new Updater();
 		this.winner = (w == this.character1.name) ? 0 : 1;
 		var pw = null;
 		if (this.strategy.abstain)
 			pw = "a";
 		else
 			pw = (this.strategy.prediction == this.names[this.winner]) ? "t" : "f";
-		var mr={
+		var mr = {
 			"c1" : this.character1.name,
 			"c2" : this.character2.name,
 			"w" : this.winner,
@@ -52,13 +51,38 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"o" : this.odds,
 			"ts" : this.time
 		};
-		
+
 		updater.updateCharactersFromMatch(mr, this.character1, this.character2);
 		return [mr, this.character1, this.character2];
 	} else {
 		console.log("-\nsalt robot error : name not in list : " + w + " names: " + this.names[0] + ", " + this.names[1]);
 		return null;
 	}
+};
+Match.prototype.betAmount = function(tournament, debug) {
+	var balanceBox = document.getElementById("balance");
+	var wagerBox = document.getElementById("wager");
+	var balance = parseInt(balanceBox.innerHTML.replace(",", ""));
+	var amountToBet;
+	if (this.strategy instanceof ConfidenceScore)
+		this.strategy.confidence = this.strategy.fallback1.confidence || 0.1;
+	if (tournament && this.strategy.confidence && !this.strategy.lowBet) {
+		amountToBet = Math.round(balance * this.strategy.confidence).toString();
+		wagerBox.value = amountToBet;
+		if (debug)
+			console.log("- betting: " + balance + " x  cf(" + (Math.round(this.strategy.confidence * 100)).toFixed(2) + "%) = " + amountToBet);
+	} else if (!tournament && this.strategy.confidence && !this.strategy.lowBet) {
+		amountToBet = Math.round(balance * .1 * this.strategy.confidence).toString();
+		wagerBox.value = amountToBet;
+		if (debug)
+			console.log("- betting: " + balance + " x .10 =(" + (balance * .1) + ") x cf(" + (Math.round(this.strategy.confidence * 100)).toFixed(2) + "%) = " + amountToBet);
+	} else {
+		amountToBet = (100 + Math.round(Math.random() * 75)).toString();
+		wagerBox.value = amountToBet;
+		if (debug)
+			console.log("- betting without confidence: " + amountToBet);
+	}
+
 };
 Match.prototype.init = function() {
 	var s = this;
@@ -90,15 +114,17 @@ Match.prototype.init = function() {
 			"matches" : result.matches_v1
 		});
 
-		if (prediction != null) {
+		if (prediction != null || self.strategy.lowBet) {
 			setTimeout(function() {
 				var tournamentModeIndicator = "characters are left in the bracket!";
 				var footer = document.getElementById("footer-alert");
 				if (footer != null && footer.innerHTML.indexOf(tournamentModeIndicator) > -1) {
 					//bet more in tournaments
-					self.strategy.btn50.click();
+					self.betAmount(true, true);
+					// self.strategy.btn50.click();
 				} else {
-					self.strategy.btn10.click();
+					self.betAmount(false, true);
+					// self.strategy.btn10.click();
 				}
 			}, Math.floor(Math.random() * baseSeconds));
 			setTimeout(function() {

@@ -50,7 +50,7 @@ var Controller = function() {
 	var timerInterval = 3000;
 	this.ticksSinceMatchBegan = -999;
 	this.bestChromosome = new Chromosome();
-	this.nextStrategy = "o";
+	this.nextStrategy = "cs";
 
 	var self = this;
 
@@ -175,8 +175,8 @@ var Controller = function() {
 			case "o":
 				self.currentMatch = new Match(new Observer());
 				break;
-			case "rb":
-				self.currentMatch = new Match(new RatioBasic());
+			case "rc":
+				self.currentMatch = new Match(new RatioConfidence());
 				break;
 			case "cs":
 				self.currentMatch = new Match(new ConfidenceScore(self.bestChromosome));
@@ -220,13 +220,13 @@ Controller.prototype.ensureTwitch = function() {
 	});
 };
 Controller.prototype.changeStrategy = function(sn, data) {
-	console.log("-\nchanging strategy to " + sn);
+	console.log("-\nchanging strategy to " + sn.replace("cs_", ""));
 	switch(sn) {
 	case "cs_o":
 		this.nextStrategy = "o";
 		break;
-	case "cs_rb":
-		this.nextStrategy = "rb";
+	case "cs_rc":
+		this.nextStrategy = "rc";
 		break;
 	case "cs_cs":
 		this.nextStrategy = "cs";
