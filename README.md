@@ -1,2 +1,4 @@
 # SaltBot
-A simple betting bot for SaltyBet. It collects stats and then bets based on wins and losses. It won't make a single bet without a ton of data. If you're interested in testing it or working on it, please feel free to email me and ask for my database.
+A betting bot for SaltyBet. It has two strategies choosable by the user. One of them uses a genetic algorithm to weigh data from previous matches. The other one just compares win percentages. Both select betting amounts based on confidence. Uses Chrome storage to save and load data.
+
+It requires about 1000 saved matches to get decent accuracy. Email me if you'd like a copy of my database.
