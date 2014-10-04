@@ -66,11 +66,15 @@ Match.prototype.betAmount = function(tournament, debug) {
 	var amountToBet;
 	if (this.strategy instanceof ConfidenceScore)
 		this.strategy.confidence = this.strategy.fallback1.confidence || 0.1;
-	if (tournament && this.strategy.confidence && !this.strategy.lowBet) {
-		amountToBet = Math.round(balance * this.strategy.confidence).toString();
+	if (tournament) {
+		amountToBet = Math.round(balance * (this.strategy.confidence || 0.5)).toString();
 		wagerBox.value = amountToBet;
-		if (debug)
-			console.log("- betting: " + balance + " x  cf(" + (Math.round(this.strategy.confidence * 100)).toFixed(2) + "%) = " + amountToBet);
+		if (debug) {
+			if (this.strategy.confidence)
+				console.log("- betting: " + balance + " x  cf(" + (Math.round(this.strategy.confidence * 100)).toFixed(2) + "%) = " + amountToBet);
+			else
+				console.log("- betting: " + balance + " x  50%) = " + amountToBet);
+		}
 	} else if (!tournament && this.strategy.confidence && !this.strategy.lowBet) {
 		amountToBet = Math.round(balance * .1 * this.strategy.confidence).toString();
 		wagerBox.value = amountToBet;
