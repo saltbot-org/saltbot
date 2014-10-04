@@ -50,7 +50,7 @@ var Controller = function() {
 	var timerInterval = 3000;
 	this.ticksSinceMatchBegan = -999;
 	this.bestChromosome = new Chromosome();
-	this.nextStrategy = "rc";
+	this.nextStrategy = "cs";
 
 	var self = this;
 
