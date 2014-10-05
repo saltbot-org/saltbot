@@ -67,10 +67,13 @@ Match.prototype.betAmount = function(tournament, debug) {
 	if (this.strategy instanceof ConfidenceScore)
 		this.strategy.confidence = this.strategy.fallback1.confidence || 0.1;
 	if (tournament) {
-		amountToBet = Math.round(balance * (this.strategy.confidence || 0.5)).toString();
+		var allIn = balance < 2000;
+		amountToBet = allIn ? Math.round(balance * (this.strategy.confidence || 0.5)).toString() : balance.toString();
 		wagerBox.value = amountToBet;
 		if (debug) {
-			if (this.strategy.confidence)
+			if (allIn)
+				console.log("- ALL IN: " + balance);
+			else if (this.strategy.confidence)
 				console.log("- betting: " + balance + " x  cf(" + (Math.round(this.strategy.confidence * 100)).toFixed(2) + "%) = " + amountToBet);
 			else
 				console.log("- betting: " + balance + " x  50%) = " + amountToBet);
@@ -121,15 +124,14 @@ Match.prototype.init = function() {
 		if (prediction != null || self.strategy.lowBet) {
 			setTimeout(function() {
 				var tournamentModeIndicator = "characters are left in the bracket!";
+				var tournamentModeIndicator2 = "Tournament mode start";
 				var footer = document.getElementById("footer-alert");
 				//
-				if (footer != null && footer.innerHTML.indexOf(tournamentModeIndicator) > -1) {
+				if (footer != null && (footer.innerHTML.indexOf(tournamentModeIndicator) > -1 || footer.innerHTML.indexOf(tournamentModeIndicator2) > -1)) {
 					//bet more in tournaments
 					self.betAmount(true, true);
-					// self.strategy.btn50.click();
 				} else {
 					self.betAmount(false, true);
-					// self.strategy.btn10.click();
 				}
 			}, Math.floor(Math.random() * baseSeconds));
 			setTimeout(function() {
