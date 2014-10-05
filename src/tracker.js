@@ -122,6 +122,7 @@ Match.prototype.init = function() {
 			setTimeout(function() {
 				var tournamentModeIndicator = "characters are left in the bracket!";
 				var footer = document.getElementById("footer-alert");
+				//
 				if (footer != null && footer.innerHTML.indexOf(tournamentModeIndicator) > -1) {
 					//bet more in tournaments
 					self.betAmount(true, true);

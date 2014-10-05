@@ -235,6 +235,11 @@ Controller.prototype.changeStrategy = function(sn, data) {
 		break;
 	}
 };
+Controller.prototype.receiveBestChromosome = function(data) {
+	// console.log("- received chromosome");
+	var chromosome = new Chromosome().loadFromJSON(data);
+	this.bestChromosome = chromosome;
+};
 
 ctrl = null;
 if (window.location.href == "http://www.saltybet.com/") {

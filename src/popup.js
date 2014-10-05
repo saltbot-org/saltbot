@@ -22,13 +22,13 @@ var prClick = function() {
 var erClick = function() {
 	btnClicked("er");
 };
+
 var changeStrategyClickO = function() {
 	btnClicked("cs_o");
 };
 var changeStrategyClickCS = function() {
 	chrome.storage.local.get(["chromosomes_v1"], function(results) {
 		var data = JSON.stringify(results.chromosomes_v1[0]);
-		//new Chromosome().loadFromObject(results.chromosomes_v1[0]).toJSON();
 		btnClicked("cs_cs", data);
 	});
 };
@@ -358,6 +358,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("cs_o").addEventListener("click", changeStrategyClickO);
 	document.getElementById("cs_cs").addEventListener("click", changeStrategyClickCS);
 	document.getElementById("cs_rc").addEventListener("click", changeStrategyClickRC);
+	chrome.alarms.create("chromosome update", {
+		when : Date.now(),
+		periodInMinutes : 1
+	});
 
 });
 

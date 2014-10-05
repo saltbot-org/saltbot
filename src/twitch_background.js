@@ -22,7 +22,25 @@ chrome.extension.onMessage.addListener(function(details) {
 		});
 	}
 });
-
+var sendUpdatedChromosome = function() {
+	chrome.storage.local.get(["chromosomes_v1"], function(results) {
+		if (results.chromosomes_v1) {
+			var data = JSON.stringify(results.chromosomes_v1[0]);
+			chrome.tabs.query({
+				title : "Salty Bet - In Salt We Trust",
+				url : "http://www.saltybet.com/"
+			}, function(result) {
+				chrome.tabs.sendMessage(result[0].id, {
+					type : "suc",
+					text : data
+				});
+			});
+		}
+	});
+};
+chrome.alarms.onAlarm.addListener(function(alarm) {
+	sendUpdatedChromosome();
+});
 //To reload
 //chrome.tabs.reload(myTabs[i].id)
 // or if that doesn't work

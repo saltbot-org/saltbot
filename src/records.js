@@ -186,6 +186,9 @@ if (window.location.href == "http://www.saltybet.com/")
 		case "cs_o":
 			ctrl.changeStrategy(request.type);
 			break;
+		case "suc":
+			ctrl.receiveBestChromosome(request.text);
+			break;
 		case "cs_rc":
 			ctrl.changeStrategy(request.type);
 			break;
