@@ -68,7 +68,7 @@ Match.prototype.betAmount = function(tournament, debug) {
 		this.strategy.confidence = this.strategy.fallback1.confidence || 0.1;
 	if (tournament) {
 		var allIn = balance < 2000;
-		amountToBet = allIn ? Math.round(balance * (this.strategy.confidence || 0.5)).toString() : balance.toString();
+		amountToBet = (!allIn) ? Math.round(balance * (this.strategy.confidence || 0.5)).toString() : balance.toString();
 		wagerBox.value = amountToBet;
 		if (debug) {
 			if (allIn)
