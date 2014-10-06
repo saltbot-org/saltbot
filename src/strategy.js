@@ -391,7 +391,7 @@ var RatioConfidence = function() {
 		var c2TotalMatches = c2.wins.length + c2.losses.length;
 		var p;
 
-		if (c1TotalMatches < 2 || c2TotalMatches < 2) {
+		if (c1TotalMatches < 3 || c2TotalMatches < 3) {
 			if (this.debug)
 				console.log("-\nRC has insufficient information, W:L(P1)(P2)->  (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
 			self.abstain = true;
