@@ -9,8 +9,10 @@ var Match = function(strat) {
 	this.mode = "U";
 	this.odds = "U";
 	this.time = 0;
+	this.crowdFavor=2;
+	this.illumFavor=2;
 };
-Match.prototype.update = function(infoFromWaifu, odds, timeInfo) {
+Match.prototype.update = function(infoFromWaifu, odds, timeInfo, crowdFavor, illumFavor) {
 	for (var i = 0; i < infoFromWaifu.length; i++) {
 		var ifw = infoFromWaifu[i];
 		if (this.names[0] == ifw.c1 && this.names[1] == ifw.c2) {
@@ -30,6 +32,9 @@ Match.prototype.update = function(infoFromWaifu, odds, timeInfo) {
 	//add more time to matches that are recognized as being in exhibition mode, proportional to the amount of required matches missing
 	if (this.mode == "e")
 		this.time = Math.round(this.time * 1.5);
+	// add favor stats
+	this.crowdFavor=crowdFavor;
+	this.illumFavor=illumFavor;	
 };
 Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
 	if (this.names.indexOf(w) > -1) {
@@ -49,7 +54,9 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"t" : this.tier,
 			"m" : this.mode.charAt(0),
 			"o" : this.odds,
-			"ts" : this.time
+			"ts" : this.time, 
+			"cf": this.crowdFavor, 
+			"if": this.illumFavor
 		};
 
 		updater.updateCharactersFromMatch(mr, this.character1, this.character2);

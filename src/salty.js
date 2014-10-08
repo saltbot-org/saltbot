@@ -45,6 +45,9 @@ var Controller = function() {
 	this.infoFromWaifu = [];
 	this.lastWinnerFromWaifuAnnouncement = null;
 	this.odds = null;
+	//0- player one ; 1- player two ; 2- information not captured
+	this.crowdFavor = 2;
+	this.illumFavor = 2;
 	var attemptsToProcess = 0;
 	var maxAttempts = 3;
 	var timerInterval = 3000;
@@ -94,7 +97,7 @@ var Controller = function() {
 					self.currentMatch.update(self.infoFromWaifu, self.odds, {
 						"ticks" : self.ticksSinceMatchBegan,
 						"interval" : timerInterval
-					});
+					},self.crowdFavor, self.illumFavor);
 					var records = self.currentMatch.getRecords(winner);
 					var mr = records[0];
 					var c1 = records[1];
@@ -116,7 +119,7 @@ var Controller = function() {
 							matches_v1.push(mr);
 						}
 						if (debugMode)
-							console.log("-\nnumber of match records: " + matches_v1.length);
+							console.log("- number of match records: " + matches_v1.length);
 
 						//character records:
 						if (results.hasOwnProperty("characters_v1"))
@@ -142,7 +145,7 @@ var Controller = function() {
 						else
 							characters_v1.push(c2);
 						if (debugMode)
-							console.log("-\nnumber of character records: " + characters_v1.length);
+							console.log("- number of character records: " + characters_v1.length);
 
 						//do aliasing for closure
 						var mbr = matchesBeforeReset;
@@ -152,7 +155,7 @@ var Controller = function() {
 							'characters_v1' : characters_v1
 						}, function() {
 							if (debugMode) {
-								console.log("-\nrecords saved, matches this cycle: " + mp);
+								console.log("- records saved, matches this cycle: " + mp);
 							}
 							if (mp >= mbr) {
 								location.reload();
@@ -162,7 +165,7 @@ var Controller = function() {
 
 				} else {
 					//if we failed to get a winner and record the match, still count the match towards the reset number
-					console.log("-\nfailed to determine winner, matches this cycle: " + matchesProcessed);
+					console.log("- failed to determine winner, matches this cycle: " + matchesProcessed);
 					if (matchesProcessed >= matchesBeforeReset)
 						location.reload();
 				}
@@ -189,13 +192,13 @@ var Controller = function() {
 			//skip team matches, mirror matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
 				self.currentMatch = null;
-				console.log("-\nskipping team match");
+				console.log("- skipping team match");
 			} else if (self.currentMatch.names[0] == self.currentMatch.names[1]) {
 				self.currentMatch = null;
-				console.log("-\nskipping mirror match");
+				console.log("- skipping mirror match");
 			} else if (self.currentMatch.names[0].indexOf(",") > -1 || self.currentMatch.names[1].indexOf(",") > -1) {
 				self.currentMatch = null;
-				console.log("-\nskipping match, comma in name");
+				console.log("- skipping match, comma in name");
 			} else {
 				self.currentMatch.init();
 			}
@@ -296,6 +299,26 @@ if (window.location.href == "http://www.saltybet.com/") {
 						self.odds = "" + c1Odds + ":" + c2Odds;
 					} catch(e) {
 						self.odds = null;
+					}
+					// save the crowd favor and the illuminati favor
+					try {
+						var betsForC1 = document.getElementById("sbettors1");
+						var betsForC2 = document.getElementById("sbettors2");
+						var crowdSizeC1 = betsForC1.getElementsByClassName("bettor-line").length;
+						var crowdSizeC2 = betsForC2.getElementsByClassName("bettor-line").length;
+						var illumSizeC1 = betsForC1.getElementsByClassName("goldtext").length;
+						var illumSizeC2 = betsForC2.getElementsByClassName("goldtext").length;
+						if (crowdSizeC1 == crowdSizeC2)
+							self.crowdFavor = 2;
+						else
+							self.crowdFavor = (crowdSizeC1 > crowdSizeC2) ? 0 : 1;
+						if (illumSizeC1 == illumSizeC2)
+							self.illumFavor = 2;
+						else
+							self.illumFavor = (illumSizeC1 > illumSizeC2) ? 0 : 1;
+					} catch(e) {
+						self.crowdFavor = 2;
+						self.illumFavor = 2;
 					}
 				}, 10000);
 			}

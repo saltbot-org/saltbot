@@ -5,6 +5,8 @@ var Character = function(name) {
 	this.winTimes = [];
 	this.lossTimes = [];
 	this.odds = [];
+	this.crowdFavor = [];
+	this.illumFavor = [];
 };
 
 var Updater = function() {
@@ -32,6 +34,22 @@ Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
 		var oc2 = parseFloat(mObj.o.split(":")[1]);
 		c1Obj.odds.push(parseFloat((oc1 / oc2).toFixed(2)));
 		c2Obj.odds.push(parseFloat((oc2 / oc1).toFixed(2)));
+	}
+	if (mObj.if != null && mObj.if.length > 0) {
+		if (mObj.cf == 0) {
+			c1Obj.crowdFavor.push(1);
+			c2Obj.crowdFavor.push(0);
+		} else if (mObj.cf == 1) {
+			c1Obj.crowdFavor.push(0);
+			c2Obj.crowdFavor.push(1);
+		}
+		if (mObj.if == 0) {
+			c1Obj.illumFavor.push(1);
+			c2Obj.illumFavor.push(0);
+		} else if (mObj.if == 1) {
+			c1Obj.illumFavor.push(0);
+			c2Obj.illumFavor.push(1);
+		}
 	}
 };
 
@@ -81,14 +99,19 @@ var er = function() {
 			record += ",";
 			record += (match.hasOwnProperty("ts")) ? match.ts : 0;
 			record += "\n";
+			record += (match.hasOwnProperty("cf")) ? match.cf : 2;
+			record += "\n";
+			record += (match.hasOwnProperty("if")) ? match.if : 2;
+			record += "\n";
 			lines.push(record);
 		}
 
 		var time = new Date();
-		var blob = new Blob(lines, {
+		var blobM = new Blob(lines, {
 			type : "text/plain;charset=utf-8"
 		});
-		saveAs(blob, "saltyRecords--" + time.getFullYear() + "-" + time.getMonth() + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes() + ".txt");
+		var timeStr = "" + time.getFullYear() + "-" + time.getMonth() + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+		saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
 	});
 };
 
@@ -113,7 +136,7 @@ var ir = function(f) {
 		return cobject;
 	};
 	//numberOfProperties refers to c1, c2, w, sn, etc.
-	var numberOfProperties = 9;
+	var numberOfProperties = 11;
 	var mObj = null;
 	var lines = f.split("\n");
 	for (var i = 0; i < lines.length; i++) {
@@ -148,6 +171,12 @@ var ir = function(f) {
 				break;
 			case 8:
 				mObj.ts = parseInt(match[j]);
+				break;
+			case 9:
+				mObj.cf = parseInt(match[j]);
+				break;
+			case 10:
+				mObj.if = parseInt(match[j]);
 				matchRecords.push(mObj);
 				var c1Obj = getCharacter(mObj.c1);
 				var c2Obj = getCharacter(mObj.c2);
