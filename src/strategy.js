@@ -78,7 +78,7 @@ var MoreWinsCautious = function() {
 		var p;
 		if ((c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
 			if (this.debug)
-				console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
+				console.log("- MWC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
 			self.abstain = true;
 			return null;
 		}
@@ -96,7 +96,7 @@ var MoreWinsCautious = function() {
 			return p;
 		} else {
 			if (this.debug)
-				console.log("-\nMWC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
+				console.log("- MWC has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
 			self.abstain = true;
 			return null;
 		}
@@ -119,7 +119,7 @@ var RatioBasic = function() {
 
 		if (c1TotalMatches < 2 || c2TotalMatches < 2) {
 			if (this.debug)
-				console.log("-\nRB has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
+				console.log("- RB has insufficient information (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), canceling bet");
 			self.abstain = true;
 			return null;
 		}
@@ -134,18 +134,18 @@ var RatioBasic = function() {
 			//
 			if (pChar.ratio <= 0.5 || (npChar.ratio == 0.5 && (npChar.wins.length + npChar.losses.length == 2))) {
 				if (this.debug)
-					console.log("-\nRB prohibited from betting on or against <51% (" + (c1Ratio * 100) + "% : " + (c2Ratio * 100) + "%), canceling bet");
+					console.log("- RB prohibited from betting on or against <51% (" + (c1Ratio * 100) + "% : " + (c2Ratio * 100) + "%), canceling bet");
 				self.abstain = true;
 				return null;
 			}
 			p = pChar.name;
 			if (this.debug)
-				console.log("-\n" + p + " has a better win percentage (" + (c1Ratio * 100) + "% : " + (c2Ratio * 100) + "%); RB betting " + p);
+				console.log("- " + p + " has a better win percentage (" + (c1Ratio * 100) + "% : " + (c2Ratio * 100) + "%); RB betting " + p);
 			self.prediction = p;
 			return p;
 		} else if (c1Ratio == c2Ratio) {
 			if (this.debug)
-				console.log("-\nRB has insufficient information (" + (c1Ratio * 100) + "% : " + (c2Ratio * 100) + "%), canceling bet");
+				console.log("- RB has insufficient information (" + (c1Ratio * 100) + "% : " + (c2Ratio * 100) + "%), canceling bet");
 			self.abstain = true;
 			return null;
 		}
@@ -161,6 +161,9 @@ var Chromosome = function() {
 	this.oddsWeight = 1;
 	this.timeWeight = 0.5;
 	this.winPercentageWeight = 1;
+	this.crowdFavorWeight = 1;
+	this.illumFavorWeight = 1;
+	this.junk = 1;
 	//1;
 	this.totalWinsWeight = 0.1;
 	// tier Scoring
@@ -235,6 +238,8 @@ var CSStats = function(cObj) {
 	this.averageOdds = null;
 	this.averageWinTime = null;
 	this.averageLossTime = null;
+	this.cfPercent = null;
+	this.ifPercent = null;
 	for (var i = 0; i < cObj.odds.length; i++) {
 		oddsSum += cObj.odds[i];
 		oddsCount += 1;
@@ -250,6 +255,20 @@ var CSStats = function(cObj) {
 		timedLostMatchesCount += 1;
 	}
 	this.averageLossTime = (lossTimesTotal != 0) ? lossTimesTotal / timedLostMatchesCount : null;
+	if (cObj.crowdFavor.length > 0) {
+		var cfSum = 0;
+		for (var l = 0; l < cObj.crowdFavor.length; l++) {
+			cfSum += cObj.crowdFavor[l];
+		}
+		this.cfPercent = cfSum / cObj.cf.length;
+	}
+	if (cObj.illumFavor.length > 0) {
+		var ifSum = 0;
+		for (var m = 0; m < cObj.illumFavor.length; m++) {
+			cfSum += cObj.illumFavor[m];
+		}
+		this.ifPercent = ifSum / cObj.illumFavor.length;
+	}
 };
 var ConfidenceScore = function(chromosome) {
 	this.base = Intermediary;
@@ -302,12 +321,20 @@ ConfidenceScore.prototype.execute = function(info) {
 	var timeWeight = this.chromosome.timeWeight;
 	var winPercentageWeight = this.chromosome.winPercentageWeight;
 	var totalWinsWeight = this.chromosome.totalWinsWeight;
+	var crowdFavorWeight = this.chromosome.crowdFavorWeight;
+	var illumFavorWeight = this.chromosome.illumFavorWeight;
+	var totalWeight = oddsWeight + timeWeight + winPercentageWeight + totalWinsWeight + crowdFavorWeight + illumFavorWeight;
 
-	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null)
+	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
 		if (c1Stats.averageOdds > c2Stats.averageOdds)
 			c1Score += oddsWeight;
 		else if (c1Stats.averageOdds < c2Stats.averageOdds)
 			c2Score += oddsWeight;
+		if (this.debug) {
+			var lesserOdds = (c1Stats.averageOdds < c2Stats.averageOdds) ? c1Stats.averageOdds : c2Stats.averageOdds;
+			console.log("- predicted odds: " + (c1Stats.averageOdds / lesserOdds).toFixed(2) + " : " + (c2Stats.averageOdds / lesserOdds).toFixed(2));
+		}
+	}
 
 	if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null)
 		if (c1Stats.averageWinTime < c2Stats.averageWinTime)
@@ -353,10 +380,23 @@ ConfidenceScore.prototype.execute = function(info) {
 	else if (c1WLScores[1] > c2WLScores[1])
 		c2Score += totalWinsWeight;
 
+	if (c1Stats.cfPercent != null && c2Stats.cfPercent != null) {
+		if (c1Stats.cfPercent > c2Stats.cfPercent)
+			c1Score += crowdFavorWeight;
+		else if (c1Stats.cfPercent < c2Stats.cfPercent)
+			c2Score += crowdFavorWeight;
+	}
+	if (c1Stats.ifPercent != null && c2Stats.ifPercent != null) {
+		if (c1Stats.ifPercent > c2Stats.ifPercent)
+			c1Score += illumFavorWeight;
+		else if (c1Stats.ifPercent < c2Stats.ifPercent)
+			c2Score += illumFavorWeight;
+	}
+
 	// final decision
 	if ((c1Score == c2Score) || (c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
 		if (this.debug)
-			console.log("-\nCS has insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+			console.log("- CS has insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
 		this.abstain = true;
 		this.lowBet = true;
 		return null;
@@ -368,13 +408,15 @@ ConfidenceScore.prototype.execute = function(info) {
 
 	var winnerPoints = (this.prediction == c1.name) ? c1Score : c2Score;
 	var totalAvailablePoints = c1Score + c2Score;
-	this.confidence = parseFloat((winnerPoints / totalAvailablePoints).toFixed(2));
+	this.confidence = parseFloat((winnerPoints / totalWeight));
+	if (this.debug)
+		console.log("- CS confidence: " + (this.confidence * 100).toFixed(2) + " % ");
 
 	// the point scoring in this makes for a terrible confidence predictor; rely on this for betting amount instead
 	this.fallback1.execute(info);
 
 	if (this.debug)
-		console.log("-\n" + this.prediction + " has a better W score (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), betting " + this.prediction);
+		console.log("- " + this.prediction + " has a better W score (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), betting " + this.prediction);
 	return this.prediction;
 };
 
@@ -393,7 +435,7 @@ var RatioConfidence = function() {
 
 		if (c1TotalMatches < 3 || c2TotalMatches < 3) {
 			if (this.debug)
-				console.log("-\nRC has insufficient information, W:L(P1)(P2)->  (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+				console.log("- RC has insufficient information, W:L(P1)(P2)->  (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
 			self.abstain = true;
 			self.lowBet = true;
 			return null;
@@ -410,26 +452,26 @@ var RatioConfidence = function() {
 			self.confidence = (pChar.name == c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
 			if (self.confidence < 0.6) {
 				if (this.debug)
-					console.log("-\nRC has insufficient confidence (confidence: " + self.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+					console.log("- RC has insufficient confidence (confidence: " + self.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
 				self.abstain = true;
 				self.lowBet = true;
 				return null;
 			}
 			if (pChar.ratio <= 0.5 || (npChar.ratio == 0.5 && (npChar.wins.length + npChar.losses.length == 2))) {
 				if (this.debug)
-					console.log("-\nRC discourages betting on or against <51% (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
+					console.log("- RC discourages betting on or against <51% (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
 				self.abstain = true;
 				self.lowBet = true;
 				return null;
 			}
 			p = pChar.name;
 			if (this.debug)
-				console.log("-\n" + p + " has a better win percentage (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%); RB betting " + p + " confidence: " + self.confidence.toFixed(2));
+				console.log("- " + p + " has a better win percentage (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%); RB betting " + p + " confidence: " + self.confidence.toFixed(2));
 			self.prediction = p;
 			return p;
 		} else if (c1Ratio == c2Ratio) {
 			if (this.debug)
-				console.log("-\nRC has insufficient information (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
+				console.log("- RC has insufficient information (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
 			self.abstain = true;
 			self.lowBet = true;
 			return null;
@@ -444,7 +486,7 @@ var Observer = function() {
 	this.abstain = true;
 	this.execute = function(info) {
 		if (this.debug)
-			console.log("-\nOBS does not bet");
+			console.log("- OBS does not bet");
 		this.abstain = true;
 		return null;
 	};

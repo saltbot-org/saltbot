@@ -98,9 +98,9 @@ var er = function() {
 			record += (match.hasOwnProperty("o")) ? match.o : "U";
 			record += ",";
 			record += (match.hasOwnProperty("ts")) ? match.ts : 0;
-			record += "\n";
+			record += ",";
 			record += (match.hasOwnProperty("cf")) ? match.cf : 2;
-			record += "\n";
+			record += ",";
 			record += (match.hasOwnProperty("if")) ? match.if : 2;
 			record += "\n";
 			lines.push(record);

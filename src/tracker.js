@@ -9,8 +9,8 @@ var Match = function(strat) {
 	this.mode = "U";
 	this.odds = "U";
 	this.time = 0;
-	this.crowdFavor=2;
-	this.illumFavor=2;
+	this.crowdFavor = 2;
+	this.illumFavor = 2;
 };
 Match.prototype.update = function(infoFromWaifu, odds, timeInfo, crowdFavor, illumFavor) {
 	for (var i = 0; i < infoFromWaifu.length; i++) {
@@ -33,8 +33,8 @@ Match.prototype.update = function(infoFromWaifu, odds, timeInfo, crowdFavor, ill
 	if (this.mode == "e")
 		this.time = Math.round(this.time * 1.5);
 	// add favor stats
-	this.crowdFavor=crowdFavor;
-	this.illumFavor=illumFavor;	
+	this.crowdFavor = crowdFavor;
+	this.illumFavor = illumFavor;
 };
 Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
 	if (this.names.indexOf(w) > -1) {
@@ -54,9 +54,9 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"t" : this.tier,
 			"m" : this.mode.charAt(0),
 			"o" : this.odds,
-			"ts" : this.time, 
-			"cf": this.crowdFavor, 
-			"if": this.illumFavor
+			"ts" : this.time,
+			"cf" : this.crowdFavor,
+			"if" : this.illumFavor
 		};
 
 		updater.updateCharactersFromMatch(mr, this.character1, this.character2);
@@ -75,8 +75,10 @@ Match.prototype.betAmount = function(tournament, debug) {
 		this.strategy.confidence = this.strategy.fallback1.confidence || 0.1;
 	if (tournament) {
 		var allIn = balance < 2000;
-		amountToBet = (!allIn) ? Math.round(balance * (this.strategy.confidence || 0.5)).toString() : balance.toString();
-		wagerBox.value = amountToBet;
+		amountToBet = (!allIn) ? Math.round(balance * (this.strategy.confidence || 0.5)) : balance;
+		if (amountToBet < 1000)
+			amountToBet = 1000;
+		wagerBox.value = amountToBet.toString();
 		if (debug) {
 			if (allIn)
 				console.log("- ALL IN: " + balance);
