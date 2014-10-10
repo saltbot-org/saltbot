@@ -1,3 +1,10 @@
+var Bettor = function(name) {
+	this.name = name;
+	this.wins = 0;
+	this.losses = 0;
+	this.type="U";
+};
+
 var Character = function(name) {
 	this.name = name;
 	this.wins = [];
@@ -11,6 +18,53 @@ var Character = function(name) {
 
 var Updater = function() {
 
+};
+Updater.prototype.getCharacter = function(cname, characterRecords, namesOfCharactersWhoAlreadyHaveRecords) {
+	var cobject = null;
+	if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
+		cobject = new Character(cname);
+		characterRecords.push(cobject);
+		namesOfCharactersWhoAlreadyHaveRecords.push(cname);
+	} else {
+		for (var k = 0; k < characterRecords.length; k++) {
+			if (cname == characterRecords[k].name) {
+				cobject = characterRecords[k];
+				break;
+			}
+		}
+	}
+	return cobject;
+};
+Updater.prototype.getBettor = function(bname, bettorRecords, namesOfBettorsWhoAlreadyHaveRecords) {
+	var bobject = null;
+	if (namesOfBettorsWhoAlreadyHaveRecords.indexOf(bname) == -1) {
+		bobject = new Bettor(bname);
+		bettorRecords.push(bobject);
+		namesOfBettorsWhoAlreadyHaveRecords.push(bname);
+	} else {
+		for (var k = 0; k < bettorRecords.length; k++) {
+			if (bname == bettorRecords[k].name) {
+				bobject = bettorRecords[k];
+				break;
+			}
+		}
+	}
+	return bobject;
+};
+Updater.prototype.updateBettorsFromMatch = function(mObj, bc1, bc2) {
+	var c1Won = (mObj.w == 0);
+	for (var i = 0; i < bc1.length; i++) {
+		if (c1Won)
+			bc1[i].wins += 1;
+		else
+			bc1[i].losses += 1;
+	}
+	for (var j = 0; j < bc2.length; j++) {
+		if (!c1Won)
+			bc2[j].wins += 1;
+		else
+			bc2[j].losses += 1;
+	}
 };
 Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
 	// alters mutable character records only
@@ -120,21 +174,7 @@ var ir = function(f) {
 	var matchRecords = [];
 	var characterRecords = [];
 	var namesOfCharactersWhoAlreadyHaveRecords = [];
-	var getCharacter = function(cname) {
-		var cobject = null;
-		if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
-			cobject = new Character(cname);
-			characterRecords.push(cobject);
-			namesOfCharactersWhoAlreadyHaveRecords.push(cname);
-		} else {
-			for (var k = 0; k < characterRecords.length; k++) {
-				if (cname == characterRecords[k].name) {
-					cobject = characterRecords[k];
-				}
-			}
-		}
-		return cobject;
-	};
+	
 	//numberOfProperties refers to c1, c2, w, sn, etc.
 	var numberOfProperties = 11;
 	var mObj = null;
@@ -178,8 +218,8 @@ var ir = function(f) {
 			case 10:
 				mObj.if = parseInt(match[j]);
 				matchRecords.push(mObj);
-				var c1Obj = getCharacter(mObj.c1);
-				var c2Obj = getCharacter(mObj.c2);
+				var c1Obj = updater.getCharacter(mObj.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
+				var c2Obj = updater.getCharacter(mObj.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
 				updater.updateCharactersFromMatch(mObj, c1Obj, c2Obj);
 
 				break;

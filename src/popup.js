@@ -131,30 +131,14 @@ Simulator.prototype.evalMutations = function(mode) {
 			totalPercentCorrect.push(0);
 		}
 
-		// this is copied from records.js, do something about that
 		var characterRecords = [];
 		var namesOfCharactersWhoAlreadyHaveRecords = [];
-		var getCharacter = function(cname) {
-			var cobject = null;
-			if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
-				cobject = new Character(cname);
-				characterRecords.push(cobject);
-				namesOfCharactersWhoAlreadyHaveRecords.push(cname);
-			} else {
-				for (var k = 0; k < characterRecords.length; k++) {
-					if (cname == characterRecords[k].name) {
-						cobject = characterRecords[k];
-					}
-				}
-			}
-			return cobject;
-		};
 
 		// process matches
 		for (var i = 0; i < matches.length; i++) {
 			var info = {
-				"character1" : getCharacter(matches[i].c1),
-				"character2" : getCharacter(matches[i].c2),
+				"character1" : updater.getCharacter(matches[i].c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
+				"character2" : updater.getCharacter(matches[i].c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
 				"matches" : results.matches_v1
 			};
 
