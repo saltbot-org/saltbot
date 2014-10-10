@@ -27,7 +27,7 @@ Match.prototype.update = function(infoFromWaifu, odds, timeInfo, crowdFavor, ill
 	if (timeInfo.ticks > 0)
 		this.time = timeInfo.ticks * timeInfo.interval / 1000;
 	//Ignore times from matches that occurred before changing modes; 350 is the maximum time that can occur
-	if (this.time >= 350)
+	if (this.time >= 240)
 		this.time = 0;
 	//add more time to matches that are recognized as being in exhibition mode, proportional to the amount of required matches missing
 	if (this.mode == "e")
@@ -71,11 +71,16 @@ Match.prototype.betAmount = function(tournament, debug) {
 	var wagerBox = document.getElementById("wager");
 	var balance = parseInt(balanceBox.innerHTML.replace(",", ""));
 	var amountToBet;
-	if (this.strategy instanceof ConfidenceScore)
-		this.strategy.confidence = this.strategy.fallback1.confidence || 0.1;
+	var minimum = 100 + Math.round(Math.random() * 50);
+	if (this.strategy instanceof ConfidenceScore) {
+		this.strategy.adjustConfidence();
+	}
+
 	if (tournament) {
 		var allIn = balance < 2000;
 		amountToBet = (!allIn) ? Math.round(balance * (this.strategy.confidence || 0.5)) : balance;
+		if (amountToBet > balance)
+			amountToBet = balance;
 		if (amountToBet < 1000)
 			amountToBet = 1000;
 		wagerBox.value = amountToBet.toString();
@@ -83,18 +88,22 @@ Match.prototype.betAmount = function(tournament, debug) {
 			if (allIn)
 				console.log("- ALL IN: " + balance);
 			else if (this.strategy.confidence)
-				console.log("- betting: " + balance + " x  cf(" + (Math.round(this.strategy.confidence * 100)).toFixed(2) + "%) = " + amountToBet);
+				console.log("- betting: " + balance + " x  cf(" + (this.strategy.confidence * 100).toFixed(2) + "%) = " + amountToBet);
 			else
 				console.log("- betting: " + balance + " x  50%) = " + amountToBet);
 		}
-	} else if (!tournament && this.strategy.confidence && !this.strategy.lowBet) {
-		amountToBet = Math.round(balance * .1 * this.strategy.confidence).toString();
-		wagerBox.value = amountToBet;
+	} else if (!this.strategy.lowBet) {
+		amountToBet = Math.round(balance * .1 * this.strategy.confidence);
+		if (amountToBet > balance * .1)
+			amountToBet = balance * .1;
+		wagerBox.value = amountToBet.toString();
 		if (debug)
-			console.log("- betting: " + balance + " x .10 =(" + (balance * .1) + ") x cf(" + (Math.round(this.strategy.confidence * 100)).toFixed(2) + "%) = " + amountToBet);
+			console.log("- betting: " + balance + " x .10 =(" + (balance * .1) + ") x cf(" + (this.strategy.confidence * 100).toFixed(2) + "%) = " + amountToBet);
 	} else {
-		amountToBet = (100 + Math.round(Math.random() * 75)).toString();
-		wagerBox.value = amountToBet;
+		var p05 = Math.ceil(balance * .01);
+		var cb = Math.ceil(balance * this.strategy.confidence);
+		amountToBet = (p05 < cb) ? p05 : cb;
+		wagerBox.value = amountToBet.toString();
 		if (debug)
 			console.log("- betting without confidence: " + amountToBet);
 	}

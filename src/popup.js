@@ -52,6 +52,41 @@ var Order = function(typeStr, chromosome) {
 };
 var Simulator = function() {
 	this.data = [];
+	this.money = [];
+	this.minimum = 400;
+};
+Simulator.prototype.updateMoney = function(index, odds, selection, amount, correct) {
+	var oddsArr = odds.split(":");
+	if (!correct) {
+		this.money[index] -= amount;
+		if (this.money[index] < this.minimum)
+			this.money[index] = this.minimum;
+	} else {
+		if (selection == 0)
+			this.money[index] += amount * parseFloat(oddsArr[1]) / parseFloat(oddsArr[0]);
+		else if (selection == 1)
+			this.money[index] += amount * parseFloat(oddsArr[0]) / parseFloat(oddsArr[1]);
+	}
+};
+Simulator.prototype.getBetAmount = function(strategy, index) {
+	var amountToBet = 0;
+	//This should mimic the code in tracker.js
+
+	if ( strategy instanceof ConfidenceScore) {
+		strategy.adjustConfidence();
+	}
+
+	if (!strategy.lowBet) {
+		amountToBet = Math.round(this.money[index] * .1 * this.strategy.confidence);
+		if (amountToBet > this.money[index] * .1)
+			amountToBet = this.money[index] * .1;
+	} else {
+		var p05 = Math.ceil(this.money[index] * .01);
+		var cb = Math.ceil(this.money[index] * strategy.confidence);
+		amountToBet = (p05 < cb) ? p05 : cb;
+	}
+
+	return amountToBet;
 };
 Simulator.prototype.evalMutations = function(mode) {
 	var self = this;
@@ -62,6 +97,7 @@ Simulator.prototype.evalMutations = function(mode) {
 		var totalBettedOn = [];
 		var strategies = [];
 		var totalPercentCorrect = [];
+		self.money = [];
 		var updater = new Updater();
 		//
 		var confidencesLedToLoss = [];
@@ -129,6 +165,7 @@ Simulator.prototype.evalMutations = function(mode) {
 			totalBettedOn.push(0);
 			strategies.push(strategy);
 			totalPercentCorrect.push(0);
+			self.money.push(self.minimum);
 		}
 
 		var characterRecords = [];
@@ -175,7 +212,14 @@ Simulator.prototype.evalMutations = function(mode) {
 					totalPercentCorrect[k] = correct[k] / totalBettedOn[k] * 100;
 					data[k].push([totalBettedOn[k], totalPercentCorrect[k]]);
 				}
-
+				//update simulated money
+				if (matches[i].o != "U") {
+					var moneyBefore = self.money[k];
+					var betAmount = self.getBetAmount(strategy, k);
+					self.updateMoney(k, matches[i].o, prediction == matches[i].c1 ? 0 : 1, betAmount, predictionWasCorrect);
+					if (k == 0 && false)
+						console.log("m " + i + ": " + moneyBefore + " o: " + matches[i].o + " b: " + betAmount + " -> " + self.money[k]);
+				}
 			}
 		}
 
@@ -187,14 +231,14 @@ Simulator.prototype.evalMutations = function(mode) {
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
-					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l]]);
+					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l]]);
 				}
 				sortingArray.sort(function(a, b) {
-					return b[1] - a[1];
+					return (b[1] * b[2]) - (a[1] * a[2]);
 				});
 				var top = Math.round(sortingArray.length / 2);
 				for (var o = 0; o < top; o++) {
-					console.log(sortingArray[o][0].toDisplayString() + " -> " + sortingArray[o][1]);
+					console.log(sortingArray[o][0].toDisplayString() + " -> " + sortingArray[o][1].toFixed(4) + "%,  $" + parseInt(sortingArray[o][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 					parents.push(sortingArray[o][0]);
 					nextGeneration.push(sortingArray[o][0]);
 				}
@@ -205,6 +249,9 @@ Simulator.prototype.evalMutations = function(mode) {
 					if (mf == 0) {
 						parent1 = parents[0];
 						parent2 = parents[parents.length - 1];
+					} else if (mf <= 4) {
+						parent1 = parents[0];
+						parent2 = parents[mf];
 					} else {
 						parent1 = parents[mf - 1];
 						parent2 = parents[mf];
@@ -224,17 +271,19 @@ Simulator.prototype.evalMutations = function(mode) {
 				lConfidenceSum += confidencesLedToLoss[wl];
 			var lConfidenceAvg = (lConfidenceSum / confidencesLedToLoss.length * 100).toFixed(4);
 
-			var best;
+			var bestPercent;
+			var bestMoney;
 			if (mode == "evolution") {
-				best = sortingArray[0][1];
+				bestPercent = sortingArray[0][1];
+				bestMoney = sortingArray[0][2];
 
 				chrome.storage.local.set({
 					'chromosomes_v1' : nextGeneration,
 					'best_chromosome' : sortingArray[0][0]
 				}, function() {
 					roundsOfEvolution += 1;
-					console.log("\n\n-------- end of generation " + roundsOfEvolution + ", matches processed with ConfidenceScore " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "% -> " + best.toFixed(4) + "%, wC: " + wConfidenceAvg + ", lC: " + lConfidenceAvg + "-------------------\n\n");
-					document.getElementById('msgbox').value = "rounds: " + roundsOfEvolution + ", best: " + best;
+					console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "%m -> " + bestPercent.toFixed(1) + "%c, $" + bestMoney.toFixed(0) + ",    wC: " + wConfidenceAvg + ", lC: " + lConfidenceAvg + "-------------------\n\n");
+					document.getElementById('msgbox').value = "gen: " + roundsOfEvolution + ", best: " + bestPercent.toFixed(1) + "%, $" + bestMoney.toFixed(0);
 					setTimeout(function() {
 						simulator.evalMutations("evolution");
 					}, 5000);

@@ -86,8 +86,8 @@ Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
 	if (mObj.o != null && mObj.o != "U") {
 		var oc1 = parseFloat(mObj.o.split(":")[0]);
 		var oc2 = parseFloat(mObj.o.split(":")[1]);
-		c1Obj.odds.push(parseFloat((oc1 / oc2).toFixed(2)));
-		c2Obj.odds.push(parseFloat((oc2 / oc1).toFixed(2)));
+		c1Obj.odds.push(oc1 / oc2);
+		c2Obj.odds.push(oc2 / oc1);
 	}
 	if (mObj.if != null && mObj.if.length > 0) {
 		if (mObj.cf == 0) {

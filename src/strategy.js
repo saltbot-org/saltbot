@@ -161,11 +161,16 @@ var Chromosome = function() {
 	this.oddsWeight = 1;
 	this.timeWeight = 0.5;
 	this.winPercentageWeight = 1;
+	this.totalWinsWeight = 0.1;
 	this.crowdFavorWeight = 1;
 	this.illumFavorWeight = 1;
+	//
 	this.junk = 1;
-	//1;
-	this.totalWinsWeight = 0.1;
+	//
+	this.confidenceWeight = 1;
+	this.oddsConfidenceWeight = 1;
+	this.fallbackConfidenceWeight = 1;
+	this.minimumCombinedConfidenceForLargeBet = 0.5;
 	// tier Scoring
 	this.wX = 5;
 	this.wS = 4;
@@ -213,7 +218,7 @@ Chromosome.prototype.mate = function(other) {
 			// 20% chance of mutation
 			var radiation = Math.random() + Math.random();
 			radiation *= radiation;
-			if (Math.random() < 0.2)
+			if (Math.random() < 0.2 && offspring[i] != null)
 				offspring[i] *= radiation;
 		}
 	}
@@ -307,12 +312,57 @@ ConfidenceScore.prototype.getWeightedScores = function(c, hasTiered, hasUntiered
 		return this.countFromRecord(c, ["U", "P", "B", "A", "S", "X"], this.chromosome.wModWorst);
 	}
 };
+ConfidenceScore.prototype.adjustConfidence = function() {
+	var numberOfFactors;
+	var multipliers;
+	var oddsConfidence;
+	var confidence = this.confidence;
+	// the below line was the original way it was set up
+	// this.confidence = this.fallback1.confidence || 0.1;
+	var fallbackConfidence = this.fallback1.confidence || 0.1;
+	var oc = this.oddsConfidence;
+	confidence *= this.chromosome.confidenceWeight;
+	fallbackConfidence *= this.chromosome.fallbackConfidenceWeight;
+
+	if (oc) {
+		numberOfFactors = 3;
+		multipliers = (this.chromosome.confidenceWeight + this.chromosome.fallbackConfidenceWeight + this.chromosome.oddsConfidenceWeight) / numberOfFactors;
+		oddsConfidence = (oc[0] > oc[1]) ? oc[0] / (oc[0] + oc[1]) : oc[1] / (oc[0] + oc[1]);
+		oddsConfidence *= this.chromosome.oddsConfidenceWeight;
+		this.confidence = (confidence + fallbackConfidence + oddsConfidence) / numberOfFactors / multipliers;
+	} else {
+		numberOfFactors = 2;
+		multipliers = (this.chromosome.confidenceWeight + this.chromosome.fallbackConfidenceWeight ) / numberOfFactors;
+		this.confidence = (confidence + fallbackConfidence ) / numberOfFactors / multipliers;
+	}
+
+	if (/*!oc || */
+		this.confidence < this.chromosome.minimumCombinedConfidenceForLargeBet)
+		this.confidence = .01;
+};
 ConfidenceScore.prototype.execute = function(info) {
 	var c1 = info.character1;
 	var c2 = info.character2;
 	var matches = info.matches;
 	var c1Stats = new CSStats(c1);
 	var c2Stats = new CSStats(c2);
+
+	if (c1Stats.averageOdds == 0 || c2Stats.averageOdds == 0) {
+		c1Stats.averageOdds = null;
+		c2Stats.averageOdds = null;
+		console.log("Flag match for removal: " + c1.name + "," + c2.name);
+	}
+
+	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
+		var lesserOdds = (c1Stats.averageOdds < c2Stats.averageOdds) ? c1Stats.averageOdds : c2Stats.averageOdds;
+		this.oddsConfidence = [(c1Stats.averageOdds / lesserOdds), (c2Stats.averageOdds / lesserOdds)];
+		if (this.debug)
+			console.log("- predicted odds: " + (this.oddsConfidence[0]).toFixed(2) + " : " + (this.oddsConfidence[1]).toFixed(2));
+	} else {
+		this.oddsConfidence = null;
+		if (this.debug)
+			console.log("- cannot predict odds: one or both characters missing odds");
+	}
 
 	// the weights come in from the chromosome
 	var c1Score = 0;
@@ -330,10 +380,6 @@ ConfidenceScore.prototype.execute = function(info) {
 			c1Score += oddsWeight;
 		else if (c1Stats.averageOdds < c2Stats.averageOdds)
 			c2Score += oddsWeight;
-		if (this.debug) {
-			var lesserOdds = (c1Stats.averageOdds < c2Stats.averageOdds) ? c1Stats.averageOdds : c2Stats.averageOdds;
-			console.log("- predicted odds: " + (c1Stats.averageOdds / lesserOdds).toFixed(2) + " : " + (c2Stats.averageOdds / lesserOdds).toFixed(2));
-		}
 	}
 
 	if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null)
@@ -394,13 +440,6 @@ ConfidenceScore.prototype.execute = function(info) {
 	}
 
 	// final decision
-	if ((c1Score == c2Score) || (c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
-		if (this.debug)
-			console.log("- CS has insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
-		this.abstain = true;
-		this.lowBet = true;
-		return null;
-	}
 
 	// figure out prediction, confidence
 
@@ -409,12 +448,17 @@ ConfidenceScore.prototype.execute = function(info) {
 	var winnerPoints = (this.prediction == c1.name) ? c1Score : c2Score;
 	var totalAvailablePoints = c1Score + c2Score;
 	this.confidence = parseFloat((winnerPoints / totalWeight));
-	if (this.debug)
-		console.log("- CS confidence: " + (this.confidence * 100).toFixed(2) + " % ");
 
 	// the point scoring in this makes for a terrible confidence predictor; rely on this for betting amount instead
 	this.fallback1.execute(info);
 
+	if ((c1Score == c2Score) || (c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
+		if (this.debug)
+			console.log("- CS has insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+		this.abstain = true;
+		this.lowBet = true;
+		return this.prediction;
+	}
 	if (this.debug)
 		console.log("- " + this.prediction + " has a better W score (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), betting " + this.prediction);
 	return this.prediction;
