@@ -2,7 +2,7 @@ var Bettor = function(name) {
 	this.name = name;
 	this.wins = 0;
 	this.losses = 0;
-	this.type="U";
+	this.type = "U";
 };
 
 var Character = function(name) {
@@ -108,26 +108,40 @@ Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
 };
 
 var dr = function() {
-	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
-		console.log("-\ndebugging records...");
-
-		//match records:
-		if (results.hasOwnProperty("matches_v1")) {
-			console.log("-\nmatch records found\nnumber of match records: " + results.matches_v1.length + "-\n");
-			for (var i = 0; i < results.matches_v1.length; i++) {
-				var match = results.matches_v1[i];
-				console.log("match results: " + match.c1 + " vs " + match.c2 + " ... winner: " + match.w);
+	chrome.storage.local.get(["matches_v1", "characters_v1", "bettors_v1"], function(results) {
+		var bw10 = [];
+		var accTypeI = [];
+		var accTypeC = [];
+		for (var i in results.bettors_v1) {
+			var a = results.bettors_v1[i];
+			var aTotal = a.wins + a.losses;
+			a.accuracy = a.wins / aTotal * 100;
+			if (aTotal >= 25) {
+				a.total = aTotal;
+				bw10.push(a);
 			}
-
+			if (a.type == "i")
+				accTypeI.push(a.accuracy);
+			else if (a.type == "c")
+				accTypeC.push(a.accuracy);
 		}
-		//character records:
-		if (results.hasOwnProperty("characters_v1")) {
-			console.log("-\ncharacter records found\nnumber of character records: " + results.characters_v1.length + "-\n");
-			for (var i = 0; i < results.characters_v1.length; i++) {
-				var character = results.characters_v1[i];
-				console.log(character.name + "\t\t\t\twins: " + character.wins.length + ",\t\t\t\tlosses: " + character.losses.length);
-			}
+		bw10.sort(function(a, b) {
+			return b.accuracy - a.accuracy;
+		});
+		var blist = "";
+		for (var j = 0; j < bw10.length; j++) {
+			var b = bw10[j];
+			blist += b.accuracy.toFixed(2) + " %acc  (" + ((1 - (j / bw10.length)) * 100).toFixed(2) + "%pcl) : (" + b.type + ")(" + b.total + ") " + b.name + "\n";
 		}
+		console.log(blist);
+		var iSum = 0;
+		for (var k in accTypeI)
+		iSum += accTypeI[k];
+		var cSum = 0;
+		for (var l in accTypeC)
+		cSum += accTypeC[l];
+		console.log("Avg I: " + (iSum / accTypeI.length).toFixed(2) + "% (" + accTypeI.length + ")");
+		console.log("Avg C: " + (cSum / accTypeC.length).toFixed(2) + "% (" + accTypeC.length + ")");
 
 	});
 };
@@ -174,7 +188,7 @@ var ir = function(f) {
 	var matchRecords = [];
 	var characterRecords = [];
 	var namesOfCharactersWhoAlreadyHaveRecords = [];
-	
+
 	//numberOfProperties refers to c1, c2, w, sn, etc.
 	var numberOfProperties = 11;
 	var mObj = null;
