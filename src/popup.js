@@ -35,6 +35,9 @@ var changeStrategyClickCS = function() {
 var changeStrategyClickRC = function() {
 	btnClicked("cs_rc");
 };
+var changeStrategyClickIPU = function() {
+	btnClicked("cs_ipu");
+};
 var onFileRead = function(e) {
 	var t = e.target.result;
 	btnClicked("ir", t);
@@ -399,6 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("cs_o").addEventListener("click", changeStrategyClickO);
 	document.getElementById("cs_cs").addEventListener("click", changeStrategyClickCS);
 	document.getElementById("cs_rc").addEventListener("click", changeStrategyClickRC);
+	document.getElementById("cs_ipu").addEventListener("click", changeStrategyClickIPU);
 	chrome.alarms.create("chromosome update", {
 		when : Date.now(),
 		periodInMinutes : 1

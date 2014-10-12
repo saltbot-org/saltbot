@@ -1,3 +1,7 @@
+var Settings = function() {
+	this.nextStrategy = null;
+};
+
 var StatusScanner = function() {
 	var self = this;
 	this.announcements = [];
@@ -56,12 +60,16 @@ var Controller = function() {
 	this.nextStrategy = "ipu";
 	this.bettorsC1 = [];
 	this.bettorsC2 = [];
+	this.settings = null;
 
 	var self = this;
 
 	var debugMode = true;
 
 	setInterval(function() {
+		if (!self.settings)
+			return;
+
 		self.ticksSinceMatchBegan += 1;
 
 		//check to see if the betting buttons are visible
@@ -201,7 +209,7 @@ var Controller = function() {
 			}
 
 			//set up next strategy
-			switch(self.nextStrategy) {
+			switch(self.settings.nextStrategy) {
 			case "o":
 				self.currentMatch = new Match(new Observer());
 				break;
@@ -253,20 +261,28 @@ Controller.prototype.ensureTwitch = function() {
 	});
 };
 Controller.prototype.changeStrategy = function(sn, data) {
-	console.log("-\nchanging strategy to " + sn.replace("cs_", ""));
+	console.log("- changing strategy to " + sn.replace("cs_", ""));
 	switch(sn) {
 	case "cs_o":
-		this.nextStrategy = "o";
+		this.settings.nextStrategy = "o";
 		break;
 	case "cs_rc":
-		this.nextStrategy = "rc";
+		this.settings.nextStrategy = "rc";
 		break;
 	case "cs_cs":
-		this.nextStrategy = "cs";
+		this.settings.nextStrategy = "cs";
 		var chromosome = new Chromosome().loadFromJSON(data);
 		this.bestChromosome = chromosome;
 		break;
+	case "cs_ipu":
+		this.settings.nextStrategy = "ipu";
+		break;
 	}
+	chrome.storage.local.set({
+		'settings_v1' : this.settings
+	}, function() {
+		console.log("- settings updated");
+	});
 };
 Controller.prototype.receiveBestChromosome = function(data) {
 	// console.log("- received chromosome");
@@ -278,6 +294,22 @@ ctrl = null;
 if (window.location.href == "http://www.saltybet.com/") {
 	ctrl = new Controller();
 	ctrl.ensureTwitch();
+	chrome.storage.local.get(["settings_v1"], function(results) {
+		var self = ctrl;
+		if (results.settings_v1) {
+			self.settings = results.settings_v1;
+		} else {
+			self.settings = new Settings();
+			self.settings.nextStrategy = "o";
+			chrome.storage.local.set({
+				'settings_v1' : self.settings
+			}, function() {
+				console.log("- settings initialized");
+			});
+		}
+		console.log("- settings applied");
+
+	});
 	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		var self = ctrl;
 		// console.log("-\nmessage from Waifu:\t" + message);

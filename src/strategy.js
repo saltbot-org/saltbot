@@ -37,7 +37,7 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 	} else if (!this.lowBet) {
 		amountToBet = Math.round(balance * .1 * this.confidence);
 		if (amountToBet > balance * .1)
-			amountToBet = balance * .1;
+			amountToBet = Math.round(balance * .1);
 		if (debug)
 			console.log("- betting: " + balance + " x .10 =(" + (balance * .1) + ") x cf(" + (this.confidence * 100).toFixed(2) + "%) = " + amountToBet);
 	} else {
@@ -51,16 +51,7 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 };
 
 var CoinToss = function() {
-	// this.base = Strategy;
-	// this.base("ct");
 	Strategy.call(this, "ct");
-	// this.execute = function(info) {
-	// var c1 = info.character1;
-	// var c2 = info.character2;
-	// var p = (Math.random() > .5) ? c1.name : c2.name;
-	// self.prediction = p;
-	// return p;
-	// };
 };
 CoinToss.prototype = Object.create(Strategy.prototype);
 CoinToss.prototype.execute = function(info) {
@@ -194,8 +185,6 @@ var CSStats = function(cObj) {
 	}
 };
 var ConfidenceScore = function(chromosome) {
-	// this.base = Intermediary;
-	// this.base("cs");
 	Strategy.call(this, "cs");
 	this.abstain = false;
 	this.confidence = null;
@@ -393,8 +382,6 @@ ConfidenceScore.prototype.execute = function(info) {
 };
 
 var RatioConfidence = function() {
-	// this.base = Strategy;
-	// this.base("rc");
 	Strategy.call(this, "rc");
 	this.abstain = false;
 };
@@ -453,16 +440,12 @@ RatioConfidence.prototype.execute = function(info) {
 };
 
 var ChromosomeIPU = function() {
-	// this.base=Chromosome;
-	// this.base();
 	Strategy.call(this);
 	this.baseBettingTier = 1500;
 };
 ChromosomeIPU.prototype = Object.create(Chromosome.prototype);
 ;
 var InternetPotentialUpset = function(cipu) {
-	// this.base = IntermediaryIPU;
-	// this.base("ipu");
 	Strategy.call(this, "ipu");
 	this.debug = true;
 	this.ct = new CoinToss();
@@ -471,15 +454,16 @@ var InternetPotentialUpset = function(cipu) {
 	this.confidence = 1;
 };
 InternetPotentialUpset.prototype = Object.create(Strategy.prototype);
+InternetPotentialUpset.prototype.__super__ = Strategy;
 InternetPotentialUpset.prototype.execute = function(info) {
 	this.prediction = this.ct.execute(info);
 	if (this.debug)
 		console.log("- IPU is 50% confident, bBT: " + this.chromosome.baseBettingTier);
 	return this.prediction;
 };
-InternetPotentialUpset.prototype.getBetAmount = function(balance, tournament) {
+InternetPotentialUpset.prototype.getBetAmount = function(balance, tournament, debug) {
 	if (tournament)
-		return this.__proto__.getBetAmount(balance);
+		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
 
 	var t1 = this.chromosome.baseBettingTier;
 	var t2 = t1 * 10;
@@ -495,8 +479,6 @@ InternetPotentialUpset.prototype.getBetAmount = function(balance, tournament) {
 };
 
 var Observer = function() {
-	// this.base = Strategy;
-	// this.base("obs");
 	Strategy.call(this, "obs");
 	this.abstain = true;
 };
