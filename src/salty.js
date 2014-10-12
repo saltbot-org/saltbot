@@ -53,7 +53,7 @@ var Controller = function() {
 	var timerInterval = 3000;
 	this.ticksSinceMatchBegan = -999;
 	this.bestChromosome = new Chromosome();
-	this.nextStrategy = "cs";
+	this.nextStrategy = "ipu";
 	this.bettorsC1 = [];
 	this.bettorsC2 = [];
 
@@ -123,7 +123,7 @@ var Controller = function() {
 							matches_v1 = [];
 							matches_v1.push(mr);
 						}
-						
+
 						//character records:
 						if (results.hasOwnProperty("characters_v1"))
 							characters_v1 = results.characters_v1;
@@ -147,7 +147,7 @@ var Controller = function() {
 							characters_v1[c2_index] = c2;
 						else
 							characters_v1.push(c2);
-						
+
 						//bettor records
 						if (results.hasOwnProperty("bettors_v1"))
 							bettors_v1 = results.bettors_v1;
@@ -156,22 +156,22 @@ var Controller = function() {
 						var updater = new Updater();
 						var namesOfBettorsWhoAlreadyHaveRecords = [];
 						for (var l in bettors_v1)
-							namesOfBettorsWhoAlreadyHaveRecords.push(bettors_v1[l].name);
+						namesOfBettorsWhoAlreadyHaveRecords.push(bettors_v1[l].name);
 						var bc1 = [];
 						var bc2 = [];
 						for (var j in self.bettorsC1) {
 							var b = updater.getBettor(self.bettorsC1[j][0], bettors_v1, namesOfBettorsWhoAlreadyHaveRecords);
-							b.type=(self.bettorsC1[j][1])?"i":"c";
+							b.type = (self.bettorsC1[j][1]) ? "i" : "c";
 							bc1.push(b);
 						}
 						for (var k in self.bettorsC2) {
 							var b = updater.getBettor(self.bettorsC2[k][0], bettors_v1, namesOfBettorsWhoAlreadyHaveRecords);
-							b.type=(self.bettorsC2[k][1])?"i":"c";
+							b.type = (self.bettorsC2[k][1]) ? "i" : "c";
 							bc2.push(b);
 						}
 						updater.updateBettorsFromMatch(mr, bc1, bc2);
 						if (debugMode)
-							console.log("- number of:: chars: " + characters_v1.length+", matches: "+matches_v1.length+", bettors: "+bettors_v1.length);
+							console.log("- number of:: chars: " + characters_v1.length + ", matches: " + matches_v1.length + ", bettors: " + bettors_v1.length);
 
 						//do aliasing for closure
 						var mbr = matchesBeforeReset;
@@ -210,6 +210,9 @@ var Controller = function() {
 				break;
 			case "cs":
 				self.currentMatch = new Match(new ConfidenceScore(self.bestChromosome));
+				break;
+			case "ipu":
+				self.currentMatch = new Match(new InternetPotentialUpset(new ChromosomeIPU()));
 				break;
 			default:
 				self.currentMatch = new Match(new Observer());
@@ -354,11 +357,11 @@ if (window.location.href == "http://www.saltybet.com/") {
 						self.bettorsC1 = [];
 						self.bettorsC2 = [];
 						for (var i = 0; i < crowdC1.length; i++) {
-							var e=crowdC1[i].getElementsByTagName("strong")[0];
+							var e = crowdC1[i].getElementsByTagName("strong")[0];
 							self.bettorsC1.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 						for (var j = 0; j < crowdC2.length; j++) {
-							var e=crowdC2[j].getElementsByTagName("strong")[0];
+							var e = crowdC2[j].getElementsByTagName("strong")[0];
 							self.bettorsC2.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 					} catch(e) {

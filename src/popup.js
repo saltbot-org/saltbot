@@ -69,22 +69,18 @@ Simulator.prototype.updateMoney = function(index, odds, selection, amount, corre
 	}
 };
 Simulator.prototype.getBetAmount = function(strategy, index) {
-	var amountToBet = 0;
-	//This should mimic the code in tracker.js
+	var amountToBet;
+	var tournament = false;
+	var debug = false;
+	var balance = this.money[index];
 
-	if ( strategy instanceof ConfidenceScore) {
+	if ( strategy instanceof ConfidenceScore)
 		strategy.adjustConfidence();
-	}
 
-	if (!strategy.lowBet) {
-		amountToBet = Math.round(this.money[index] * .1 * this.strategy.confidence);
-		if (amountToBet > this.money[index] * .1)
-			amountToBet = this.money[index] * .1;
-	} else {
-		var p05 = Math.ceil(this.money[index] * .01);
-		var cb = Math.ceil(this.money[index] * strategy.confidence);
-		amountToBet = (p05 < cb) ? p05 : cb;
-	}
+	if (!strategy.confidence)
+		amountToBet = Math.ceil(balance * .1);
+	else
+		amountToBet = strategy.getBetAmount(balance, tournament, debug);
 
 	return amountToBet;
 };
@@ -119,6 +115,8 @@ Simulator.prototype.evalMutations = function(mode) {
 		} else if (mode == "mass") {
 			orders.push(new Order("rc"));
 			orders.push(new Order("rb"));
+			for (var z = 0; z < 50; z++)
+				orders.push(new Order("ipu", new ChromosomeIPU()));
 		} else {
 			if (document.getElementById("ct").checked)
 				orders.push(new Order("ct"));
@@ -157,6 +155,9 @@ Simulator.prototype.evalMutations = function(mode) {
 			case "rc":
 				strategy = new RatioConfidence();
 				break;
+			case "ipu":
+				strategy = new InternetPotentialUpset(order.chromosome);
+				break;
 			}
 			strategy.debug = false;
 
@@ -171,8 +172,19 @@ Simulator.prototype.evalMutations = function(mode) {
 		var characterRecords = [];
 		var namesOfCharactersWhoAlreadyHaveRecords = [];
 
+		var denominators = [];
+
 		// process matches
 		for (var i = 0; i < matches.length; i++) {
+			if (mode == "mass")
+				if (matches[i].o != "U") {
+					var t = matches[i].o.split(":");
+					var o1 = parseFloat(t[0]);
+					var o2 = parseFloat(t[1]);
+					var greaterNumber = o1 < o2 ? o2 / o1 : o1 / o2;
+					denominators.push(greaterNumber);
+				}
+
 			var info = {
 				"character1" : updater.getCharacter(matches[i].c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
 				"character2" : updater.getCharacter(matches[i].c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
@@ -221,6 +233,14 @@ Simulator.prototype.evalMutations = function(mode) {
 						console.log("m " + i + ": " + moneyBefore + " o: " + matches[i].o + " b: " + betAmount + " -> " + self.money[k]);
 				}
 			}
+		}
+
+		if (mode == "mass") {
+			var dSum = 0;
+			for (var z in denominators) {
+				dSum += denominators[z];
+			}
+			console.log("Average denominator: " + (dSum / denominators.length));
 		}
 
 		if (mode == "evolution" || mode == "mass") {
@@ -289,11 +309,15 @@ Simulator.prototype.evalMutations = function(mode) {
 					}, 5000);
 				});
 			} else if (mode == "mass") {
-				console.log("\n\n--------------- matches processed with RatioConfidence " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "% -> wC: " + wConfidenceAvg + ", lC: " + lConfidenceAvg + "-------------------\n\n");
-
+				console.log("\n\n--------------- matches processed " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "% -> wC: " + wConfidenceAvg + ", lC: " + lConfidenceAvg + "-------------------\n\n");
+				var ipuSum = 0;
 				for (var l = 0; l < orders.length; l++) {
-					console.log(orders[l].type + ": " + totalPercentCorrect[l]);
+					if (orders[l].type == "ipu")
+						ipuSum += self.money[l];
+					else
+						console.log(orders[l].type + ": " + totalPercentCorrect[l] + "%, $" + self.money[l]);
 				}
+				console.log("average IPU money: " + (ipuSum / (self.money.length - 2)));
 			}
 
 		} else {

@@ -66,48 +66,23 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 		return null;
 	}
 };
-Match.prototype.betAmount = function(tournament, debug) {
+Match.prototype.betAmount = function(tournament) {
 	var balanceBox = document.getElementById("balance");
 	var wagerBox = document.getElementById("wager");
 	var balance = parseInt(balanceBox.innerHTML.replace(",", ""));
 	var amountToBet;
-	var minimum = 100 + Math.round(Math.random() * 50);
-	if (this.strategy instanceof ConfidenceScore) {
-		this.strategy.adjustConfidence();
-	}
+	var strategy = this.strategy;
+	var debug = true;
 
-	if (tournament) {
-		var allIn = balance < 2000;
-		amountToBet = (!allIn) ? Math.round(balance * (this.strategy.confidence || 0.5)) : balance;
-		if (amountToBet > balance)
-			amountToBet = balance;
-		if (amountToBet < 1000)
-			amountToBet = 1000;
-		wagerBox.value = amountToBet.toString();
-		if (debug) {
-			if (allIn)
-				console.log("- ALL IN: " + balance);
-			else if (this.strategy.confidence)
-				console.log("- betting: " + balance + " x  cf(" + (this.strategy.confidence * 100).toFixed(2) + "%) = " + amountToBet);
-			else
-				console.log("- betting: " + balance + " x  50%) = " + amountToBet);
-		}
-	} else if (!this.strategy.lowBet) {
-		amountToBet = Math.round(balance * .1 * this.strategy.confidence);
-		if (amountToBet > balance * .1)
-			amountToBet = balance * .1;
-		wagerBox.value = amountToBet.toString();
-		if (debug)
-			console.log("- betting: " + balance + " x .10 =(" + (balance * .1) + ") x cf(" + (this.strategy.confidence * 100).toFixed(2) + "%) = " + amountToBet);
-	} else {
-		var p05 = Math.ceil(balance * .01);
-		var cb = Math.ceil(balance * this.strategy.confidence);
-		amountToBet = (p05 < cb) ? p05 : cb;
-		wagerBox.value = amountToBet.toString();
-		if (debug)
-			console.log("- betting without confidence: " + amountToBet);
-	}
+	if (strategy instanceof ConfidenceScore)
+		strategy.adjustConfidence();
 
+	if (!strategy.confidence)
+		amountToBet = Math.ceil(balance * .1);
+	else
+		amountToBet = strategy.getBetAmount(balance, tournament, debug);
+
+	wagerBox.value = amountToBet.toString();
 };
 Match.prototype.init = function() {
 	var s = this;
@@ -144,13 +119,10 @@ Match.prototype.init = function() {
 				var tournamentModeIndicator = "characters are left in the bracket!";
 				var tournamentModeIndicator2 = "Tournament mode start";
 				var footer = document.getElementById("footer-alert");
-				//
-				if (footer != null && (footer.innerHTML.indexOf(tournamentModeIndicator) > -1 || footer.innerHTML.indexOf(tournamentModeIndicator2) > -1)) {
-					//bet more in tournaments
-					self.betAmount(true, true);
-				} else {
-					self.betAmount(false, true);
-				}
+				var tournament = footer != null && (footer.innerHTML.indexOf(tournamentModeIndicator) > -1 || footer.innerHTML.indexOf(tournamentModeIndicator2) > -1);
+
+				self.betAmount(tournament);
+
 			}, Math.floor(Math.random() * baseSeconds));
 			setTimeout(function() {
 				if (prediction == self.strategy.p1name) {
