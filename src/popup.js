@@ -114,18 +114,11 @@ Simulator.prototype.evalMutations = function(mode) {
 			}
 		} else if (mode == "mass") {
 			orders.push(new Order("rc"));
-			orders.push(new Order("rb"));
 			for (var z = 0; z < 50; z++)
 				orders.push(new Order("ipu", new ChromosomeIPU()));
 		} else {
 			if (document.getElementById("ct").checked)
 				orders.push(new Order("ct"));
-			if (document.getElementById("mw").checked)
-				orders.push(new Order("mw"));
-			if (document.getElementById("mwc").checked)
-				orders.push(new Order("mwc"));
-			if (document.getElementById("rb").checked)
-				orders.push(new Order("rb"));
 			if (document.getElementById("cs").checked)
 				orders.push(new Order("cs", new Chromosome().loadFromObject(results.chromosomes_v1[0])));
 			if (document.getElementById("rc").checked)
@@ -139,15 +132,6 @@ Simulator.prototype.evalMutations = function(mode) {
 			switch(order.type) {
 			case "ct":
 				strategy = new CoinToss();
-				break;
-			case "mw":
-				strategy = new MoreWins();
-				break;
-			case "mwc":
-				strategy = new MoreWinsCautious();
-				break;
-			case "rb":
-				strategy = new RatioBasic();
 				break;
 			case "cs":
 				strategy = new ConfidenceScore(order.chromosome);
@@ -317,7 +301,7 @@ Simulator.prototype.evalMutations = function(mode) {
 					else
 						console.log(orders[l].type + ": " + totalPercentCorrect[l] + "%, $" + self.money[l]);
 				}
-				console.log("average IPU money: " + (ipuSum / (self.money.length - 2)));
+				console.log("average IPU money: " + (ipuSum / (self.money.length - 1)));
 			}
 
 		} else {

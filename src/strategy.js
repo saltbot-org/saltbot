@@ -479,7 +479,7 @@ InternetPotentialUpset.prototype.execute = function(info) {
 };
 InternetPotentialUpset.prototype.getBetAmount = function(balance, tournament) {
 	if (tournament)
-		return this.prototype.getBetAmount(balance);
+		return this.__proto__.getBetAmount(balance);
 
 	var t1 = this.chromosome.baseBettingTier;
 	var t2 = t1 * 10;
