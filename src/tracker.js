@@ -74,7 +74,7 @@ Match.prototype.betAmount = function(tournament) {
 	var strategy = this.strategy;
 	var debug = true;
 
-	if (strategy instanceof ConfidenceScore)
+	if ( strategy instanceof ConfidenceScore)
 		strategy.adjustConfidence();
 
 	if (!strategy.confidence)
@@ -94,15 +94,16 @@ Match.prototype.init = function() {
 		var recs = result.characters_v1;
 
 		//self.fillCharacters(result);//get character record objects or make new ones
-		for (var i = 0; i < recs.length; i++) {
-			var c = recs[i];
-			if (c.name == self.names[0]) {
-				self.character1 = c;
+		if (recs)
+			for (var i = 0; i < recs.length; i++) {
+				var c = recs[i];
+				if (c.name == self.names[0]) {
+					self.character1 = c;
+				}
+				if (c.name == self.names[1]) {
+					self.character2 = c;
+				}
 			}
-			if (c.name == self.names[1]) {
-				self.character2 = c;
-			}
-		}
 
 		//
 		self.character1 = (self.character1 == null) ? new Character(self.names[0]) : self.character1;

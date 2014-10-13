@@ -22,6 +22,9 @@ var prClick = function() {
 var erClick = function() {
 	btnClicked("er");
 };
+var tvClick = function() {
+	btnClicked("tv");
+};
 
 var changeStrategyClickO = function() {
 	btnClicked("cs_o");
@@ -399,6 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("mrc").addEventListener("click", function() {
 		simulator.evalMutations("mass");
 	});
+	document.getElementById("tv").addEventListener("click", tvClick);
 	document.getElementById("cs_o").addEventListener("click", changeStrategyClickO);
 	document.getElementById("cs_cs").addEventListener("click", changeStrategyClickCS);
 	document.getElementById("cs_rc").addEventListener("click", changeStrategyClickRC);

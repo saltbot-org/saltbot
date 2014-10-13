@@ -467,7 +467,7 @@ InternetPotentialUpset.prototype.getBetAmount = function(balance, tournament, de
 
 	var t1 = this.chromosome.baseBettingTier;
 	var t2 = t1 * 10;
-	var t3 = t2 * 10;
+	var t3 = t2 * 100;
 	if (balance > t1 && balance < t2)
 		return 100;
 	else if (balance > t2 && balance < t3)

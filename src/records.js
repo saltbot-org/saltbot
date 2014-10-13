@@ -266,6 +266,9 @@ if (window.location.href == "http://www.saltybet.com/")
 		case "ir":
 			ir(request.text);
 			break;
+		case "tv":
+			ctrl.toggleVideoWindow();
+			break;
 		case "cs_o":
 			ctrl.changeStrategy(request.type);
 			break;

@@ -1,5 +1,6 @@
 var Settings = function() {
 	this.nextStrategy = null;
+	this.video = true;
 };
 
 var StatusScanner = function() {
@@ -260,6 +261,27 @@ Controller.prototype.ensureTwitch = function() {
 		console.log("response received in salty");
 	});
 };
+Controller.prototype.removeVideoWindow = function() {
+	var killVideo = function() {
+		var parent = document.getElementById("video-embed");
+		while (parent.childNodes.length > 0) {
+			parent.removeChild(parent.childNodes[0]);
+		}
+	};
+	killVideo();
+	setTimeout(killVideo, 20000);
+};
+Controller.prototype.toggleVideoWindow = function() {
+	this.settings.video = !this.settings.video;
+	if (!this.settings.video)
+		this.removeVideoWindow();
+	var self = this;
+	chrome.storage.local.set({
+		'settings_v1' : self.settings
+	}, function() {
+		console.log("- settings updated, video: " + self.settings.video);
+	});
+};
 Controller.prototype.changeStrategy = function(sn, data) {
 	console.log("- changing strategy to " + sn.replace("cs_", ""));
 	switch(sn) {
@@ -298,6 +320,8 @@ if (window.location.href == "http://www.saltybet.com/") {
 		var self = ctrl;
 		if (results.settings_v1) {
 			self.settings = results.settings_v1;
+			if (!self.settings.video)
+				self.removeVideoWindow();
 		} else {
 			self.settings = new Settings();
 			self.settings.nextStrategy = "o";
