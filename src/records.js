@@ -107,7 +107,7 @@ Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
 	}
 };
 
-var dr = function() {
+var dr = function(sortByMoney) {
 	chrome.storage.local.get(["matches_v1", "characters_v1", "bettors_v1"], function(results) {
 		var bw10 = [];
 		var accTypeI = [];
@@ -125,8 +125,11 @@ var dr = function() {
 			else if (a.type == "c")
 				accTypeC.push(a.accuracy);
 		}
+		var sbm = sortByMoney;
 		bw10.sort(function(a, b) {
-			return b.accuracy - a.accuracy;
+			if (sbm)
+				return (b.accuracy * b.total) - (a.accuracy * a.total);
+			return (b.accuracy) - (a.accuracy);
 		});
 		var blist = "";
 		for (var j = 0; j < bw10.length; j++) {
@@ -147,9 +150,7 @@ var dr = function() {
 };
 
 var pr = function() {
-	chrome.storage.local.get(["matches_v1", "characters_v1"], function(results) {
-		console.log("-\nrecord verification stuff deleted...");
-	});
+	dr(true);
 };
 
 var er = function() {
