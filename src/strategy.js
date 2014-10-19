@@ -245,11 +245,14 @@ ConfidenceScore.prototype.adjustConfidence = function() {
 	}
 
 	var unconfident = false;
-	if (this.confidence < this.chromosome.minimumCombinedConfidenceForLargeBet) {
+	var minCon=this.chromosome.minimumCombinedConfidenceForLargeBet;
+	if(minCon>1)
+		minCon=1/minCon;
+	if (this.confidence < minCon) {
 		unconfident = true;
 		if (this.debug)
 			console.log("- combined confidence too low, dropping confidence by 75%");
-	} else if (this.confidence < Math.ceil(this.chromosome.minimumMatchesForLargeBet)) {
+	} else if (this.lowerTotalMatches < Math.ceil(this.chromosome.minimumMatchesForLargeBet)) {
 		unconfident = true;
 		if (this.debug)
 			console.log("- one or both players have too few matches, dropping confidence by 75%");
@@ -263,6 +266,11 @@ ConfidenceScore.prototype.execute = function(info) {
 	var matches = info.matches;
 	var c1Stats = new CSStats(c1);
 	var c2Stats = new CSStats(c2);
+
+	//This works with this.chromosome.minimumMatchesForLargeBet in adjustConfidence()
+	var c1TotalMatches = c1.wins.length + c1.losses.length;
+	var c2TotalMatches = c2.wins.length + c2.losses.length;
+	this.lowerTotalMatches = (c1TotalMatches < c2TotalMatches) ? c1TotalMatches : c2TotalMatches;
 
 	if (c1Stats.averageOdds == 0 || c2Stats.averageOdds == 0) {
 		c1Stats.averageOdds = null;

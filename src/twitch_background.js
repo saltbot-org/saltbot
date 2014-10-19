@@ -25,6 +25,13 @@ chrome.extension.onMessage.addListener(function(details) {
 var sendUpdatedChromosome = function() {
 	chrome.storage.local.get(["chromosomes_v1"], function(results) {
 		if (results.chromosomes_v1) {
+			for (var i in results.chromosomes_v1) {
+				if (!results.chromosomes_v1[i].rank)
+					results.chromosomes_v1[i].rank = 100;
+			}
+			results.chromosomes_v1.sort(function(a, b) {
+				return a.rank - b.rank;
+			});
 			var data = JSON.stringify(results.chromosomes_v1[0]);
 			chrome.tabs.query({
 				title : "Salty Bet - In Salt We Trust",

@@ -250,6 +250,8 @@ Simulator.prototype.evalMutations = function(mode) {
 				for (var o = 0; o < top; o++) {
 					console.log(sortingArray[o][0].toDisplayString() + " -> " + sortingArray[o][1].toFixed(4) + "%,  $" + parseInt(sortingArray[o][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 					parents.push(sortingArray[o][0]);
+					//ranking guarantees that we send to the best one
+					sortingArray[o][0].rank=o+1;
 					nextGeneration.push(sortingArray[o][0]);
 				}
 				for (var mf = 0; mf < parents.length; mf++) {
