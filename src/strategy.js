@@ -226,17 +226,14 @@ ConfidenceScore.prototype.adjustConfidence = function() {
 ConfidenceScore.prototype.execute = function(info) {
 	var c1 = info.character1;
 	var c2 = info.character2;
-	// saving names for jury calculation
-	this.c1name = c1.name;
-	this.c2name = c2.name;
 	var matches = info.matches;
 	var c1Stats = new CSStats(c1);
 	var c2Stats = new CSStats(c2);
 
-	//This works with this.chromosome.minimumMatchesForLargeBet in adjustConfidence()
+	//This works with this.chromosome.minimumMatchesForLargeBet in adjust Confidence section
 	var c1TotalMatches = c1.wins.length + c1.losses.length;
 	var c2TotalMatches = c2.wins.length + c2.losses.length;
-	this.lowerTotalMatches = (c1TotalMatches < c2TotalMatches) ? c1TotalMatches : c2TotalMatches;
+	var lowerTotalMatches = (c1TotalMatches < c2TotalMatches) ? c1TotalMatches : c2TotalMatches;
 
 	if (c1Stats.averageOdds == 0 || c2Stats.averageOdds == 0) {
 		c1Stats.averageOdds = null;
@@ -374,47 +371,54 @@ ConfidenceScore.prototype.execute = function(info) {
 		this.confidence = (confidence + fallbackConfidence ) / multipliers / numberOfFactors;
 	}
 
-	var unconfident = false;
+	// var unconfident = false;
+	var nerfAmount = 0;
+	var nerfMsg = null;
 	var minCon = this.chromosome.minimumCombinedConfidenceForLargeBet;
 	if (minCon > 1)
 		minCon = 1 / minCon;
+	var unweightedWinPercentageC1 = c1.wins.length / (c1.wins.length + c1.losses.length);
+	var unweightedWinPercentageC2 = c2.wins.length / (c2.wins.length + c2.losses.length);
 	if (this.confidence < minCon) {
-		unconfident = true;
-		if (this.debug)
-			console.log("- combined confidence too low (cf:" + this.confidence.toFixed(4) + ", rq:" + minCon.toFixed(4) + "), dropping confidence by 75%");
-	} else if (this.lowerTotalMatches < Math.ceil(this.chromosome.minimumMatchesForLargeBet)) {
-		unconfident = true;
-		if (this.debug)
-			console.log("- one or both players have too few matches (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), dropping confidence by 75%");
-	} else if (c1WWinPercentage < .25 && c2WWinPercentage < .25) {
+		nerfAmount = .3;
+		nerfMsg = "- combined confidence too low (cf:" + (this.confidence * 100).toFixed(0) + "%, rq:" + (minCon * 100).toFixed(0) + "%), ";
+	} else if (lowerTotalMatches < Math.ceil(this.chromosome.minimumMatchesForLargeBet)) {
+		nerfAmount = .75;
+		nerfMsg = "- one or both players have too few matches (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
+	} else if (unweightedWinPercentageC1 < .25 && unweightedWinPercentageC2 < .25) {
 		// that .25 could possibly be given to the chromosome
-		unconfident = true;
-		if (this.debug)
-			console.log("- both players are losers (<25% weighted win rate) c1: " + (c1WWinPercentage * 100).toFixed(2) + "%, c2: " + (c2WWinPercentage * 100).toFixed(2) + "%, dropping confidence by 75%");
+		nerfAmount = .2;
+		nerfMsg = "- both players are losers (<25% win rate) c1: " + (c1WWinPercentage * 100).toFixed(2) + "%, c2: " + (c2WWinPercentage * 100).toFixed(2) + "%, ";
 	} else if ((c1Score == c2Score) || (c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
-		unconfident = true;
-		if (this.debug)
-			console.log("- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), dropping confidence by 75% -> " + this.insufficientInformationMessage);
+		nerfAmount = .75;
+		nerfMsg = "- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
 	} else {
 		var oP = null;
 		var fbP = this.fallback1.prediction;
 		if (oc)
-			oP = (oc[0] > oc[1]) ? this.c1name : this.c2name;
-		if ((oP != null && oP != this.prediction) || (fbP != null && fbP != this.prediction) || (oP != null && fbP != null && oP != fbP)) {
-			unconfident = true;
-			if (this.debug)
-				console.log("- the jury disagrees, dropping confidence by 75%");
-		}
-	}
+			oP = (oc[0] > oc[1]) ? c1.name : c2.name;
+		var oDisagrees = (oP != null && oP != this.prediction);
+		var fbDisagrees = (fbP != null && fbP != this.prediction);
+		var oAndFbDisagree = (oP != null && fbP != null && oP != fbP);
 
-	if (unconfident) {
-		this.abstain = true;
-		this.lowBet = true;
-		this.confidence *= .25;
+		if ((oDisagrees || fbDisagrees) && !oAndFbDisagree)
+			nerfAmount = 2 / 3;
+		else if ((oDisagrees || fbDisagrees) && oAndFbDisagree)
+			nerfAmount = 1 / 3;
+		nerfMsg = "- the jury disagrees, ";
 	}
-
+	
 	// subtract confidence from 50%, 50% is when you know nothing
 	this.confidence -= .5;
+	
+	// nerf the confidence if there is a reason
+	if (nerfAmount != 0) {
+		if (this.debug)
+			console.log(nerfMsg + "dropping confidence by " + (nerfAmount * 100).toFixed(0) + "%");
+		this.confidence *= 1 - nerfAmount;
+	}
+
+	// make sure something gets bet
 	if (this.confidence < 0)
 		this.confidence = .01;
 
