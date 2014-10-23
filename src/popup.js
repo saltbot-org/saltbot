@@ -218,6 +218,9 @@ Simulator.prototype.evalMutations = function(mode) {
 				if (matches[i].o != "U") {
 					var moneyBefore = self.money[k];
 					var betAmount = self.getBetAmount(strategy, k);
+					// the following line is to compensate for the fact that I haven't been recording the money of the matches
+					if(betAmount> 20000)
+						betAmount= 20000;
 					self.updateMoney(k, matches[i].o, prediction == matches[i].c1 ? 0 : 1, betAmount, predictionWasCorrect);
 					if (k == 0 && false)
 						console.log("m " + i + ": " + moneyBefore + " o: " + matches[i].o + " b: " + betAmount + " -> " + self.money[k]);
