@@ -34,7 +34,7 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 			else
 				console.log("- betting: " + balance + " x  50%) = " + amountToBet);
 		}
-	} else if (!this.lowBet) {
+	} else if (!(this.lowBet && this instanceof RatioConfidence)) {
 		amountToBet = Math.round(balance * .1 * this.confidence);
 		if (amountToBet > balance * .1)
 			amountToBet = Math.round(balance * .1);
@@ -245,9 +245,9 @@ ConfidenceScore.prototype.adjustConfidence = function() {
 	}
 
 	var unconfident = false;
-	var minCon=this.chromosome.minimumCombinedConfidenceForLargeBet;
-	if(minCon>1)
-		minCon=1/minCon;
+	var minCon = this.chromosome.minimumCombinedConfidenceForLargeBet;
+	if (minCon > 1)
+		minCon = 1 / minCon;
 	if (this.confidence < minCon) {
 		unconfident = true;
 		if (this.debug)
@@ -256,13 +256,42 @@ ConfidenceScore.prototype.adjustConfidence = function() {
 		unconfident = true;
 		if (this.debug)
 			console.log("- one or both players have too few matches, dropping confidence by 75%");
+	} else if (this.c1WWinPercentage < .25 && this.c2WWinPercentage < .25) {
+		// that .25 could possibly be given to the chromosome
+		unconfident = true;
+		if (this.debug)
+			console.log("- both players are losers, dropping confidence by 75%");
+	} else if (this.lowBet) {
+		unconfident = true;
+		if (this.debug)
+			console.log("- insufficient information, dropping confidence by 75% -> " + this.insufficientInformationMessage);
+	} else {
+		var oP = null;
+		var fbP = this.fallback1.prediction;
+		if (oc)
+			oP = (oc[0] > oc[1]) ? this.c1name : this.c2name;
+		if ((oP != null && oP != this.prediction) || (fbP != null && fbP != this.prediction) || (oP != null && fbP != null && oP != fbP)) {
+			unconfident = true;
+			if (this.debug)
+				console.log("- the jury disagrees, dropping confidence by 75%");
+		}
 	}
+	//See if the Jury disagrees
+
 	if (unconfident)
 		this.confidence *= .25;
+
+	// subtract confidence from 50%, 50% is when you know nothing
+	this.confidence -= .5;
+	if (this.confidence < 0)
+		this.confidence = .01;
 };
 ConfidenceScore.prototype.execute = function(info) {
 	var c1 = info.character1;
 	var c2 = info.character2;
+	// saving names for jury calculation
+	this.c1name = c1.name;
+	this.c2name = c2.name;
 	var matches = info.matches;
 	var c1Stats = new CSStats(c1);
 	var c2Stats = new CSStats(c2);
@@ -332,13 +361,16 @@ ConfidenceScore.prototype.execute = function(info) {
 	var c1WPotential = c1WLScores[0] + c1WLScores[1];
 	var c2WPotential = c2WLScores[0] + c2WLScores[1];
 
+	// used for jury calculation also, hence "this"
+	this.c1WWinPercentage = 0;
+	this.c2WWinPercentage = 0;
 	if (c1WPotential != 0 && c2WPotential != 0) {
-		var c1WWinPercentage = c1WLScores[0] / c1WPotential;
-		var c2WWinPercentage = c2WLScores[0] / c2WPotential;
+		this.c1WWinPercentage = c1WLScores[0] / c1WPotential;
+		this.c2WWinPercentage = c2WLScores[0] / c2WPotential;
 
-		if (c1WWinPercentage > c2WWinPercentage)
+		if (this.c1WWinPercentage > this.c2WWinPercentage)
 			c1Score += winPercentageWeight;
-		else if (c2WWinPercentage > c1WWinPercentage)
+		else if (this.c2WWinPercentage > this.c1WWinPercentage)
 			c2Score += winPercentageWeight;
 	}
 
@@ -378,10 +410,11 @@ ConfidenceScore.prototype.execute = function(info) {
 	this.fallback1.execute(info);
 
 	if ((c1Score == c2Score) || (c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
-		if (this.debug)
-			console.log("- CS has insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+		// if (this.debug)
+		// console.log("- CS has insufficient information ");
 		this.abstain = true;
 		this.lowBet = true;
+		this.insufficientInformationMessage = "(scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")";
 		return this.prediction;
 	}
 	if (this.debug)
