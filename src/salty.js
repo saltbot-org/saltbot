@@ -1,6 +1,8 @@
 var Settings = function() {
 	this.nextStrategy = null;
 	this.video = true;
+	// used for tiered betting:
+	this.level = 0;
 };
 
 var StatusScanner = function() {
@@ -227,6 +229,8 @@ var Controller = function() {
 				self.currentMatch = new Match(new Observer());
 				break;
 			}
+			
+			
 
 			//skip team matches, mirror matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
@@ -275,12 +279,7 @@ Controller.prototype.toggleVideoWindow = function() {
 	this.settings.video = !this.settings.video;
 	if (!this.settings.video)
 		this.removeVideoWindow();
-	var self = this;
-	chrome.storage.local.set({
-		'settings_v1' : self.settings
-	}, function() {
-		console.log("- settings updated, video: " + self.settings.video);
-	});
+	this.saveSettings("- settings updated, video: " + this.settings.video);
 };
 Controller.prototype.changeStrategy = function(sn, data) {
 	console.log("- changing strategy to " + sn.replace("cs_", ""));
@@ -300,16 +299,17 @@ Controller.prototype.changeStrategy = function(sn, data) {
 		this.settings.nextStrategy = "ipu";
 		break;
 	}
+	this.saveSettings("- settings saved");
+};
+Controller.prototype.receiveBestChromosome = function(data) {
+	this.bestChromosome = new Chromosome().loadFromJSON(data);
+};
+Controller.prototype.saveSettings = function(msg) {
 	chrome.storage.local.set({
 		'settings_v1' : this.settings
 	}, function() {
-		console.log("- settings updated");
+		console.log(msg);
 	});
-};
-Controller.prototype.receiveBestChromosome = function(data) {
-	// console.log("- received chromosome");
-	var chromosome = new Chromosome().loadFromJSON(data);
-	this.bestChromosome = chromosome;
 };
 
 ctrl = null;
@@ -322,14 +322,14 @@ if (window.location.href == "http://www.saltybet.com/") {
 			self.settings = results.settings_v1;
 			if (!self.settings.video)
 				self.removeVideoWindow();
+			if (!self.settings.level) {
+				self.settings.level = 0;
+				self.saveSettings("- settings upgraded");
+			}
 		} else {
 			self.settings = new Settings();
 			self.settings.nextStrategy = "o";
-			chrome.storage.local.set({
-				'settings_v1' : self.settings
-			}, function() {
-				console.log("- settings initialized");
-			});
+			self.saveSettings("- settings initialized");
 		}
 		console.log("- settings applied");
 

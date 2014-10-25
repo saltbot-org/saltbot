@@ -8,9 +8,10 @@ var Strategy = function(sn) {
 	this.strategyName = sn;
 	this.prediction = null;
 	this.debug = true;
-	this.getWinner = function(ss) {
-		return ss.getWinner();
-	};
+	this.levels = [[0, 1000], [1000, 10000], [10000, 100000], [100000, 1000000]];
+};
+Strategy.prototype.getWinner = function(ss) {
+	return ss.getWinner();
 };
 Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 	if (!this.confidence)
@@ -49,6 +50,26 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 	}
 	return amountToBet;
 };
+Strategy.prototype.adjustLevel = function(balance) {
+	if (!this.level)
+		this.level = 0;
+
+	var valley = 0;
+	var peak = 1;
+	var maxLv = this.levels.length - 1;
+	var minLv = 0;
+	var changed = false;
+	do {
+		changed = false;
+		if (this.level + 1 <= maxLv && balance >= this.levels[this.level+1][peak]) {
+			this.level += 1;
+			changed = true;
+		} else if (this.level - 1 >= minLv && balance <= this.levels[this.level-1][valley]) {
+			this.level -= 1;
+			changed = true;
+		}
+	} while (changed);
+};
 
 var CoinToss = function() {
 	Strategy.call(this, "ct");
@@ -59,6 +80,64 @@ CoinToss.prototype.execute = function(info) {
 	var c2 = info.character2;
 	this.prediction = (Math.random() > .5) ? c1.name : c2.name;
 	return this.prediction;
+};
+
+var RatioConfidence = function() {
+	Strategy.call(this, "rc");
+	this.abstain = false;
+};
+RatioConfidence.prototype = Object.create(Strategy.prototype);
+RatioConfidence.prototype.execute = function(info) {
+	var self = this;
+	var c1 = info.character1;
+	var c2 = info.character2;
+	var c1TotalMatches = c1.wins.length + c1.losses.length;
+	var c2TotalMatches = c2.wins.length + c2.losses.length;
+	var p;
+
+	if (c1TotalMatches < 3 || c2TotalMatches < 3) {
+		if (this.debug)
+			console.log("- RC has insufficient information, W:L(P1)(P2)->  (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+		self.abstain = true;
+		self.lowBet = true;
+		return null;
+	}
+	var c1Ratio = (c1TotalMatches) ? c1.wins.length / c1TotalMatches : 0;
+	var c2Ratio = (c2TotalMatches) ? c2.wins.length / c2TotalMatches : 0;
+
+	if (c1Ratio != c2Ratio) {
+		c1.ratio = c1Ratio;
+		c2.ratio = c2Ratio;
+		var pChar = (c1.ratio > c2.ratio) ? c1 : c2;
+		var npChar = (c1.ratio < c2.ratio) ? c1 : c2;
+		//confidence score
+		self.confidence = (pChar.name == c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
+		if (self.confidence < 0.6) {
+			if (this.debug)
+				console.log("- RC has insufficient confidence (confidence: " + self.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+			self.abstain = true;
+			self.lowBet = true;
+			return null;
+		}
+		if (pChar.ratio <= 0.5 || (npChar.ratio == 0.5 && (npChar.wins.length + npChar.losses.length == 2))) {
+			if (this.debug)
+				console.log("- RC discourages betting on or against <51% (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
+			self.abstain = true;
+			self.lowBet = true;
+			return null;
+		}
+		p = pChar.name;
+		if (this.debug)
+			console.log("- " + p + " has a better win percentage (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%); RB betting " + p + " confidence: " + self.confidence.toFixed(2));
+		self.prediction = p;
+		return p;
+	} else if (c1Ratio == c2Ratio) {
+		if (this.debug)
+			console.log("- RC has insufficient information (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
+		self.abstain = true;
+		self.lowBet = true;
+		return null;
+	}
 };
 
 var Chromosome = function() {
@@ -80,7 +159,14 @@ var Chromosome = function() {
 	this.fallbackConfidenceWeight = 1;
 	this.minimumCombinedConfidenceForLargeBet = 0.5;
 	this.minimumMatchesForLargeBet = 3;
-	// tier Scoring
+	// confidence adjustment
+	this.useMinCon = 0.51;
+	this.useMinMat = 0.51;
+	this.useLosers = 0.51;
+	this.useJury = 0.51;
+	this.useAverage = 0.51;
+	this.useFlatBets = 0.51;
+	// tier scoring
 	this.wX = 5;
 	this.wS = 4;
 	this.wA = 3;
@@ -184,7 +270,7 @@ var CSStats = function(cObj) {
 		this.ifPercent = ifSum / cObj.illumFavor.length;
 	}
 };
-var ConfidenceScore = function(chromosome) {
+var ConfidenceScore = function(chromosome, level) {
 	Strategy.call(this, "cs");
 	this.abstain = false;
 	this.confidence = null;
@@ -192,8 +278,10 @@ var ConfidenceScore = function(chromosome) {
 	this.fallback1 = new RatioConfidence();
 	this.fallback1.debug = false;
 	this.chromosome = chromosome || this.chromosome;
+	this.level = level;
 };
 ConfidenceScore.prototype = Object.create(Strategy.prototype);
+ConfidenceScore.prototype.__super__ = Strategy;
 ConfidenceScore.prototype.countFromRecord = function(c, tierCharacters, modifier) {
 	var wins = 0;
 	var losses = 0;
@@ -220,7 +308,28 @@ ConfidenceScore.prototype.getWeightedScores = function(c, hasTiered, hasUntiered
 		return this.countFromRecord(c, ["U", "P", "B", "A", "S", "X"], this.chromosome.wModWorst);
 	}
 };
-ConfidenceScore.prototype.adjustConfidence = function() {
+ConfidenceScore.prototype.getBetAmount = function(balance, tournament, debug) {
+	if (tournament)
+		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
+	if (this.chromosome.useFlatBets > -.5) {
+		var flatAmount = 100;
+		switch(this.level) {
+		case 0:
+			return balance;
+			break;
+		case 1:
+			return flatAmount;
+			break;
+		case 2:
+			return flatAmount * 10;
+			break;
+		case 3:
+			return flatAmount * 100;
+			break;
+
+		}
+	} else
+		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
 
 };
 ConfidenceScore.prototype.execute = function(info) {
@@ -350,49 +459,55 @@ ConfidenceScore.prototype.execute = function(info) {
 	// CONFIDENCE ADJUSTMENT SECTION
 	/*---------------------------------------------------------------------------------------------------*/
 
-	var numberOfFactors;
-	var multipliers;
-	var oddsConfidence;
-	var confidence = this.confidence;
-	var fallbackConfidence = this.fallback1.confidence || 0.1;
-	var oc = this.oddsConfidence;
-	confidence *= this.chromosome.confidenceWeight;
-	fallbackConfidence *= this.chromosome.fallbackConfidenceWeight;
+	if (this.chromosome.useAverage > .5) {
+		var numberOfFactors;
+		var multipliers;
+		var oddsConfidence;
+		var confidence = this.confidence;
+		var fallbackConfidence = this.fallback1.confidence || 0.1;
+		var oc = this.oddsConfidence;
+		confidence *= this.chromosome.confidenceWeight;
+		fallbackConfidence *= this.chromosome.fallbackConfidenceWeight;
 
-	if (oc) {
-		numberOfFactors = 3;
-		multipliers = (this.chromosome.confidenceWeight + this.chromosome.fallbackConfidenceWeight + this.chromosome.oddsConfidenceWeight) / numberOfFactors;
-		oddsConfidence = (oc[0] > oc[1]) ? oc[0] / (oc[0] + oc[1]) : oc[1] / (oc[0] + oc[1]);
-		oddsConfidence *= this.chromosome.oddsConfidenceWeight;
-		this.confidence = (confidence + fallbackConfidence + oddsConfidence) / multipliers / numberOfFactors;
-	} else {
-		numberOfFactors = 2;
-		multipliers = (this.chromosome.confidenceWeight + this.chromosome.fallbackConfidenceWeight ) / numberOfFactors;
-		this.confidence = (confidence + fallbackConfidence ) / multipliers / numberOfFactors;
+		if (oc) {
+			numberOfFactors = 3;
+			multipliers = (this.chromosome.confidenceWeight + this.chromosome.fallbackConfidenceWeight + this.chromosome.oddsConfidenceWeight) / numberOfFactors;
+			oddsConfidence = (oc[0] > oc[1]) ? oc[0] / (oc[0] + oc[1]) : oc[1] / (oc[0] + oc[1]);
+			oddsConfidence *= this.chromosome.oddsConfidenceWeight;
+			this.confidence = (confidence + fallbackConfidence + oddsConfidence) / multipliers / numberOfFactors;
+		} else {
+			numberOfFactors = 2;
+			multipliers = (this.chromosome.confidenceWeight + this.chromosome.fallbackConfidenceWeight ) / numberOfFactors;
+			this.confidence = (confidence + fallbackConfidence ) / multipliers / numberOfFactors;
+		}
 	}
 
 	// var unconfident = false;
 	var nerfAmount = 0;
-	var nerfMsg = null;
+	var nerfMsg = "-- PROBLEMS:";
 	var minCon = this.chromosome.minimumCombinedConfidenceForLargeBet;
 	if (minCon > 1)
 		minCon = 1 / minCon;
 	var unweightedWinPercentageC1 = c1.wins.length / (c1.wins.length + c1.losses.length);
 	var unweightedWinPercentageC2 = c2.wins.length / (c2.wins.length + c2.losses.length);
-	if (this.confidence < minCon) {
-		nerfAmount = .3;
-		nerfMsg = "- combined confidence too low (cf:" + (this.confidence * 100).toFixed(0) + "%, rq:" + (minCon * 100).toFixed(0) + "%), ";
-	} else if (lowerTotalMatches < Math.ceil(this.chromosome.minimumMatchesForLargeBet)) {
-		nerfAmount = .75;
-		nerfMsg = "- one or both players have too few matches (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
-	} else if (unweightedWinPercentageC1 < .25 && unweightedWinPercentageC2 < .25) {
+	if (this.chromosome.useMinCon > .5 && this.confidence < minCon) {
+		nerfAmount += .1;
+		nerfMsg += "\n- conf too low (cf:" + (this.confidence * 100).toFixed(0) + "%, rq:" + (minCon * 100).toFixed(0) + "%), ";
+	}
+	if (this.chromosome.useMinMat > .5 && lowerTotalMatches < Math.ceil(this.chromosome.minimumMatchesForLargeBet)) {
+		nerfAmount += .1;
+		nerfMsg += "\n- one or both players have too few matches (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
+	}
+	if (this.chromosome.useLosers > .5 && unweightedWinPercentageC1 < .25 && unweightedWinPercentageC2 < .25) {
 		// that .25 could possibly be given to the chromosome
-		nerfAmount = .2;
-		nerfMsg = "- both players are losers (<25% win rate) c1: " + (c1WWinPercentage * 100).toFixed(2) + "%, c2: " + (c2WWinPercentage * 100).toFixed(2) + "%, ";
-	} else if ((c1Score == c2Score) || (c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
-		nerfAmount = .75;
-		nerfMsg = "- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
-	} else {
+		nerfAmount += .15;
+		nerfMsg += "- both players are losers (<25% win rate) c1: " + (c1WWinPercentage * 100).toFixed(2) + "%, c2: " + (c2WWinPercentage * 100).toFixed(2) + "%, ";
+	}
+	if ((c1Score == c2Score) || (c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
+		nerfAmount += .4;
+		nerfMsg += "\n- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
+	}
+	if (this.chromosome.useJury > .5) {
 		var oP = null;
 		var fbP = this.fallback1.prediction;
 		if (oc)
@@ -401,20 +516,22 @@ ConfidenceScore.prototype.execute = function(info) {
 		var fbDisagrees = (fbP != null && fbP != this.prediction);
 		var oAndFbDisagree = (oP != null && fbP != null && oP != fbP);
 
-		if ((oDisagrees || fbDisagrees) && !oAndFbDisagree)
-			nerfAmount = 2 / 3;
-		else if ((oDisagrees || fbDisagrees) && oAndFbDisagree)
-			nerfAmount = 1 / 3;
-		nerfMsg = "- the jury disagrees, ";
+		if ((oDisagrees || fbDisagrees) && !oAndFbDisagree) {
+			nerfAmount += .1;
+			nerfMsg += "\n- the jury disagrees, ";
+		} else if ((oDisagrees || fbDisagrees) && oAndFbDisagree) {
+			nerfAmount += .05;
+			nerfMsg += "\n- the jury disagrees, ";
+		}
 	}
-	
+
 	// subtract confidence from 50%, 50% is when you know nothing
 	this.confidence -= .5;
-	
+
 	// nerf the confidence if there is a reason
 	if (nerfAmount != 0) {
 		if (this.debug)
-			console.log(nerfMsg + "dropping confidence by " + (nerfAmount * 100).toFixed(0) + "%");
+			console.log(nerfMsg + "\n--> dropping confidence by " + (nerfAmount * 100).toFixed(0) + "%");
 		this.confidence *= 1 - nerfAmount;
 	}
 
@@ -423,64 +540,6 @@ ConfidenceScore.prototype.execute = function(info) {
 		this.confidence = .01;
 
 	return this.prediction;
-};
-
-var RatioConfidence = function() {
-	Strategy.call(this, "rc");
-	this.abstain = false;
-};
-RatioConfidence.prototype = Object.create(Strategy.prototype);
-RatioConfidence.prototype.execute = function(info) {
-	var self = this;
-	var c1 = info.character1;
-	var c2 = info.character2;
-	var c1TotalMatches = c1.wins.length + c1.losses.length;
-	var c2TotalMatches = c2.wins.length + c2.losses.length;
-	var p;
-
-	if (c1TotalMatches < 3 || c2TotalMatches < 3) {
-		if (this.debug)
-			console.log("- RC has insufficient information, W:L(P1)(P2)->  (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
-		self.abstain = true;
-		self.lowBet = true;
-		return null;
-	}
-	var c1Ratio = (c1TotalMatches) ? c1.wins.length / c1TotalMatches : 0;
-	var c2Ratio = (c2TotalMatches) ? c2.wins.length / c2TotalMatches : 0;
-
-	if (c1Ratio != c2Ratio) {
-		c1.ratio = c1Ratio;
-		c2.ratio = c2Ratio;
-		var pChar = (c1.ratio > c2.ratio) ? c1 : c2;
-		var npChar = (c1.ratio < c2.ratio) ? c1 : c2;
-		//confidence score
-		self.confidence = (pChar.name == c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
-		if (self.confidence < 0.6) {
-			if (this.debug)
-				console.log("- RC has insufficient confidence (confidence: " + self.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
-			self.abstain = true;
-			self.lowBet = true;
-			return null;
-		}
-		if (pChar.ratio <= 0.5 || (npChar.ratio == 0.5 && (npChar.wins.length + npChar.losses.length == 2))) {
-			if (this.debug)
-				console.log("- RC discourages betting on or against <51% (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
-			self.abstain = true;
-			self.lowBet = true;
-			return null;
-		}
-		p = pChar.name;
-		if (this.debug)
-			console.log("- " + p + " has a better win percentage (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%); RB betting " + p + " confidence: " + self.confidence.toFixed(2));
-		self.prediction = p;
-		return p;
-	} else if (c1Ratio == c2Ratio) {
-		if (this.debug)
-			console.log("- RC has insufficient information (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
-		self.abstain = true;
-		self.lowBet = true;
-		return null;
-	}
 };
 
 var ChromosomeIPU = function() {

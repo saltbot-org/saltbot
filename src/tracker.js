@@ -74,13 +74,12 @@ Match.prototype.betAmount = function(tournament) {
 	var strategy = this.strategy;
 	var debug = true;
 
-	if ( strategy instanceof ConfidenceScore)
-		strategy.adjustConfidence();
-
-	if (!strategy.confidence)
+	if (!strategy.confidence) {
 		amountToBet = Math.ceil(balance * .1);
-	else
+	} else {
+		strategy.adjustLevel(balance);
 		amountToBet = strategy.getBetAmount(balance, tournament, debug);
+	}
 
 	wagerBox.value = amountToBet.toString();
 };

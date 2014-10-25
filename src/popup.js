@@ -80,9 +80,6 @@ Simulator.prototype.getBetAmount = function(strategy, index) {
 	var debug = false;
 	var balance = this.money[index];
 
-	if ( strategy instanceof ConfidenceScore)
-		strategy.adjustConfidence();
-
 	if (!strategy.confidence)
 		amountToBet = Math.ceil(balance * .1);
 	else
@@ -101,9 +98,6 @@ Simulator.prototype.evalMutations = function(mode) {
 		var totalPercentCorrect = [];
 		self.money = [];
 		var updater = new Updater();
-		//
-		var confidencesLedToLoss = [];
-		var confidencesLedToWin = [];
 
 		// create orders from string passed in
 		var orders = [];
@@ -119,9 +113,10 @@ Simulator.prototype.evalMutations = function(mode) {
 				throw msg;
 			}
 		} else if (mode == "mass") {
-			orders.push(new Order("rc"));
-			for (var z = 0; z < 50; z++)
-				orders.push(new Order("ipu", new ChromosomeIPU()));
+			orders.push(new Order("cs", new Chromosome().loadFromObject(results.chromosomes_v1[0])));
+			// orders.push(new Order("rc"));
+			// for (var z = 0; z < 50; z++)
+			// orders.push(new Order("ipu", new ChromosomeIPU()));
 		} else {
 			if (document.getElementById("ct").checked)
 				orders.push(new Order("ct"));
@@ -162,18 +157,13 @@ Simulator.prototype.evalMutations = function(mode) {
 		var characterRecords = [];
 		var namesOfCharactersWhoAlreadyHaveRecords = [];
 
+		var nonupsetDenominators = [];
+		var upsetDenominators = [];
 		var denominators = [];
+		var upsetsBetOn = 0;
 
 		// process matches
 		for (var i = 0; i < matches.length; i++) {
-			if (mode == "mass")
-				if (matches[i].o != "U") {
-					var t = matches[i].o.split(":");
-					var o1 = parseFloat(t[0]);
-					var o2 = parseFloat(t[1]);
-					var greaterNumber = o1 < o2 ? o2 / o1 : o1 / o2;
-					denominators.push(greaterNumber);
-				}
 
 			var info = {
 				"character1" : updater.getCharacter(matches[i].c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
@@ -205,22 +195,41 @@ Simulator.prototype.evalMutations = function(mode) {
 				var predictionWasCorrect = prediction == actualWinner;
 				if (!strategy.abstain) {
 					correct[k] += (predictionWasCorrect) ? 1 : 0;
-					if (predictionWasCorrect && strategy.confidence)
-						confidencesLedToWin.push(strategy.confidence);
-					else if (strategy.confidence)
-						confidencesLedToLoss.push(strategy.confidence);
 
 					totalBettedOn[k] += 1;
 					totalPercentCorrect[k] = correct[k] / totalBettedOn[k] * 100;
 					data[k].push([totalBettedOn[k], totalPercentCorrect[k]]);
+
+					if (mode == "mass")
+						if (matches[i].o != "U") {
+							var t = matches[i].o.split(":");
+							var o1 = parseFloat(t[0]);
+							var o2 = parseFloat(t[1]);
+							var greaterNumber = o1 < o2 ? o2 / o1 : o1 / o2;
+							denominators.push(greaterNumber);
+
+							var isAnUpset = (matches[i].w == 0 && o2 > o1) || (matches[i].w == 1 && o1 > o2);
+							if (isAnUpset) {
+								upsetDenominators.push(greaterNumber);
+								if (predictionWasCorrect)
+									upsetsBetOn += 1;
+							} else {
+								nonupsetDenominators.push(greaterNumber);
+							}
+
+							// var avgOddsC1 = updater.getCharAvgOdds(matches[i].c1);
+							// var avgOddsC2 = updater.getCharAvgOdds(matches[i].c2);
+
+						}
 				}
 				//update simulated money
 				if (matches[i].o != "U") {
 					var moneyBefore = self.money[k];
+					strategy.adjustLevel(moneyBefore);
 					var betAmount = self.getBetAmount(strategy, k);
-					// the following line is to compensate for the fact that I haven't been recording the money of the matches
-					if(betAmount> 20000)
-						betAmount= 20000;
+					// the 20,000 limit is to compensate for the fact that I haven't been recording the money of the matches -- that amount wouldn't swing the odds
+					if (betAmount > 20000)
+						betAmount = 20000;
 					self.updateMoney(k, matches[i].o, prediction == matches[i].c1 ? 0 : 1, betAmount, predictionWasCorrect);
 					if (k == 0 && false)
 						console.log("m " + i + ": " + moneyBefore + " o: " + matches[i].o + " b: " + betAmount + " -> " + self.money[k]);
@@ -233,7 +242,18 @@ Simulator.prototype.evalMutations = function(mode) {
 			for (var z in denominators) {
 				dSum += denominators[z];
 			}
-			console.log("Average denominator: " + (dSum / denominators.length));
+
+			var udSum = 0;
+			for (var zz in upsetDenominators) {
+				udSum += upsetDenominators[zz];
+			}
+
+			var nudSum = 0;
+			for (var zzz in nonupsetDenominators) {
+				nudSum += nonupsetDenominators[zzz];
+			}
+
+			console.log("avg denom: " + (dSum / denominators.length).toFixed(0) + ", avg upset: " + (udSum / upsetDenominators.length).toFixed(0) + ", avg nonupset: " + (nudSum / nonupsetDenominators.length).toFixed(0) + ", upsets called correctly: " + (upsetsBetOn / upsetDenominators.length * 100).toFixed(2) + "%, (" + upsetsBetOn + "/" + upsetDenominators.length + ")");
 		}
 
 		if (mode == "evolution" || mode == "mass") {
@@ -254,7 +274,7 @@ Simulator.prototype.evalMutations = function(mode) {
 					console.log(sortingArray[o][0].toDisplayString() + " -> " + sortingArray[o][1].toFixed(4) + "%,  $" + parseInt(sortingArray[o][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 					parents.push(sortingArray[o][0]);
 					//ranking guarantees that we send to the best one
-					sortingArray[o][0].rank=o+1;
+					sortingArray[o][0].rank = o + 1;
 					nextGeneration.push(sortingArray[o][0]);
 				}
 				for (var mf = 0; mf < parents.length; mf++) {
@@ -276,16 +296,6 @@ Simulator.prototype.evalMutations = function(mode) {
 				}
 			}
 
-			//figure out confidence thresholds
-			var wConfidenceSum = 0;
-			var lConfidenceSum = 0;
-			for (var wc = 0; wc < confidencesLedToWin.length; wc++)
-				wConfidenceSum += confidencesLedToWin[wc];
-			var wConfidenceAvg = (wConfidenceSum / confidencesLedToWin.length * 100).toFixed(4);
-			for (var wl = 0; wl < confidencesLedToLoss.length; wl++)
-				lConfidenceSum += confidencesLedToLoss[wl];
-			var lConfidenceAvg = (lConfidenceSum / confidencesLedToLoss.length * 100).toFixed(4);
-
 			var bestPercent;
 			var bestMoney;
 			if (mode == "evolution") {
@@ -297,14 +307,14 @@ Simulator.prototype.evalMutations = function(mode) {
 					'best_chromosome' : sortingArray[0][0]
 				}, function() {
 					roundsOfEvolution += 1;
-					console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "%m -> " + bestPercent.toFixed(1) + "%c, $" + bestMoney.toFixed(0) + ",    wC: " + wConfidenceAvg + ", lC: " + lConfidenceAvg + "-------------------\n\n");
-					document.getElementById('msgbox').value = "gen: " + roundsOfEvolution + ", best: " + bestPercent.toFixed(1) + "%, $" + bestMoney.toFixed(0);
+					console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "%m -> " + bestPercent.toFixed(1) + "%c, $" + bestMoney.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "   -----------------\n\n");
+					document.getElementById('msgbox').value = "g(" + roundsOfEvolution + "), best: " + bestPercent.toFixed(1) + "%, $" + bestMoney.toFixed(0);
 					setTimeout(function() {
 						simulator.evalMutations("evolution");
 					}, 5000);
 				});
 			} else if (mode == "mass") {
-				console.log("\n\n--------------- matches processed " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "% -> wC: " + wConfidenceAvg + ", lC: " + lConfidenceAvg + "-------------------\n\n");
+				console.log("\n\n--------------- matches processed: " + matches.length);
 				var ipuSum = 0;
 				for (var l = 0; l < orders.length; l++) {
 					if (orders[l].type == "ipu")

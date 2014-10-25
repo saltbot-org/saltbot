@@ -19,6 +19,14 @@ var Character = function(name) {
 var Updater = function() {
 
 };
+Updater.prototype.getCharAvgOdds = function(c) {
+	var o = 0;
+	var i;
+	for ( i = 0; i < c.odds.length; i++)
+		o += c.odds[i];
+	i = (i > 0) ? i : 1;
+	return o / i;
+};
 Updater.prototype.getCharacter = function(cname, characterRecords, namesOfCharactersWhoAlreadyHaveRecords) {
 	var cobject = null;
 	if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
@@ -116,7 +124,7 @@ var dr = function(sortByMoney) {
 			var a = results.bettors_v1[i];
 			var aTotal = a.wins + a.losses;
 			a.accuracy = a.wins / aTotal * 100;
-			if (aTotal >= 25) {
+			if (aTotal >= 100) {
 				a.total = aTotal;
 				bw10.push(a);
 			}
