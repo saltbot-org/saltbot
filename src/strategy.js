@@ -70,6 +70,25 @@ Strategy.prototype.adjustLevel = function(balance) {
 		}
 	} while (changed);
 };
+Strategy.prototype.flatBet = function(balance, debug) {
+	var flatAmount = 100;
+	if (debug)
+		console.log("- betting at level: " + this.level);
+	switch(this.level) {
+	case 0:
+		return balance;
+		break;
+	case 1:
+		return flatAmount;
+		break;
+	case 2:
+		return flatAmount * 10;
+		break;
+	case 3:
+		return flatAmount * 100;
+		break;
+	}
+};
 
 var CoinToss = function() {
 	Strategy.call(this, "ct");
@@ -311,26 +330,10 @@ ConfidenceScore.prototype.getWeightedScores = function(c, hasTiered, hasUntiered
 ConfidenceScore.prototype.getBetAmount = function(balance, tournament, debug) {
 	if (tournament)
 		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
-	if (this.chromosome.useFlatBets > -.5) {
-		var flatAmount = 100;
-		switch(this.level) {
-		case 0:
-			return balance;
-			break;
-		case 1:
-			return flatAmount;
-			break;
-		case 2:
-			return flatAmount * 10;
-			break;
-		case 3:
-			return flatAmount * 100;
-			break;
-
-		}
-	} else
+	if (this.chromosome.useFlatBets > -.5)
+		return this.__super__.prototype.flatBet.call(this, balance, debug);
+	else
 		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
-
 };
 ConfidenceScore.prototype.execute = function(info) {
 	var c1 = info.character1;
@@ -567,18 +570,7 @@ InternetPotentialUpset.prototype.execute = function(info) {
 InternetPotentialUpset.prototype.getBetAmount = function(balance, tournament, debug) {
 	if (tournament)
 		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
-
-	var t1 = this.chromosome.baseBettingTier;
-	var t2 = t1 * 10;
-	var t3 = t2 * 100;
-	if (balance > t1 && balance < t2)
-		return 100;
-	else if (balance > t2 && balance < t3)
-		return 1000;
-	else if (balance > t3)
-		return 10000;
-	else
-		return balance;
+	return this.__super__.prototype.flatBet.call(this, balance, debug);
 };
 
 var Observer = function() {
