@@ -69,7 +69,7 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 Match.prototype.betAmount = function(tournament) {
 	var balanceBox = document.getElementById("balance");
 	var wagerBox = document.getElementById("wager");
-	var balance = parseInt(balanceBox.innerHTML.replace(",", ""));
+	var balance = parseInt(balanceBox.innerHTML.replace(/,/g, ""));
 	var amountToBet;
 	var strategy = this.strategy;
 	var debug = true;

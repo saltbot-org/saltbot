@@ -212,6 +212,8 @@ var Controller = function() {
 			}
 
 			//set up next strategy
+			if (self.currentMatch && self.currentMatch.strategy)
+				var level = self.currentMatch.strategy.level;
 			switch(self.settings.nextStrategy) {
 			case "o":
 				self.currentMatch = new Match(new Observer());
@@ -220,17 +222,15 @@ var Controller = function() {
 				self.currentMatch = new Match(new RatioConfidence());
 				break;
 			case "cs":
-				self.currentMatch = new Match(new ConfidenceScore(self.bestChromosome));
+				self.currentMatch = new Match(new ConfidenceScore(self.bestChromosome, level));
 				break;
 			case "ipu":
-				self.currentMatch = new Match(new InternetPotentialUpset(new ChromosomeIPU()));
+				self.currentMatch = new Match(new InternetPotentialUpset(new ChromosomeIPU(), level));
 				break;
 			default:
 				self.currentMatch = new Match(new Observer());
 				break;
 			}
-			
-			
 
 			//skip team matches, mirror matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {

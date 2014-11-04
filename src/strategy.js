@@ -551,13 +551,14 @@ var ChromosomeIPU = function() {
 };
 ChromosomeIPU.prototype = Object.create(Chromosome.prototype);
 ;
-var InternetPotentialUpset = function(cipu) {
+var InternetPotentialUpset = function(cipu, level) {
 	Strategy.call(this, "ipu");
 	this.debug = true;
 	this.ct = new CoinToss();
 	this.chromosome = cipu;
 	// even though it doesn't use it, it needs confidence so as to be marked as new
 	this.confidence = 1;
+	this.level = level;
 };
 InternetPotentialUpset.prototype = Object.create(Strategy.prototype);
 InternetPotentialUpset.prototype.__super__ = Strategy;

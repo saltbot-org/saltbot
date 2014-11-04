@@ -330,36 +330,9 @@ Simulator.prototype.evalMutations = function(mode) {
 			for (var l = 0; l < orders.length; l++) {
 				console.log(orders[l].type + ": " + totalPercentCorrect[l]);
 			}
-			self.draw(data);
 		}
 
 	});
-};
-Simulator.prototype.draw = function(d) {
-	// Create the Scatter chart.
-	var scatter = new RGraph.Scatter({
-
-		id : 'cvs',
-		data : d,
-		options : {
-			background : {
-				barcolor1 : 'white',
-				barcolor2 : 'white',
-				grid : {
-					color : 'rgba(238,238,238,1)'
-				}
-			},
-			gutter : {
-				left : 30
-			},
-			title : {
-				xaxis : "# matches",
-				yaxis : "% correct"
-			},
-			xmax : 1000,
-			ymax : 100
-		}
-	}).draw();
 };
 Simulator.prototype.initializePool = function() {
 	var pool = [new Chromosome(), new Chromosome()];

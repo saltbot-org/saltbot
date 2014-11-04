@@ -4,19 +4,17 @@
 		<title>SaltBot Controls</title>
 		<style>
 			body {
-				min-width:400px;
-				overflow-x:hidden;
+				min-width: 400px;
+				overflow-x: hidden;
 			}
 			#player1, #player2 {
-				display:none;
+				display: none;
 			}
 		</style>
 		<script type="text/javascript" src="records.js"></script>
 		<script type="text/javascript" src="strategy.js"></script>
 		<script type="text/javascript" src="popup.js"></script>
 		<script type="text/javascript" src="lib/jquery.min.js"></script>
-		<script type="text/javascript" src="lib/RGraph.common.core.js" ></script>
-		<script type="text/javascript" src="lib/RGraph.scatter.js" ></script>
 	</head>
 	<body>
 		<h1>SaltBot Controls</h1>
@@ -29,16 +27,7 @@
 		<span>Import Records</span>
 		<input type="file" value="Import Records" id="bir">
 		<br>
-		<input type="button" value="Charts" id="bsc">
-		<label>
-			<input type="checkbox" id="ct">
-			ct</label>
-		<label>
-			<input type="checkbox" id="mw">
-			mw</label>
-		<label>
-			<input type="checkbox" id="mwc">
-			mwc</label>
+		<input type="button" value="Simulate Multiple" id="bsc">
 		<label>
 			<input type="checkbox" id="rb">
 			rb</label>
@@ -61,14 +50,9 @@
 		<input type="button" value="Mass RC" id="mrc">
 		<input type="button" value="Toggle Video" id="tv">
 		<br>
-		<label> M: 
+		<label> M:
 			<input type="text" name="msgbox" id="msgbox"/>
 		</label>
-
-		<canvas id="cvs" width="400" height="250">
-			[No canvas support]
-		</canvas>
-		<a href="http://www.rgraph.net" target="_blank"> Charts by RGraph </a>
 	</body>
 </html>
 
