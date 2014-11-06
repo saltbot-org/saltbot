@@ -234,14 +234,15 @@ var Controller = function() {
 
 			//skip team matches, mirror matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
-				self.currentMatch = null;
-				console.log("- skipping team match");
+				self.currentMatch = new Match(new Observer());
+				console.log("- skipping team match, but placing an observer");
+				self.currentMatch.init();
 			} else if (self.currentMatch.names[0] == self.currentMatch.names[1]) {
 				self.currentMatch = null;
 				console.log("- skipping mirror match");
 			} else if (self.currentMatch.names[0].indexOf(",") > -1 || self.currentMatch.names[1].indexOf(",") > -1) {
 				self.currentMatch = null;
-				console.log("- skipping match, comma in name");
+				console.log("- skipping match, comma in name, too lazy to deal with escape characters");
 			} else {
 				self.currentMatch.init();
 			}
