@@ -59,7 +59,7 @@ var Controller = function() {
 	var maxAttempts = 3;
 	var timerInterval = 3000;
 	this.ticksSinceMatchBegan = -999;
-	this.bestChromosome = new Chromosome();
+	this.bestChromosome = null;
 	this.nextStrategy = "ipu";
 	this.bettorsC1 = [];
 	this.bettorsC2 = [];
@@ -100,7 +100,7 @@ var Controller = function() {
 				if (winner != self.currentMatch.names[0] && winner != self.currentMatch.names[1])
 					winner = null;
 				//wait a little bit longer before giving up on this match getting processed
-				if (winner == null && attemptsToProcess < maxAttempts) {
+				if ((winner == null || !self.bestChromosome) && attemptsToProcess < maxAttempts) {
 					attemptsToProcess += 1;
 					return;
 				}

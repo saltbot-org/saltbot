@@ -8,7 +8,51 @@ var Strategy = function(sn) {
 	this.strategyName = sn;
 	this.prediction = null;
 	this.debug = true;
-	this.levels = [[0, 1000], [1000, 10000], [10000, 100000], [100000, 1000000]];
+	this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100]];
+};
+Strategy.prototype.flatBet = function(balance, debug) {
+	var flatAmount = 100;
+	var multiplierIndex = 2;
+	if (debug)
+		console.log("- betting at level: " + this.level + ", confidence: " + (this.confidence * 100).toFixed(2) + "%");
+	if (this.level == 0)
+		return balance;
+	else
+		return Math.ceil(flatAmount * this.levels[this.level][multiplierIndex] * this.confidence);
+	// switch(this.level) {
+	// case 0:
+	// return balance;
+	// break;
+	// case 1:
+	// return Math.round(flatAmount * this.confidence);
+	// break;
+	// case 2:
+	// return Math.round(flatAmount * 10 * this.confidence);
+	// break;
+	// case 3:
+	// return Math.round(flatAmount * 100 * this.confidence);
+	// break;
+	// }
+};
+Strategy.prototype.adjustLevel = function(balance) {
+	if (!this.level)
+		this.level = 0;
+
+	var valley = 0;
+	var peak = 1;
+	var maxLv = this.levels.length - 1;
+	var minLv = 0;
+	var changed = false;
+	do {
+		changed = false;
+		if (this.level + 1 <= maxLv && balance >= this.levels[this.level+1][peak]) {
+			this.level += 1;
+			changed = true;
+		} else if (this.level - 1 >= minLv && balance <= this.levels[this.level-1][valley]) {
+			this.level -= 1;
+			changed = true;
+		}
+	} while (changed);
 };
 Strategy.prototype.getWinner = function(ss) {
 	return ss.getWinner();
@@ -49,45 +93,6 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 			console.log("- betting without confidence: " + amountToBet);
 	}
 	return amountToBet;
-};
-Strategy.prototype.adjustLevel = function(balance) {
-	if (!this.level)
-		this.level = 0;
-
-	var valley = 0;
-	var peak = 1;
-	var maxLv = this.levels.length - 1;
-	var minLv = 0;
-	var changed = false;
-	do {
-		changed = false;
-		if (this.level + 1 <= maxLv && balance >= this.levels[this.level+1][peak]) {
-			this.level += 1;
-			changed = true;
-		} else if (this.level - 1 >= minLv && balance <= this.levels[this.level-1][valley]) {
-			this.level -= 1;
-			changed = true;
-		}
-	} while (changed);
-};
-Strategy.prototype.flatBet = function(balance, debug) {
-	var flatAmount = 100;
-	if (debug)
-		console.log("- betting at level: " + this.level);
-	switch(this.level) {
-	case 0:
-		return balance;
-		break;
-	case 1:
-		return flatAmount;
-		break;
-	case 2:
-		return flatAmount * 10;
-		break;
-	case 3:
-		return flatAmount * 100;
-		break;
-	}
 };
 
 var CoinToss = function() {
@@ -160,32 +165,25 @@ RatioConfidence.prototype.execute = function(info) {
 };
 
 var Chromosome = function() {
-	// original values
-	this.wModBest = 1;
-	this.wModMiddle = 0.5;
-	this.wModWorst = 0.25;
+	// confidence weights
 	this.oddsWeight = 1;
 	this.timeWeight = 0.5;
 	this.winPercentageWeight = 1;
 	this.totalWinsWeight = 0.1;
 	this.crowdFavorWeight = 1;
 	this.illumFavorWeight = 1;
-	//
-	this.junk = 1;
-	//
-	this.confidenceWeight = 1;
-	this.oddsConfidenceWeight = 1;
-	this.fallbackConfidenceWeight = 1;
+	// confidence nerf
 	this.minimumCombinedConfidenceForLargeBet = 0.5;
 	this.minimumMatchesForLargeBet = 3;
-	// confidence adjustment
 	this.useMinCon = 0.51;
 	this.useMinMat = 0.51;
-	this.useLosers = 0.51;
+	this.useSimilarAbility = 0.51;
 	this.useJury = 0.51;
-	this.useAverage = 0.51;
-	this.useFlatBets = 0.51;
+	this.useFlatBets = 1;
 	// tier scoring
+	this.tierWeightNoU = 1;
+	this.tierWeightUOnly = 0.5;
+	this.tierWeightMixed = 0.25;
 	this.wX = 5;
 	this.wS = 4;
 	this.wA = 3;
@@ -318,13 +316,13 @@ ConfidenceScore.prototype.getWeightedScores = function(c, hasTiered, hasUntiered
 
 	if (hasTiered && !hasUntiered) {
 		// best case scenario, only comparing tiered matches
-		return this.countFromRecord(c, ["P", "B", "A", "S", "X"], this.chromosome.wModBest);
+		return this.countFromRecord(c, ["P", "B", "A", "S", "X"], this.chromosome.tierWeightNoU);
 	} else if (!hasTiered && hasUntiered) {
 		// next best case
-		return this.countFromRecord(c, ["U"], this.chromosome.wModMiddle);
+		return this.countFromRecord(c, ["U"], this.chromosome.tierWeightUOnly);
 	} else {
 		// worst-case
-		return this.countFromRecord(c, ["U", "P", "B", "A", "S", "X"], this.chromosome.wModWorst);
+		return this.countFromRecord(c, ["U", "P", "B", "A", "S", "X"], this.chromosome.tierWeightMixed);
 	}
 };
 ConfidenceScore.prototype.getBetAmount = function(balance, tournament, debug) {
@@ -384,9 +382,9 @@ ConfidenceScore.prototype.execute = function(info) {
 
 	if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null)
 		if (c1Stats.averageWinTime < c2Stats.averageWinTime)
-			c1Score += timeWeight;
+			c1Score += timeWeight / 2;
 		else if (c1Stats.averageWinTime > c2Stats.averageWinTime)
-			c2Score += timeWeight;
+			c2Score += timeWeight / 2;
 
 	if (c1Stats.averageLossTime != null && c2Stats.averageLossTime != null)
 		if (c1Stats.averageLossTime > c2Stats.averageLossTime)
@@ -420,6 +418,7 @@ ConfidenceScore.prototype.execute = function(info) {
 			c2Score += winPercentageWeight;
 	}
 
+	// more wins
 	if (c1WLScores[0] > c2WLScores[0])
 		c1Score += totalWinsWeight;
 	else if (c1WLScores[0] < c2WLScores[0])
@@ -462,28 +461,28 @@ ConfidenceScore.prototype.execute = function(info) {
 	// CONFIDENCE ADJUSTMENT SECTION
 	/*---------------------------------------------------------------------------------------------------*/
 
-	if (this.chromosome.useAverage > .5) {
-		var numberOfFactors;
-		var multipliers;
-		var oddsConfidence;
-		var confidence = this.confidence;
-		var fallbackConfidence = this.fallback1.confidence || 0.1;
-		var oc = this.oddsConfidence;
-		confidence *= this.chromosome.confidenceWeight;
-		fallbackConfidence *= this.chromosome.fallbackConfidenceWeight;
-
-		if (oc) {
-			numberOfFactors = 3;
-			multipliers = (this.chromosome.confidenceWeight + this.chromosome.fallbackConfidenceWeight + this.chromosome.oddsConfidenceWeight) / numberOfFactors;
-			oddsConfidence = (oc[0] > oc[1]) ? oc[0] / (oc[0] + oc[1]) : oc[1] / (oc[0] + oc[1]);
-			oddsConfidence *= this.chromosome.oddsConfidenceWeight;
-			this.confidence = (confidence + fallbackConfidence + oddsConfidence) / multipliers / numberOfFactors;
-		} else {
-			numberOfFactors = 2;
-			multipliers = (this.chromosome.confidenceWeight + this.chromosome.fallbackConfidenceWeight ) / numberOfFactors;
-			this.confidence = (confidence + fallbackConfidence ) / multipliers / numberOfFactors;
-		}
-	}
+	// if (this.chromosome.useAverage > .5) {
+	// var numberOfFactors;
+	// var multipliers;
+	// var oddsConfidence;
+	// var confidence = this.confidence;
+	// var fallbackConfidence = this.fallback1.confidence || 0.1;
+	// var oc = this.oddsConfidence;
+	// confidence *= this.chromosome.confidenceWeight;
+	// fallbackConfidence *= this.chromosome.fallbackConfidenceWeight;
+	//
+	// if (oc) {
+	// numberOfFactors = 3;
+	// multipliers = (this.chromosome.confidenceWeight + this.chromosome.fallbackConfidenceWeight + this.chromosome.oddsConfidenceWeight) / numberOfFactors;
+	// oddsConfidence = (oc[0] > oc[1]) ? oc[0] / (oc[0] + oc[1]) : oc[1] / (oc[0] + oc[1]);
+	// oddsConfidence *= this.chromosome.oddsConfidenceWeight;
+	// this.confidence = (confidence + fallbackConfidence + oddsConfidence) / multipliers / numberOfFactors;
+	// } else {
+	// numberOfFactors = 2;
+	// multipliers = (this.chromosome.confidenceWeight + this.chromosome.fallbackConfidenceWeight ) / numberOfFactors;
+	// this.confidence = (confidence + fallbackConfidence ) / multipliers / numberOfFactors;
+	// }
+	// }
 
 	// var unconfident = false;
 	var nerfAmount = 0;
@@ -501,10 +500,14 @@ ConfidenceScore.prototype.execute = function(info) {
 		nerfAmount += .1;
 		nerfMsg += "\n- one or both players have too few matches (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
 	}
-	if (this.chromosome.useLosers > .5 && unweightedWinPercentageC1 < .25 && unweightedWinPercentageC2 < .25) {
+	if (this.chromosome.useSimilarAbility > .5 && unweightedWinPercentageC1 < .25 && unweightedWinPercentageC2 < .25) {
 		// that .25 could possibly be given to the chromosome
 		nerfAmount += .15;
 		nerfMsg += "- both players are losers (<25% win rate) c1: " + (c1WWinPercentage * 100).toFixed(2) + "%, c2: " + (c2WWinPercentage * 100).toFixed(2) + "%, ";
+	}
+	if (this.chromosome.useSimilarAbility > .5 && unweightedWinPercentageC1 > .75 && unweightedWinPercentageC2 > .75) {
+		nerfAmount += .15;
+		nerfMsg += "- both players are winners (<75% win rate) c1: " + (c1WWinPercentage * 100).toFixed(2) + "%, c2: " + (c2WWinPercentage * 100).toFixed(2) + "%, ";
 	}
 	if ((c1Score == c2Score) || (c1.wins.length == 0 && c1.losses.length == 0) || (c2.wins.length == 0 && c2.losses.length == 0)) {
 		nerfAmount += .4;
@@ -513,8 +516,8 @@ ConfidenceScore.prototype.execute = function(info) {
 	if (this.chromosome.useJury > .5) {
 		var oP = null;
 		var fbP = this.fallback1.prediction;
-		if (oc)
-			oP = (oc[0] > oc[1]) ? c1.name : c2.name;
+		if (this.oddsConfidence)
+			oP = (this.oddsConfidence[0] > this.oddsConfidence[1]) ? c1.name : c2.name;
 		var oDisagrees = (oP != null && oP != this.prediction);
 		var fbDisagrees = (fbP != null && fbP != this.prediction);
 		var oAndFbDisagree = (oP != null && fbP != null && oP != fbP);
@@ -529,7 +532,8 @@ ConfidenceScore.prototype.execute = function(info) {
 	}
 
 	// subtract confidence from 50%, 50% is when you know nothing
-	this.confidence -= .5;
+	// -- disabled, this was from when betting was based on 10% rather than a flat amount
+	// this.confidence -= .5;
 
 	// nerf the confidence if there is a reason
 	if (nerfAmount != 0) {

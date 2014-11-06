@@ -87,6 +87,18 @@ Simulator.prototype.getBetAmount = function(strategy, index) {
 
 	return amountToBet;
 };
+Simulator.prototype.applyPenalties = function(c) {
+	// anti-domination
+	var adOdds = c.timeWeight + c.winPercentageWeight + c.totalWinsWeight + c.crowdFavorWeight + c.illumFavorWeight;
+	var adTime = c.oddsWeight + c.winPercentageWeight + c.totalWinsWeight + c.crowdFavorWeight + c.illumFavorWeight;
+	var adWPer = c.oddsWeight + c.timeWeight + c.totalWinsWeight + c.crowdFavorWeight + c.illumFavorWeight;
+	var adTWin = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
+	var adCFW = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.totalWinsWeight + c.illumFavorWeight;
+	var adIFW = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.totalWinsWeight + c.crowdFavorWeight;
+	if (c.oddsWeight > adOdds || c.timeWeight > adTime || c.winPercentageWeight > adWPer || c.totalWinsWeight > adTWin || c.crowdFavorWeight > adCFW || c.illumFavorWeight > adIFW)
+		return 0.05;
+	return 1;
+};
 Simulator.prototype.evalMutations = function(mode) {
 	var self = this;
 	chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1"], function(results) {
@@ -264,18 +276,21 @@ Simulator.prototype.evalMutations = function(mode) {
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
-					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l]]);
+					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l], self.applyPenalties(orders[l].chromosome)]);
 				}
 				sortingArray.sort(function(a, b) {
-					return (b[1] * b[2]) - (a[1] * a[2]);
+					return (b[1] * b[2] * b[3]) - (a[1] * a[2] * a[3]);
 				});
+
 				var top = Math.round(sortingArray.length / 2);
 				for (var o = 0; o < top; o++) {
-					console.log(sortingArray[o][0].toDisplayString() + " -> " + sortingArray[o][1].toFixed(4) + "%,  $" + parseInt(sortingArray[o][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 					parents.push(sortingArray[o][0]);
-					//ranking guarantees that we send to the best one
+					//ranking guarantees that we send the best one
 					sortingArray[o][0].rank = o + 1;
 					nextGeneration.push(sortingArray[o][0]);
+				}
+				for (var oo = sortingArray.length - 1; oo >= 0; oo--) {
+					console.log(sortingArray[oo][0].toDisplayString() + " -> " + sortingArray[oo][1].toFixed(4) + "%,  $" + parseInt(sortingArray[oo][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 				}
 				for (var mf = 0; mf < parents.length; mf++) {
 					var parent1 = null;
