@@ -89,13 +89,12 @@ Simulator.prototype.getBetAmount = function(strategy, index) {
 };
 Simulator.prototype.applyPenalties = function(c) {
 	// anti-domination
-	var adOdds = c.timeWeight + c.winPercentageWeight + c.totalWinsWeight + c.crowdFavorWeight + c.illumFavorWeight;
-	var adTime = c.oddsWeight + c.winPercentageWeight + c.totalWinsWeight + c.crowdFavorWeight + c.illumFavorWeight;
-	var adWPer = c.oddsWeight + c.timeWeight + c.totalWinsWeight + c.crowdFavorWeight + c.illumFavorWeight;
-	var adTWin = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
-	var adCFW = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.totalWinsWeight + c.illumFavorWeight;
-	var adIFW = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.totalWinsWeight + c.crowdFavorWeight;
-	if (c.oddsWeight > adOdds || c.timeWeight > adTime || c.winPercentageWeight > adWPer || c.totalWinsWeight > adTWin || c.crowdFavorWeight > adCFW || c.illumFavorWeight > adIFW)
+	var adOdds = c.timeWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
+	var adTime = c.oddsWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
+	var adWPer = c.oddsWeight + c.timeWeight + c.crowdFavorWeight + c.illumFavorWeight;
+	var adCFW = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.illumFavorWeight;
+	var adIFW = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.crowdFavorWeight;
+	if (c.oddsWeight > adOdds || c.timeWeight > adTime || c.winPercentageWeight > adWPer || c.crowdFavorWeight > adCFW || c.illumFavorWeight > adIFW)
 		return 0.05;
 	return 1;
 };
@@ -289,9 +288,9 @@ Simulator.prototype.evalMutations = function(mode) {
 					sortingArray[o][0].rank = o + 1;
 					nextGeneration.push(sortingArray[o][0]);
 				}
-				for (var oo = sortingArray.length - 1; oo >= 0; oo--) {
-					console.log(sortingArray[oo][0].toDisplayString() + " -> " + sortingArray[oo][1].toFixed(4) + "%,  $" + parseInt(sortingArray[oo][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-				}
+				// i really only need to see the best one
+				console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+				//
 				for (var mf = 0; mf < parents.length; mf++) {
 					var parent1 = null;
 					var parent2 = null;

@@ -14,6 +14,7 @@ var Character = function(name) {
 	this.odds = [];
 	this.crowdFavor = [];
 	this.illumFavor = [];
+	this.tiers = [];
 };
 
 var Updater = function() {
@@ -75,28 +76,31 @@ Updater.prototype.updateBettorsFromMatch = function(mObj, bc1, bc2) {
 	}
 };
 Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
-	// alters mutable character records only
+	// wins, losses, and times
 	if (mObj.w == 0) {
 		c1Obj.wins.push(mObj.t);
 		c2Obj.losses.push(mObj.t);
-		if (mObj.ts != 0) {
-			c1Obj.winTimes.push(mObj.ts);
-			c2Obj.lossTimes.push(mObj.ts);
-		}
+		c1Obj.winTimes.push(mObj.ts);
+		c2Obj.lossTimes.push(mObj.ts);
 	} else if (mObj.w == 1) {
 		c2Obj.wins.push(mObj.t);
 		c1Obj.losses.push(mObj.t);
-		if (mObj.ts != 0) {
-			c2Obj.winTimes.push(mObj.ts);
-			c1Obj.lossTimes.push(mObj.ts);
-		}
+		c2Obj.winTimes.push(mObj.ts);
+		c1Obj.lossTimes.push(mObj.ts);
 	}
+	// this.tiers will correspond with the odds
 	if (mObj.o != null && mObj.o != "U") {
 		var oc1 = parseFloat(mObj.o.split(":")[0]);
 		var oc2 = parseFloat(mObj.o.split(":")[1]);
 		c1Obj.odds.push(oc1 / oc2);
 		c2Obj.odds.push(oc2 / oc1);
+	} else {
+		c1Obj.odds.push(-1);
+		c2Obj.odds.push(-1);
 	}
+	c1Obj.tiers.push(mObj.t);
+	c2Obj.tiers.push(mObj.t);
+	// expert favor is seemingly worthless but what the hell
 	if (mObj.if != null && mObj.if.length > 0) {
 		if (mObj.cf == 0) {
 			c1Obj.crowdFavor.push(1);
@@ -113,6 +117,7 @@ Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
 			c2Obj.illumFavor.push(1);
 		}
 	}
+
 };
 
 var dr = function(sortByMoney) {
