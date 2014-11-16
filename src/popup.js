@@ -428,8 +428,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("cs_rc").addEventListener("click", changeStrategyClickRC);
 	document.getElementById("cs_ipu").addEventListener("click", changeStrategyClickIPU);
 	chrome.alarms.create("chromosome update", {
-		when : Date.now()+6000,
-		periodInMinutes : 1
+		delayInMinutes : 0.1,
+		periodInMinutes : 1.0
 	});
 
 });
