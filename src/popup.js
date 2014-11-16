@@ -52,6 +52,10 @@ var irClick = function() {
 	reader.readAsText(file);
 };
 
+//---------------------------------------------------------------------------------------------------------
+// SIMULATOR SECTION
+//---------------------------------------------------------------------------------------------------------
+
 var Order = function(typeStr, chromosome) {
 	this.type = typeStr;
 	this.chromosome = chromosome;
@@ -124,10 +128,8 @@ Simulator.prototype.evalMutations = function(mode) {
 				throw msg;
 			}
 		} else if (mode == "mass") {
+
 			orders.push(new Order("cs", new Chromosome().loadFromObject(results.chromosomes_v1[0])));
-			// orders.push(new Order("rc"));
-			// for (var z = 0; z < 50; z++)
-			// orders.push(new Order("ipu", new ChromosomeIPU()));
 		} else {
 			if (document.getElementById("ct").checked)
 				orders.push(new Order("ct"));
@@ -172,6 +174,9 @@ Simulator.prototype.evalMutations = function(mode) {
 		var upsetDenominators = [];
 		var denominators = [];
 		var upsetsBetOn = 0;
+		var nonUpsetsBetOn = 0;
+		var minimizedLosses=0;
+		var lossMinimizationAmount=0;
 
 		// process matches
 		for (var i = 0; i < matches.length; i++) {
@@ -226,7 +231,15 @@ Simulator.prototype.evalMutations = function(mode) {
 									upsetsBetOn += 1;
 							} else {
 								nonupsetDenominators.push(greaterNumber);
+								if (predictionWasCorrect)
+									nonUpsetsBetOn += 1;
 							}
+							
+							if (!predictionWasCorrect && strategy.confidence && strategy.confidence< 0.9){
+								lossMinimizationAmount+=1-strategy.confidence;
+								minimizedLosses+=1;
+							}
+								
 
 							// var avgOddsC1 = updater.getCharAvgOdds(matches[i].c1);
 							// var avgOddsC2 = updater.getCharAvgOdds(matches[i].c2);
@@ -264,7 +277,12 @@ Simulator.prototype.evalMutations = function(mode) {
 				nudSum += nonupsetDenominators[zzz];
 			}
 
-			console.log("avg denom: " + (dSum / denominators.length).toFixed(0) + ", avg upset: " + (udSum / upsetDenominators.length).toFixed(0) + ", avg nonupset: " + (nudSum / nonupsetDenominators.length).toFixed(0) + ", upsets called correctly: " + (upsetsBetOn / upsetDenominators.length * 100).toFixed(2) + "%, (" + upsetsBetOn + "/" + upsetDenominators.length + ")");
+			console.log("avg denom: " + (dSum / denominators.length).toFixed(0) + ", avg upset: " + (udSum / upsetDenominators.length).toFixed(0) + ", avg nonupset: " + (nudSum / nonupsetDenominators.length).toFixed(0) + 
+			", \nupsets called correctly: " + (upsetsBetOn / upsetDenominators.length * 100).toFixed(2) + "%, (" + upsetsBetOn + "/" + upsetDenominators.length + ")"+
+			", \nnonupsets called correctly: " + (nonUpsetsBetOn / nonupsetDenominators.length * 100).toFixed(2) + "%, (" + nonUpsetsBetOn + "/" + nonupsetDenominators.length + ")"+
+			", \nminimized losses: "+ (minimizedLosses / matches.length * 100).toFixed(2) + "%, (" + minimizedLosses + "/" + matches.length + "), avg loss minimization amount: "
+			+(lossMinimizationAmount/minimizedLosses * 100).toFixed(2) + "%");
+
 		}
 
 		if (mode == "evolution" || mode == "mass") {
@@ -410,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("cs_rc").addEventListener("click", changeStrategyClickRC);
 	document.getElementById("cs_ipu").addEventListener("click", changeStrategyClickIPU);
 	chrome.alarms.create("chromosome update", {
-		when : Date.now(),
+		when : Date.now()+6000,
 		periodInMinutes : 1
 	});
 

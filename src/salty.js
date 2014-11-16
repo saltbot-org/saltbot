@@ -89,7 +89,12 @@ var Controller = function() {
 		}
 
 		if (bettingAvailable && !bettingEntered) {
-
+			
+			if(!self.bestChromosome){
+				//not ready to make first bet
+				return;
+			}
+			
 			//Deal with old match
 			if (self.currentMatch != null) {
 				var winner = self.statusScanner.getWinner();
@@ -100,7 +105,7 @@ var Controller = function() {
 				if (winner != self.currentMatch.names[0] && winner != self.currentMatch.names[1])
 					winner = null;
 				//wait a little bit longer before giving up on this match getting processed
-				if ((winner == null || !self.bestChromosome) && attemptsToProcess < maxAttempts) {
+				if (winner == null && attemptsToProcess < maxAttempts) {
 					attemptsToProcess += 1;
 					return;
 				}

@@ -324,7 +324,7 @@ var ConfidenceScore = function(chromosome, level) {
 	this.abstain = false;
 	this.confidence = null;
 	this.possibleConfidence = 0;
-	this.chromosome = chromosome || this.chromosome;
+	this.chromosome = chromosome;
 	this.level = level;
 };
 ConfidenceScore.prototype = Object.create(Strategy.prototype);
@@ -333,17 +333,6 @@ ConfidenceScore.prototype.getBetAmount = function(balance, tournament, debug) {
 	if (tournament)
 		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
 	return this.__super__.prototype.flatBet.call(this, balance, debug);
-};
-ConfidenceScore.prototype.countFromRecord = function(c, chromosome) {
-	var wins = 0;
-	var losses = 0;
-	for (var j = 0; j < c.wins.length; j++)
-		wins += chromosome["w" + c.wins[j]];
-
-	for (var k = 0; k < c.losses.length; k++)
-		losses += chromosome["l" + c.losses[k]];
-
-	return [wins, losses];
 };
 ConfidenceScore.prototype.execute = function(info) {
 	var c1 = info.character1;
@@ -360,11 +349,6 @@ ConfidenceScore.prototype.execute = function(info) {
 	var c1Stats = new CSStats(c1, this.chromosome);
 	var c2Stats = new CSStats(c2, this.chromosome);
 
-	var c1WLScores = this.countFromRecord(c1, this.chromosome);
-	var c2WLScores = this.countFromRecord(c2, this.chromosome);
-	var c1WPotential = c1WLScores[0] + c1WLScores[1];
-	var c2WPotential = c2WLScores[0] + c2WLScores[1];
-
 	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
 		var lesserOdds = (c1Stats.averageOdds < c2Stats.averageOdds) ? c1Stats.averageOdds : c2Stats.averageOdds;
 		this.oddsConfidence = [(c1Stats.averageOdds / lesserOdds), (c2Stats.averageOdds / lesserOdds)];
@@ -379,7 +363,19 @@ ConfidenceScore.prototype.execute = function(info) {
 	// the weights come in from the chromosome
 	var c1Score = 0;
 	var c2Score = 0;
-
+	
+	//var c1WW = c1Stats.wins - c1Stats.losses;
+	//var c2WW = c2Stats.wins - c2Stats.losses;
+	var c1WT = c1Stats.wins + c1Stats.losses;
+	var c2WT = c2Stats.wins + c2Stats.losses;
+	var c1WP =(c1WT!=0)?c1Stats.wins/c1WT:0;
+	var c2WP =(c2WT!=0)?c2Stats.wins/c2WT:0;
+	
+	if (c1WP > c2WP)
+		c1Score += winPercentageWeight;
+	else if (c1WP < c2WP)
+		c2Score += winPercentageWeight;
+		
 	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
 		if (c1Stats.averageOdds > c2Stats.averageOdds)
 			c1Score += oddsWeight;
@@ -399,25 +395,13 @@ ConfidenceScore.prototype.execute = function(info) {
 		else if (c1Stats.averageLossTime < c2Stats.averageLossTime)
 			c2Score += timeWeight / 2;
 
-	// used for jury calculation also
-	var c1WWinPercentage = 0;
-	var c2WWinPercentage = 0;
-	if (c1WPotential != 0 && c2WPotential != 0) {
-		c1WWinPercentage = c1WLScores[0] / c1WPotential;
-		c2WWinPercentage = c2WLScores[0] / c2WPotential;
-
-		if (c1WWinPercentage > c2WWinPercentage)
-			c1Score += winPercentageWeight;
-		else if (c2WWinPercentage > c1WWinPercentage)
-			c2Score += winPercentageWeight;
-	}
-
 	if (c1Stats.cfPercent != null && c2Stats.cfPercent != null) {
 		if (c1Stats.cfPercent > c2Stats.cfPercent)
 			c1Score += crowdFavorWeight;
 		else if (c1Stats.cfPercent < c2Stats.cfPercent)
 			c2Score += crowdFavorWeight;
 	}
+	
 	if (c1Stats.ifPercent != null && c2Stats.ifPercent != null) {
 		if (c1Stats.ifPercent > c2Stats.ifPercent)
 			c1Score += illumFavorWeight;
