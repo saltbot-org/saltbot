@@ -60,10 +60,11 @@ var Controller = function() {
 	var timerInterval = 3000;
 	this.ticksSinceMatchBegan = -999;
 	this.bestChromosome = null;
-	this.nextStrategy = "ipu";
+	this.nextStrategy = "o";
 	this.bettorsC1 = [];
 	this.bettorsC2 = [];
 	this.settings = null;
+	this.lastMatchCumulativeBetTotal = null;
 
 	var self = this;
 
@@ -211,30 +212,31 @@ var Controller = function() {
 				matchesProcessed += 1;
 			}
 			
-			if(!self.bestChromosome){
-				//not ready to make first bet
-				return;
-			}
-
 			//set up next strategy
-			if (self.currentMatch && self.currentMatch.strategy)
-				var level = self.currentMatch.strategy.level;
-			switch(self.settings.nextStrategy) {
-			case "o":
+			if (matchesProcessed == 0 && self.bestChromosome==null) {
+				//always observe the first match in the cycle, due to chrome alarm mandatory timing delay
 				self.currentMatch = new Match(new Observer());
-				break;
-			case "rc":
-				self.currentMatch = new Match(new RatioConfidence());
-				break;
-			case "cs":
-				self.currentMatch = new Match(new ConfidenceScore(self.bestChromosome, level));
-				break;
-			case "ipu":
-				self.currentMatch = new Match(new InternetPotentialUpset(new ChromosomeIPU(), level));
-				break;
-			default:
-				self.currentMatch = new Match(new Observer());
-				break;
+			} else {
+				if (self.currentMatch && self.currentMatch.strategy)
+					var level = self.currentMatch.strategy.level;
+				switch(self.settings.nextStrategy) {
+				case "o":
+					self.currentMatch = new Match(new Observer());
+					break;
+				case "rc":
+					self.currentMatch = new Match(new RatioConfidence());
+					break;
+				case "cs":
+					self.currentMatch = new Match(new ConfidenceScore(self.bestChromosome, level, self.lastMatchCumulativeBetTotal));
+					break;
+				case "ipu":
+					self.currentMatch = new Match(new InternetPotentialUpset(new ChromosomeIPU(), level));
+					break;
+				default:
+					self.currentMatch = new Match(new Observer());
+					break;
+				}
+
 			}
 
 			//skip team matches, mirror matches
@@ -392,6 +394,21 @@ if (window.location.href == "http://www.saltybet.com/") {
 					} catch(e) {
 						self.odds = null;
 					}
+					//save the betting totals
+					try {
+						var moneyText = document.getElementById("odds").innerHTML.replace(/,/g, "");
+						var mtMatches = null;
+						var regex = /\$([0-9]*)/g;
+						if (regex.test(moneyText)) {
+							mtMatches = moneyText.match(regex);
+							self.lastMatchCumulativeBetTotal = parseInt(mtMatches[0].replace("$", "")) + parseInt(mtMatches[1].replace("$", ""));
+						} else {
+							throw "totals error";
+						}
+					} catch(e) {
+						self.lastMatchCumulativeBetTotal = null;
+					}
+
 					// save the crowd favor and the illuminati favor
 					var betsForC1 = document.getElementById("sbettors1");
 					var betsForC2 = document.getElementById("sbettors2");

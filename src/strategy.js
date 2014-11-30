@@ -13,26 +13,16 @@ var Strategy = function(sn) {
 Strategy.prototype.flatBet = function(balance, debug) {
 	var flatAmount = 100;
 	var multiplierIndex = 2;
+	var intendedBet = flatAmount * this.levels[this.level][multiplierIndex];
+	var bigMoney = this.lastMatchCumulativeBetTotal != null && this.lastMatchCumulativeBetTotal > intendedBet * 20;
+	if (!bigMoney)
+		intendedBet *= .5;
 	if (debug)
-		console.log("- betting at level: " + this.level + ", confidence: " + (this.confidence * 100).toFixed(2) + "%");
+		console.log("- betting at level: " + this.level + ", confidence: " + (this.confidence * 100).toFixed(2) + "%, big money: " + bigMoney);
 	if (this.level == 0)
 		return balance;
 	else
-		return Math.ceil(flatAmount * this.levels[this.level][multiplierIndex] * this.confidence);
-	// switch(this.level) {
-	// case 0:
-	// return balance;
-	// break;
-	// case 1:
-	// return Math.round(flatAmount * this.confidence);
-	// break;
-	// case 2:
-	// return Math.round(flatAmount * 10 * this.confidence);
-	// break;
-	// case 3:
-	// return Math.round(flatAmount * 100 * this.confidence);
-	// break;
-	// }
+		return Math.ceil(intendedBet * this.confidence);
 };
 Strategy.prototype.adjustLevel = function(balance) {
 	if (!this.level)
@@ -319,13 +309,14 @@ var CSStats = function(cObj, chromosome) {
 		this.ifPercent = ifSum / cObj.illumFavor.length;
 	}
 };
-var ConfidenceScore = function(chromosome, level) {
+var ConfidenceScore = function(chromosome, level, lastMatchCumulativeBetTotal) {
 	Strategy.call(this, "cs");
 	this.abstain = false;
 	this.confidence = null;
 	this.possibleConfidence = 0;
 	this.chromosome = chromosome;
 	this.level = level;
+	this.lastMatchCumulativeBetTotal = lastMatchCumulativeBetTotal;
 };
 ConfidenceScore.prototype = Object.create(Strategy.prototype);
 ConfidenceScore.prototype.__super__ = Strategy;
@@ -363,19 +354,19 @@ ConfidenceScore.prototype.execute = function(info) {
 	// the weights come in from the chromosome
 	var c1Score = 0;
 	var c2Score = 0;
-	
+
 	//var c1WW = c1Stats.wins - c1Stats.losses;
 	//var c2WW = c2Stats.wins - c2Stats.losses;
 	var c1WT = c1Stats.wins + c1Stats.losses;
 	var c2WT = c2Stats.wins + c2Stats.losses;
-	var c1WP =(c1WT!=0)?c1Stats.wins/c1WT:0;
-	var c2WP =(c2WT!=0)?c2Stats.wins/c2WT:0;
-	
+	var c1WP = (c1WT != 0) ? c1Stats.wins / c1WT : 0;
+	var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
+
 	if (c1WP > c2WP)
 		c1Score += winPercentageWeight;
 	else if (c1WP < c2WP)
 		c2Score += winPercentageWeight;
-		
+
 	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
 		if (c1Stats.averageOdds > c2Stats.averageOdds)
 			c1Score += oddsWeight;
@@ -401,7 +392,7 @@ ConfidenceScore.prototype.execute = function(info) {
 		else if (c1Stats.cfPercent < c2Stats.cfPercent)
 			c2Score += crowdFavorWeight;
 	}
-	
+
 	if (c1Stats.ifPercent != null && c2Stats.ifPercent != null) {
 		if (c1Stats.ifPercent > c2Stats.ifPercent)
 			c1Score += illumFavorWeight;
