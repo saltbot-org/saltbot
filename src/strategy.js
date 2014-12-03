@@ -8,21 +8,33 @@ var Strategy = function(sn) {
 	this.strategyName = sn;
 	this.prediction = null;
 	this.debug = true;
-	this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100]];
+	this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100], [1000000, 5000000, 250]];
 };
 Strategy.prototype.flatBet = function(balance, debug) {
 	var flatAmount = 100;
 	var multiplierIndex = 2;
-	var intendedBet = flatAmount * this.levels[this.level][multiplierIndex];
-	var bigMoney = this.lastMatchCumulativeBetTotal != null && this.lastMatchCumulativeBetTotal > intendedBet * 20;
+	var intendedBet = flatAmount * this.levels[this.level][multiplierIndex] * this.confidence;
+
+	// "big money" section added to prevent damage at low traffic times
+	var bigMoney = false;
+	var bigMoneyNerf = .8/*hardcoded 80% is for the first round per cycle*/;
+	if (this.lastMatchCumulativeBetTotal != null) {
+		var largeBettingPool = intendedBet * 20;
+		if (this.lastMatchCumulativeBetTotal > largeBettingPool) {
+			bigMoney = true;
+		} else {
+			bigMoneyNerf = 1 - ((largeBettingPool - this.lastMatchCumulativeBetTotal) / largeBettingPool);
+		}
+	}
 	if (!bigMoney)
-		intendedBet *= .5;
+		intendedBet *= bigMoneyNerf;
 	if (debug)
-		console.log("- betting at level: " + this.level + ", confidence: " + (this.confidence * 100).toFixed(2) + "%, big money: " + bigMoney);
+		console.log("- betting at level: " + this.level + ", confidence: " + (
+			this.confidence * 100).toFixed(2) + "%, big money: " + ("" + bigMoney).toUpperCase()+(bigMoney?"":", nerfed to: "+(bigMoneyNerf*100).toFixed(2)));
 	if (this.level == 0)
 		return balance;
 	else
-		return Math.ceil(intendedBet * this.confidence);
+		return Math.ceil(intendedBet);
 };
 Strategy.prototype.adjustLevel = function(balance) {
 	if (!this.level)
