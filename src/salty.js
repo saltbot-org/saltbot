@@ -388,8 +388,9 @@ if (window.location.href == "http://www.saltybet.com/") {
 					//save the odds
 					try {
 						var oddsBox = document.getElementById("lastbet");
-						var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
-						var c2Odds = oddsBox.childNodes[oddsBox.childNodes.length - 1].innerHTML;
+						// var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
+						var c1Odds = oddsBox.getElementsByClassName("redtext")[0].innerHTML;
+						var c2Odds = oddsBox.getElementsByClassName("bluetext")[0].innerHTML;
 						self.odds = "" + c1Odds + ":" + c2Odds;
 					} catch(e) {
 						self.odds = null;
