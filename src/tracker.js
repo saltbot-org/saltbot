@@ -76,6 +76,12 @@ Match.prototype.betAmount = function(tournament) {
 
 	strategy.adjustLevel(balance);
 	amountToBet = strategy.getBetAmount(balance, tournament, debug);
+	if (this.strategy.aggro) {
+		amountToBet *= 10;
+		if (amountToBet > balance)
+			amountToBet = balance;
+		console.log("AGGRO multiplier active, increasing bet to "+amountToBet);
+	}
 
 	wagerBox.value = amountToBet.toString();
 };
@@ -131,4 +137,6 @@ Match.prototype.init = function() {
 
 	});
 };
-
+Match.prototype.setAggro = function(aggro) {
+	this.strategy.aggro = aggro;
+};

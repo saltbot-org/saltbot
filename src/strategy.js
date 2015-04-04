@@ -19,18 +19,18 @@ Strategy.prototype.flatBet = function(balance, debug) {
 	// var bigMoney = false;
 	// var bigMoneyNerf = .8/*hardcoded 80% is for the first round per cycle*/;
 	// if (this.lastMatchCumulativeBetTotal != null) {
-		// var largeBettingPool = intendedBet * 20;
-		// if (this.lastMatchCumulativeBetTotal > largeBettingPool) {
-			// bigMoney = true;
-		// } else {
-			// bigMoneyNerf = 1 - ((largeBettingPool - this.lastMatchCumulativeBetTotal) / largeBettingPool);
-		// }
+	// var largeBettingPool = intendedBet * 20;
+	// if (this.lastMatchCumulativeBetTotal > largeBettingPool) {
+	// bigMoney = true;
+	// } else {
+	// bigMoneyNerf = 1 - ((largeBettingPool - this.lastMatchCumulativeBetTotal) / largeBettingPool);
+	// }
 	// }
 	// if (!bigMoney)
-		// intendedBet *= bigMoneyNerf;
+	// intendedBet *= bigMoneyNerf;
 	if (debug)
-		console.log("- betting at level: " + this.level + ", confidence: " + (
-			this.confidence * 100).toFixed(2));/// + "%, big money: " + ("" + bigMoney).toUpperCase()+(bigMoney?"":", nerfed to: "+(bigMoneyNerf*100).toFixed(2)));
+		console.log("- betting at level: " + this.level + ", confidence: " + (this.confidence * 100).toFixed(2));
+	/// + "%, big money: " + ("" + bigMoney).toUpperCase()+(bigMoney?"":", nerfed to: "+(bigMoneyNerf*100).toFixed(2)));
 	if (this.level == 0)
 		return balance;
 	else

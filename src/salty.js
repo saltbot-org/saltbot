@@ -236,6 +236,8 @@ var Controller = function() {
 					self.currentMatch = new Match(new Observer());
 					break;
 				}
+				//set aggro:
+				self.currentMatch.setAggro(self.settings.aggro);
 
 			}
 
@@ -289,6 +291,10 @@ Controller.prototype.toggleVideoWindow = function() {
 		this.removeVideoWindow();
 	this.saveSettings("- settings updated, video: " + this.settings.video);
 };
+Controller.prototype.toggleAggro = function() {
+	this.settings.aggro = !this.settings.aggro;
+	this.saveSettings("- settings updated, aggro: " + this.settings.aggro);
+};
 Controller.prototype.changeStrategy = function(sn, data) {
 	console.log("- changing strategy to " + sn.replace("cs_", ""));
 	switch(sn) {
@@ -330,6 +336,8 @@ if (window.location.href == "http://www.saltybet.com/") {
 			self.settings = results.settings_v1;
 			if (!self.settings.video)
 				self.removeVideoWindow();
+			if(self.settings.aggro)
+				console.log("aggro state: "+aggro);
 			if (!self.settings.level) {
 				self.settings.level = 0;
 				self.saveSettings("- settings upgraded");
