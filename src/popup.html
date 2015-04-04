@@ -4,11 +4,47 @@
 		<title>SaltBot Controls</title>
 		<style>
 			body {
-				min-width: 400px;
+				min-width: 300px;
 				overflow-x: hidden;
+				min-height: 600px;
+				overflow-y: hidden;
 			}
 			#player1, #player2 {
 				display: none;
+			}
+			.click {
+				background-color: #CC9E00;
+				font-weight: bold;
+				font-size: medium;
+				color: white;
+				padding: 4px;
+				text-align: center;
+				min-width: 50px;
+				max-width: 100px;
+				border: 5px solid #C68A00;
+				border-radius: 10px;
+				margin: 5px;
+				float: left;
+				cursor: pointer;
+				-webkit-user-select: none;
+				height: 20px;
+			}
+			.click:hover {
+				background-color: #FF9900;
+			}
+
+			.click:active {
+				background-color: red;
+			}
+			.smalltx {
+				max-width: 200px;
+				font-size: small;
+				padding-top: 7px;
+				padding-bottom: 3px;
+			}
+			.subheading {
+				margin-bottom: 5px;
+				clear: both;
 			}
 		</style>
 		<script type="text/javascript" src="records.js"></script>
@@ -20,15 +56,59 @@
 		<h1>SaltBot Controls</h1>
 		<span id="player1" value="1337">These are here for compatibility</span>
 		<span id="player2" value="1337">with records.js.</span>
-		<input type="button" value="Players by %" id="bdr">
-		<input type="button" value="Players by $" id="bpr">
-		<br>
-		<input type="button" value="Export Records" id="ber">
-		<span>Import Records</span>
-		<input type="file" value="Import Records" id="bir">
-		<br>
-		<input type="button" value="Simulate Multiple" id="bsc">
-		<label>
+
+		<h2 class="subheading">Change Strategy</h2>
+		<div id="cs_o" class="click">
+			O
+		</div>
+		<div id="cs_cs" class="click">
+			CS
+		</div>
+		<div id="cs_rc" class="click">
+			RC
+		</div>
+		<div id="cs_ipu" class="click">
+			IPU
+		</div>
+		<h2 class="subheading">Chromosome Management</h2>
+		<div id="ugw" class="click smalltx">
+			Update Genetic Weights
+		</div>
+		<div id="rgw" class="click">
+			Reset Pool
+		</div>
+		<label style="display: block;clear: both;"> Messages:
+			<input type="text" name="msgbox" id="msgbox"/>
+		</label>
+		<h2 class="subheading">Records</h2>
+		<div id="ber" class="click smalltx">
+			Export Records
+		</div>
+		<div id="bir" class="click smalltx" style="position: relative; width: 93px;">
+			<input type="file" style="position: absolute; top: 5px; left:5px ; opacity:0; z-index: 2;cursor: pointer;">
+			<span style="position: absolute; top: 5px; left:3px ;">Import Records</span>
+		</div>
+		<h2 class="subheading">Player Rankings</h2>
+		<div id="bdr" class="click">
+			Players by %
+		</div>
+		<div id="bpr" class="click">
+			Players by $
+		</div>
+		<h2 class="subheading">Options</h2>
+		<div id="tv" class="click smalltx" >
+			Toggle Video
+		</div>
+		<div id="ta" class="click smalltx" >
+			Toggle Aggro
+		</div>
+		<h2 class="subheading">Developer</h2>
+		<div id="mrc" class="click" >
+			Mass RC
+		</div>
+		<div id="bsc" class="click smalltx">
+			Simulate Multiple
+		</div><label style="visibility: hidden;">
 			<input type="checkbox" id="rb">
 			rb</label>
 		<label>
@@ -38,21 +118,6 @@
 			<input type="checkbox" id="rc" checked>
 			rc</label>
 		<br>
-		<input type="button" value="Update Genetic Weights" id="ugw">
-		<input type="button" value="Reset Pool" id="rgw">
-		<br>
-		<span>Change Strategy</span>
-		<input type="button" value="O" id="cs_o">
-		<input type="button" value="CS" id="cs_cs">
-		<input type="button" value="RC" id="cs_rc">
-		<input type="button" value="IPU" id="cs_ipu">
-		<br>
-		<input type="button" value="Mass RC" id="mrc">
-		<input type="button" value="Toggle Video" id="tv">
-		<br>
-		<label> M:
-			<input type="text" name="msgbox" id="msgbox"/>
-		</label>
 	</body>
 </html>
 

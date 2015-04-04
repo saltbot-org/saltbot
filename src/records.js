@@ -300,4 +300,3 @@ if (window.location.href == "http://www.saltybet.com/")
 			break;
 		}
 	});
-
