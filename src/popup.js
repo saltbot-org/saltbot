@@ -45,11 +45,20 @@ var changeStrategyClickIPU = function() {
 	btnClicked("cs_ipu");
 };
 var onFileRead = function(e) {
+	console.log("File read successful.");
 	var t = e.target.result;
 	btnClicked("ir", t);
 };
 var irClick = function() {
-	var file = document.getElementById('bir').files[0];
+	console.log("Attempting records import...");
+	var files = document.getElementById('upload').files;
+	if(files.length>0)
+		console.log("Upload successful.");
+	else 
+		console.log("Upload canceled.");	
+	console.log("Attempting to read file...");
+	
+	var file = files[0];	
 	var reader = new FileReader();
 	reader.onload = onFileRead;
 	reader.readAsText(file);
