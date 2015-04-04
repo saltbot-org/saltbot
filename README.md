@@ -5,6 +5,6 @@ A betting bot for SaltyBet. It has three strategies choosable by the user.
 - InternetPotentialUpset: flips a coin, then bets a flat amount, flat amount based on how much money it has to bet with.
 
 Notes:
-- It requires about 1000 saved matches to get decent accuracy. Email me if you'd like a copy of my database.
 - You can see its decision logic if you open up the JavaScript console.
 - Uses Chrome storage to save and load data.
+- You must unzip seed.zip in order to import it. You cannot import the zip file.
