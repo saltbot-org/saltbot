@@ -123,7 +123,7 @@ RatioConfidence.prototype.execute = function(info) {
 
 	if (c1TotalMatches < 3 || c2TotalMatches < 3) {
 		if (this.debug)
-			console.log("- RC has insufficient information, W:L(P1)(P2)->  (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+			console.log("- Cowboy has insufficient information, W:L(P1)(P2)->  (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
 		self.abstain = true;
 		self.lowBet = true;
 		return null;
@@ -140,14 +140,14 @@ RatioConfidence.prototype.execute = function(info) {
 		self.confidence = (pChar.name == c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
 		if (self.confidence < 0.6) {
 			if (this.debug)
-				console.log("- RC has insufficient confidence (confidence: " + self.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+				console.log("- Cowboy has insufficient confidence (confidence: " + self.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
 			self.abstain = true;
 			self.lowBet = true;
 			return null;
 		}
 		if (pChar.ratio <= 0.5 || (npChar.ratio == 0.5 && (npChar.wins.length + npChar.losses.length == 2))) {
 			if (this.debug)
-				console.log("- RC discourages betting on or against <51% (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
+				console.log("- Cowboy discourages betting on or against <51% (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
 			self.abstain = true;
 			self.lowBet = true;
 			return null;
@@ -159,7 +159,7 @@ RatioConfidence.prototype.execute = function(info) {
 		return p;
 	} else if (c1Ratio == c2Ratio) {
 		if (this.debug)
-			console.log("- RC has insufficient information (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
+			console.log("- Cowboy has insufficient information (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
 		self.abstain = true;
 		self.lowBet = true;
 		return null;
@@ -471,7 +471,7 @@ InternetPotentialUpset.prototype.__super__ = Strategy;
 InternetPotentialUpset.prototype.execute = function(info) {
 	this.prediction = this.ct.execute(info);
 	if (this.debug)
-		console.log("- IPU is 50% confident, bBT: " + this.chromosome.baseBettingTier);
+		console.log("- Lunatic is 50% confident, bBT: " + this.chromosome.baseBettingTier);
 	return this.prediction;
 };
 InternetPotentialUpset.prototype.getBetAmount = function(balance, tournament, debug) {
@@ -487,7 +487,7 @@ var Observer = function() {
 Observer.prototype = Object.create(Strategy.prototype);
 Observer.prototype.execute = function(info) {
 	if (this.debug)
-		console.log("- OBS does not bet");
+		console.log("- Monk does not bet");
 	this.abstain = true;
 	return null;
 };
