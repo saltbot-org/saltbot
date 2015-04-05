@@ -8,12 +8,13 @@
 				overflow-x: hidden;
 				min-height: 600px;
 				overflow-y: hidden;
+				background-color: #DBEADB;
 			}
 			#player1, #player2 {
 				display: none;
 			}
 			.click {
-				background-color: #CC9E00;
+				background-color: #4D944D;
 				font-weight: bold;
 				font-size: medium;
 				color: white;
@@ -21,7 +22,7 @@
 				text-align: center;
 				min-width: 50px;
 				max-width: 100px;
-				border: 5px solid #C68A00;
+				border: 5px solid #006600;
 				border-radius: 10px;
 				margin: 5px;
 				float: left;
@@ -30,11 +31,11 @@
 				height: 20px;
 			}
 			.click:hover {
-				background-color: #FF9900;
+				background-color: #8CBB4D
 			}
 
 			.click:active {
-				background-color: red;
+				background-color: #00FF00;
 			}
 			.smalltx {
 				max-width: 200px;
@@ -57,18 +58,18 @@
 		<span id="player1" value="1337">These are here for compatibility</span>
 		<span id="player2" value="1337">with records.js.</span>
 
-		<h2 class="subheading">Change Strategy</h2>
-		<div id="cs_o" class="click">
-			O
+		<h2 class="subheading">Change Mode</h2>
+		<div id="cs_o" class="click smalltx">
+			Monk
 		</div>
-		<div id="cs_cs" class="click">
-			CS
+		<div id="cs_cs" class="click smalltx">
+			Scientist
 		</div>
-		<div id="cs_rc" class="click">
-			RC
+		<div id="cs_rc" class="click smalltx">
+			Cowboy
 		</div>
-		<div id="cs_ipu" class="click">
-			IPU
+		<div id="cs_ipu" class="click smalltx">
+			Lunatic
 		</div>
 		<h2 class="subheading">Chromosome Management</h2>
 		<div id="ugw" class="click smalltx">

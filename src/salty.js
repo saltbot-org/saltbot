@@ -244,7 +244,7 @@ var Controller = function() {
 			//skip team matches, mirror matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
 				self.currentMatch = new Match(new Observer());
-				console.log("- skipping team match, but placing an observer");
+				console.log("- skipping team match, but placing a Monk");
 				self.currentMatch.init();
 			} else if (self.currentMatch.names[0] == self.currentMatch.names[1]) {
 				self.currentMatch = null;
@@ -296,23 +296,28 @@ Controller.prototype.toggleAggro = function() {
 	this.saveSettings("- settings updated, aggro: " + this.settings.aggro);
 };
 Controller.prototype.changeStrategy = function(sn, data) {
-	console.log("- changing strategy to " + sn.replace("cs_", ""));
+	var t="";
 	switch(sn) {
 	case "cs_o":
 		this.settings.nextStrategy = "o";
+		t="Monk";
 		break;
 	case "cs_rc":
 		this.settings.nextStrategy = "rc";
+		t="Cowboy";
 		break;
 	case "cs_cs":
 		this.settings.nextStrategy = "cs";
 		var chromosome = new Chromosome().loadFromJSON(data);
 		this.bestChromosome = chromosome;
+		t="Scientist";
 		break;
 	case "cs_ipu":
 		this.settings.nextStrategy = "ipu";
+		t="Lunatic";
 		break;
 	}
+	console.log("- changing strategy to " + t);
 	this.saveSettings("- settings saved");
 };
 Controller.prototype.receiveBestChromosome = function(data) {
