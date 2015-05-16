@@ -3,7 +3,7 @@
 
 	"name": "SaltBot",
 	"description": "This extension automates betting on SaltyBet.com.",
-	"version": "1.9.0",
+	"version": "1.9.1",
 	"permissions": ["storage", "unlimitedStorage", "tabs", "alarms"],
 	"content_scripts": [
 		{
@@ -16,7 +16,11 @@
 		"scripts": ["twitch_background.js"]
 	},
 	"browser_action": {
-		"default_icon": "dp_icon32.png",
+		"default_icon": "32.png",
 		"default_popup": "popup.html"
+	}, 
+	"icons": { "16": "16.png",
+           "48": "48.png",
+          "128": "128.png"
 	}
 }

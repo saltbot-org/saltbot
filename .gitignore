@@ -1,3 +1,6 @@
 archive
 node_modules
 .project
+.idea
+*.iml
+*.pem
