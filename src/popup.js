@@ -34,8 +34,13 @@ var changeStrategyClickO = function() {
 };
 var changeStrategyClickCS = function() {
 	chrome.storage.local.get(["chromosomes_v1"], function(results) {
-		var data = JSON.stringify(results.chromosomes_v1[0]);
-		btnClicked("cs_cs", data);
+		console.log(results);
+		if (Object.keys(results).length === 0){
+			btnClicked("cs_cs_warning");
+		}else {
+			var data = JSON.stringify(results.chromosomes_v1[0]);
+        	btnClicked("cs_cs", data);
+		}
 	});
 };
 var changeStrategyClickRC = function() {

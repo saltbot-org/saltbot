@@ -298,6 +298,9 @@ if (window.location.href == "http://www.saltybet.com/")
 		case "cs_cs":
 			ctrl.changeStrategy(request.type, request.text);
 			break;
+		case "cs_cs_warning":
+			ctrl.changeStrategy(request.type, request.text);
+			break;
 		case "cs_ipu":
 			ctrl.changeStrategy(request.type);
 			break;

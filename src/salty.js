@@ -312,6 +312,9 @@ Controller.prototype.changeStrategy = function(sn, data) {
 		this.bestChromosome = chromosome;
 		t="Scientist";
 		break;
+	case "cs_cs_warning":
+		console.log("- WARNING: cannot change mode to Scientist without initializing chromosome pool;\n  please click 'Reset Pool'");
+		return;
 	case "cs_ipu":
 		this.settings.nextStrategy = "ipu";
 		t="Lunatic";

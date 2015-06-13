@@ -10,27 +10,40 @@ var Strategy = function(sn) {
 	this.debug = true;
 	this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100], [1000000, 5000000, 250]];
 };
+Strategy.prototype.getBailout = function(){
+	var links = document.getElementsByTagName("a");
+	var target = null;
+	for (var i = 0; i < links.length; i++) {
+		if (links[i].href === 'http://www.saltybet.com/options') {
+			target = links[i];
+		}
+	}
+	var isIlluminati=false;
+	var level=1;
+	if (target!=null){
+		for (var k=0; k<target.childNodes.length; k++){
+			var child = target.childNodes[k];
+			if(child.classList && child.classList.contains("goldtext"))
+				isIlluminati=true;
+		}
+	}
+	var rank = document.getElementById("rank");
+	if (rank!=null){
+		var re=/rank([0-9]{1,2})\.png/g;
+		var match=re.exec(rank.childNodes[0].src);
+		level=parseInt(match[1]);
+	}
+	if(isIlluminati)
+		return level*75;
+	else
+		return level*25;
+};
 Strategy.prototype.flatBet = function(balance, debug) {
 	var flatAmount = 100;
 	var multiplierIndex = 2;
 	var intendedBet = flatAmount * this.levels[this.level][multiplierIndex] * this.confidence;
-
-	// "big money" section added to prevent damage at low traffic times
-	// var bigMoney = false;
-	// var bigMoneyNerf = .8/*hardcoded 80% is for the first round per cycle*/;
-	// if (this.lastMatchCumulativeBetTotal != null) {
-	// var largeBettingPool = intendedBet * 20;
-	// if (this.lastMatchCumulativeBetTotal > largeBettingPool) {
-	// bigMoney = true;
-	// } else {
-	// bigMoneyNerf = 1 - ((largeBettingPool - this.lastMatchCumulativeBetTotal) / largeBettingPool);
-	// }
-	// }
-	// if (!bigMoney)
-	// intendedBet *= bigMoneyNerf;
 	if (debug)
 		console.log("- betting at level: " + this.level + ", confidence: " + (this.confidence * 100).toFixed(2));
-	/// + "%, big money: " + ("" + bigMoney).toUpperCase()+(bigMoney?"":", nerfed to: "+(bigMoneyNerf*100).toFixed(2)));
 	if (this.level == 0)
 		return balance;
 	else
@@ -65,14 +78,15 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 
 	var minimum = 100 + Math.round(Math.random() * 50);
 	var amountToBet;
+	var bailout = this.getBailout();
 
 	if (tournament) {
-		var allIn = balance < 2000;
+		var allIn = balance < 2000 || this.confidence > 0.9;
 		amountToBet = (!allIn) ? Math.round(balance * (this.confidence || 0.5)) : balance;
+		if (amountToBet < 1000+bailout)
+			amountToBet = 1000+bailout;
 		if (amountToBet > balance)
-			amountToBet = balance;
-		if (amountToBet < 1000)
-			amountToBet = 1000;
+        	amountToBet = balance;
 		if (debug) {
 			if (allIn)
 				console.log("- ALL IN: " + balance);
@@ -85,12 +99,18 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 		amountToBet = Math.round(balance * .1 * this.confidence);
 		if (amountToBet > balance * .1)
 			amountToBet = Math.round(balance * .1);
-		if (debug)
+		if (amountToBet < bailout){
+			if (debug)
+				console.log("- amount is less than bailout ("+amountToBet+"), betting bailout: "+bailout);
+			amountToBet = bailout;
+		} else if (debug)
 			console.log("- betting: " + balance + " x .10 =(" + (balance * .1) + ") x cf(" + (this.confidence * 100).toFixed(2) + "%) = " + amountToBet);
 	} else {
 		var p05 = Math.ceil(balance * .01);
 		var cb = Math.ceil(balance * this.confidence);
 		amountToBet = (p05 < cb) ? p05 : cb;
+		if (amountToBet < bailout)
+        	amountToBet = bailout;
 		if (debug)
 			console.log("- betting without confidence: " + amountToBet);
 	}
