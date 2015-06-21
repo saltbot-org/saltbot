@@ -10,7 +10,7 @@ var Strategy = function(sn) {
 	this.debug = true;
 	this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100], [1000000, 5000000, 250]];
 };
-Strategy.prototype.getBailout = function(){
+Strategy.prototype.getBailout = function(tournament){
 	var links = document.getElementsByTagName("a");
 	var target = null;
 	for (var i = 0; i < links.length; i++) {
@@ -34,9 +34,12 @@ Strategy.prototype.getBailout = function(){
 		level=parseInt(match[1]);
 	}
 	if(isIlluminati)
-		return level*75;
+		return 2000 + level*50;
 	else
-		return level*25;
+		if (tournament)
+			return 1000 + level*25;
+		else
+			return 200 + level*25;
 };
 Strategy.prototype.flatBet = function(balance, debug) {
 	var flatAmount = 100;
@@ -81,13 +84,10 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 	var bailout = this.getBailout();
 
 	if (tournament) {
-		var allIn = balance < 2000 || this.confidence > 0.9;
+		var allIn = balance <= 2*bailout || this.confidence > 0.9;
 		amountToBet = (!allIn) ? Math.round(balance * (this.confidence || 0.5)) : balance;
 		var bailoutMessage=0;
-		if (amountToBet < 1000+bailout){
-			bailoutMessage = amountToBet;
-			amountToBet = 1000+bailout;
-		}
+		
 		if (amountToBet > balance)
         	amountToBet = balance;
 		if (debug) {
