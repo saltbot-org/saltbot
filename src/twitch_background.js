@@ -11,16 +11,17 @@ chrome.extension.onMessage.addListener(function(details) {
 			}
 		});
 	}
-	if (details.getTwitch !== undefined) {
-		chrome.tabs.query({
-			url : "http://www.twitch.tv/saltybet"
-		}, function(result) {
-			if (result.length == 0)
-				chrome.tabs.create({
-					url : "http://www.twitch.tv/saltybet"
-				});
-		});
-	}
+	// Code below keeps opening the twitch tab over and over again, best to disable.
+	//if (details.getTwitch !== undefined) {
+	//	chrome.tabs.query({
+	//		url : "http://www.twitch.tv/saltybet"
+	//	}, function(result) {
+	//		if (result.length == 0)
+	//			chrome.tabs.create({
+	//				url : "http://www.twitch.tv/saltybet"
+	//			});
+	//	});
+	//}
 });
 var sendUpdatedChromosome = function() {
 	chrome.storage.local.get(["chromosomes_v1"], function(results) {
