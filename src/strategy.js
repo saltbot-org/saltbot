@@ -87,7 +87,7 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 	var bailout = this.getBailout(tournament);
 
 	if (tournament) {
-		var allIn = balance <= 2*bailout || this.confidence > 0.9;
+		var allIn = balance <= 2*bailout || this.confidence > 0.9 || (1 - this.confidence) * balance <= bailout;
 		amountToBet = (!allIn) ? Math.round(balance * (this.confidence || 0.5)) : balance;
 		var bailoutMessage=0;
 		if (amountToBet < bailout){
