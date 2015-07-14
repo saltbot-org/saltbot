@@ -120,8 +120,10 @@ Match.prototype.init = function() {
 			setTimeout(function() {
 				var tournamentModeIndicator = "characters are left in the bracket!";
 				var tournamentModeIndicator2 = "Tournament mode start";
+				var tournamentModeIndicator3 = "FINAL ROUND! Stay tuned for exhibitions after the tournament!"
 				var footer = document.getElementById("footer-alert");
-				var tournament = footer != null && (footer.innerHTML.indexOf(tournamentModeIndicator) > -1 || footer.innerHTML.indexOf(tournamentModeIndicator2) > -1);
+				var tournament = footer != null && (footer.innerHTML.indexOf(tournamentModeIndicator) > -1 || footer.innerHTML.indexOf(tournamentModeIndicator2) > -1 ||
+													footer.innerHTML.indexOf(tournamentModeIndicator3) > -1);
 
 				self.betAmount(tournament);
 
