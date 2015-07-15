@@ -2,7 +2,7 @@ chrome.extension.onMessage.addListener(function(details) {
 	if (details.message !== undefined) {
 		//Receive message from Waifu, pass it on to salty tab
 		chrome.tabs.query({
-			title : "Salty Bet - In Salt We Trust",
+			title : "Salty Bet",
 			url : "http://www.saltybet.com/"
 		}, function(result) {
 			// result is an array of tab.Tabs
@@ -34,7 +34,7 @@ var sendUpdatedChromosome = function() {
 			});
 			var data = JSON.stringify(results.chromosomes_v1[0]);
 			chrome.tabs.query({
-				title : "Salty Bet - In Salt We Trust",
+				title : "Salty Bet",
 				url : "http://www.saltybet.com/"
 			}, function(result) {
 				chrome.tabs.sendMessage(result[0].id, {
