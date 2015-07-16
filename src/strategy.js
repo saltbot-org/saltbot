@@ -11,22 +11,9 @@ var Strategy = function(sn) {
 	this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100], [1000000, 5000000, 250]];
 };
 Strategy.prototype.getBailout = function(tournament){
-	var links = document.getElementsByTagName("a");
-	var target = null;
-	for (var i = 0; i < links.length; i++) {
-		if (links[i].href === 'http://www.saltybet.com/options') {
-			target = links[i];
-		}
-	}
-	var isIlluminati=false;
+	var isIlluminati=document.getElementsByClassName("goldtext").length > 0;
 	var level=1;
-	if (target!=null){
-		for (var k=0; k<target.childNodes.length; k++){
-			var child = target.childNodes[k];
-			if(child.classList && child.classList.contains("goldtext"))
-				isIlluminati=true;
-		}
-	}
+	
 	var rank = document.getElementById("rank");
 	if (rank!=null){
 		var re=/rank([0-9]{1,2})\.png/g;
