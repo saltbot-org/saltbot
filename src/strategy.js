@@ -11,15 +11,16 @@ var Strategy = function(sn) {
 	this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100], [1000000, 5000000, 250]];
 };
 Strategy.prototype.getBailout = function(tournament){
-	var isIlluminati=document.getElementsByClassName("goldtext").length > 0;
-	var level=1;
-	
+	var nameSpan = document.getElementsByTagName("h2")[0].children[2];
+	var isIlluminati=nameSpan && nameSpan.classList && nameSpan.classList.contains("goldtext");
+
 	var rank = document.getElementById("rank");
 	if (rank!=null){
 		var re=/rank([0-9]{1,2})\.png/g;
 		var match=re.exec(rank.childNodes[0].src);
 		level=parseInt(match[1]);
 	}
+	document.get
 	if(isIlluminati)
 		if (tournament)
 			return 3000 + level*50;
