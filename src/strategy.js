@@ -12,15 +12,15 @@ var Strategy = function(sn) {
 };
 Strategy.prototype.getBailout = function(tournament){
 	var nameSpan = document.getElementsByTagName("h2")[0].children[2];
-	var isIlluminati=nameSpan && nameSpan.classList && nameSpan.classList.contains("goldtext");
-
+	var isIlluminati=nameSpan && nameSpan.children[0].classList && nameSpan.children[0].classList.contains("goldtext");
+	var level = 1;
 	var rank = document.getElementById("rank");
 	if (rank!=null){
 		var re=/rank([0-9]{1,2})\.png/g;
 		var match=re.exec(rank.childNodes[0].src);
 		level=parseInt(match[1]);
 	}
-	document.get
+
 	if(isIlluminati)
 		if (tournament)
 			return 3000 + level*50;
