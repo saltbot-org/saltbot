@@ -3,7 +3,7 @@ chrome.extension.onMessage.addListener(function(details) {
 		//Receive message from Waifu, pass it on to salty tab
 		chrome.tabs.query({
 			title : "Salty Bet",
-			url : "http://www.saltybet.com/"
+			url : "http://*.saltybet.com/"
 		}, function(result) {
 			// result is an array of tab.Tabs
 			for (var i = 0; i < result.length; i++) {
@@ -35,7 +35,7 @@ var sendUpdatedChromosome = function() {
 			var data = JSON.stringify(results.chromosomes_v1[0]);
 			chrome.tabs.query({
 				title : "Salty Bet",
-				url : "http://www.saltybet.com/"
+				url : "http://*.saltybet.com/"
 			}, function(result) {
 				chrome.tabs.sendMessage(result[0].id, {
 					type : "suc",

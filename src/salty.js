@@ -335,7 +335,7 @@ Controller.prototype.saveSettings = function(msg) {
 };
 
 ctrl = null;
-if (window.location.href == "http://www.saltybet.com/") {
+if (window.location.href == "http://www.saltybet.com/" || window.location.href == "http://mugen.saltybet.com/") {
 	ctrl = new Controller();
 	ctrl.ensureTwitch();
 	chrome.storage.local.get(["settings_v1"], function(results) {
