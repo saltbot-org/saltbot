@@ -265,7 +265,7 @@ var ir = function(f) {
 	});
 };
 
-if (window.location.href == "http://www.saltybet.com/")
+if (window.location.href == "http://www.saltybet.com/" || window.location.href == "http://mugen.saltybet.com/")
 	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		switch(request.type) {
 		case "dr":
