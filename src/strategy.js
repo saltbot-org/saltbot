@@ -54,10 +54,10 @@ Strategy.prototype.adjustLevel = function(balance) {
 	var changed = false;
 	do {
 		changed = false;
-		if (this.level + 1 <= maxLv && balance >= this.levels[this.level+1][peak]) {
+		if (this.level + 1 <= maxLv && balance >= this.levels[this.level][peak]) {
 			this.level += 1;
 			changed = true;
-		} else if (this.level - 1 >= minLv && balance <= this.levels[this.level-1][valley]) {
+		} else if (this.level - 1 >= minLv && balance <= this.levels[this.level][valley]) {
 			this.level -= 1;
 			changed = true;
 		}

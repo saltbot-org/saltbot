@@ -217,8 +217,15 @@ var Controller = function() {
 				//always observe the first match in the cycle, due to chrome alarm mandatory timing delay
 				self.currentMatch = new Match(new Observer());
 			} else {
-				if (self.currentMatch && self.currentMatch.strategy)
-					var level = self.currentMatch.strategy.level;
+				var level;
+				if (self.currentMatch && self.currentMatch.strategy) {
+					level = self.currentMatch.strategy.level;
+				} else {
+					// get amount for first match
+					var nullMatch = new Match(new Strategy("nullStrat"));
+					nullMatch.strategy.adjustLevel(nullMatch.getBalance());
+					level = nullMatch.strategy.level;
+				}
 				switch(self.settings.nextStrategy) {
 				case "o":
 					self.currentMatch = new Match(new Observer());
