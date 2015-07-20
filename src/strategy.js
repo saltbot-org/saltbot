@@ -12,7 +12,12 @@ var Strategy = function(sn) {
 };
 Strategy.prototype.getBailout = function(tournament){
 	var nameSpan = document.getElementsByTagName("h2")[0].children[2];
-	var isIlluminati=nameSpan && nameSpan.children[0].classList && nameSpan.children[0].classList.contains("goldtext");
+	var isIlluminati = false;
+	try { // the html is different for illuminati??
+		isIlluminati = nameSpan && nameSpan.children[0].classList && nameSpan.children[0].classList.contains("goldtext");
+	} catch (e) { // this is how it is for non-illums:
+		isIlluminati = nameSpan && nameSpan.classList && nameSpan.classList.contains("goldtext");
+	}
 	var level = 1;
 	var rank = document.getElementById("rank");
 	if (rank!=null){
