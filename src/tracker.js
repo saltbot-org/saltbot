@@ -66,10 +66,14 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 		return null;
 	}
 };
-Match.prototype.betAmount = function(tournament) {
+Match.prototype.getBalance = function(){
 	var balanceBox = document.getElementById("balance");
-	var wagerBox = document.getElementById("wager");
 	var balance = parseInt(balanceBox.innerHTML.replace(/,/g, ""));
+	return balance;
+}
+Match.prototype.betAmount = function(tournament) {
+	var balance = this.getBalance();
+	var wagerBox = document.getElementById("wager");
 	var amountToBet;
 	var strategy = this.strategy;
 	var debug = true;
