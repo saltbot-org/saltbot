@@ -52,10 +52,5 @@ if (window.location.href == "http://www.twitch.tv/saltybet") {
 			childList : true,
 			attributes : true
 		});
-		
-		//reload in an hour
-		setTimeout(function(){
-			window.location.reload(1);
-		}, 216000000);
 	};
 }
