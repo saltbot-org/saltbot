@@ -22,6 +22,9 @@ var prClick = function() {
 var erClick = function() {
 	btnClicked("er");
 };
+var ecClick = function() {
+	btnClicked("ec");
+}
 var tvClick = function() {
 	btnClicked("tv");
 };
@@ -49,14 +52,19 @@ var changeStrategyClickRC = function() {
 var changeStrategyClickIPU = function() {
 	btnClicked("cs_ipu");
 };
-var onFileRead = function(e) {
+var onFileReadRecord = function(e) {
 	console.log("File read successful.");
 	var t = e.target.result;
 	btnClicked("ir", t);
 };
+var onFileReadChromosome = function(e) {
+	console.log("File read successful.");
+	var t = e.target.result;
+	btnClicked("ic", t);
+}
 var irClick = function() {
 	console.log("Attempting records import...");
-	var files = document.getElementById('upload').files;
+	var files = document.getElementById('upload_r').files;
 	if(files.length>0)
 		console.log("Upload successful.");
 	else 
@@ -65,7 +73,21 @@ var irClick = function() {
 	
 	var file = files[0];	
 	var reader = new FileReader();
-	reader.onload = onFileRead;
+	reader.onload = onFileReadRecord;
+	reader.readAsText(file);
+};
+var icClick = function() {
+	console.log("Attempting chromosome import...");
+	var files = document.getElementById('upload_c').files;
+	if(files.length>0)
+		console.log("Upload successful.");
+	else 
+		console.log("Upload canceled.");	
+	console.log("Attempting to read file...");
+	
+	var file = files[0];	
+	var reader = new FileReader();
+	reader.onload = onFileReadChromosome;
 	reader.readAsText(file);
 };
 
@@ -426,6 +448,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("bpr").addEventListener("click", prClick);
 	document.getElementById("ber").addEventListener("click", erClick);
 	document.getElementById("bir").addEventListener("change", irClick);
+	document.getElementById("bec").addEventListener("click", ecClick);
+	document.getElementById("bic").addEventListener("change", icClick);
 	document.getElementById("bsc").addEventListener("click", function() {
 		simulator.evalMutations();
 		simulator.draw();

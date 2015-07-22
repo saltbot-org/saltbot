@@ -238,9 +238,6 @@ var Chromosome = function() {
 	this.ltU = 0.5;
 	return this;
 };
-Chromosome.prototype.toJSON = function() {
-	return JSON.stringify(this);
-};
 Chromosome.prototype.loadFromJSON = function(json) {
 	var copy = JSON.parse(json);
 	for (var i in copy) {

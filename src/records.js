@@ -265,6 +265,53 @@ var ir = function(f) {
 	});
 };
 
+var ec = function() {
+	chrome.storage.local.get(["chromosomes_v1"], function(results) {
+		if (results.chromosomes_v1 && results.chromosomes_v1.length > 0) {
+			var chromosome = new Chromosome();
+			chromosome = chromosome.loadFromObject(results.chromosomes_v1[0]);
+			var lines = JSON.stringify(chromosome, null, "\t").split("\n");
+			for (var i = 0; i < lines.length; ++i) {
+				lines[i] += "\n";
+			}
+
+			var time = new Date();
+			var blobM = new Blob(lines, {
+				type : "text/plain;charset=utf-8"
+			});
+			var timeStr = "" + time.getFullYear() + "-" + time.getMonth() + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+			saveAs(blobM, "chromosome--" + timeStr + ".txt");
+		}
+		else {
+			console.log("- No chromosomes found.");
+		}
+	});
+};
+
+var ic = function(f) {
+	var chromosome = new Chromosome();
+	try {
+		chromosome.loadFromJSON(f);
+	}
+	catch (err) {
+		console.log("- Could not read chromosome file.");
+		return;
+	}
+	
+	//get the chromosomes currently saved in the list
+	chrome.storage.local.get(["chromosomes_v1"], function(results) {
+		var chromosomes = results.chromosomes_v1;
+		chromosomes[0] = chromosome;
+		chrome.storage.local.set({
+			'chromosomes_v1' : chromosomes
+		}, function() {
+			console.log("- Chromosome imported successfully.");
+		});
+	});
+	
+	
+};
+
 if (window.location.href == "http://www.saltybet.com/" || window.location.href == "http://mugen.saltybet.com/")
 	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		switch(request.type) {
@@ -279,6 +326,12 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 			break;
 		case "ir":
 			ir(request.text);
+			break;
+		case "ec":
+			ec();
+			break;
+		case "ic":
+			ic(request.text);
 			break;
 		case "tv":
 			ctrl.toggleVideoWindow();
