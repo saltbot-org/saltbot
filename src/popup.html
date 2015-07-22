@@ -4,9 +4,9 @@
 		<title>SaltBot Controls</title>
 		<style>
 			body {
-				min-width: 350px;
+				min-width: 315px;
 				overflow-x: hidden;
-				min-height: 600px;
+				min-height: 500px;
 				overflow-y: hidden;
                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fcfff4), color-stop(40%,#dfe5d7), color-stop(100%,#b3bead));
             }
@@ -74,31 +74,31 @@
 		<div id="cs_ipu" class="click smalltx">
 			Lunatic
 		</div>
-		<h2 class="subheading">Chromosome Management</h2>
+		<h2 class="subheading">Chromosomes Management</h2>
 		<div id="ugw" class="click smalltx">
 			Update Genetic Weights
 		</div>
 		<div id="rgw" class="click smalltx">
 			Reset Pool
 		</div>
+		<div id="bec" class="click smalltx">
+			Export
+		</div>
+		<div id="bic" class="click smalltx" style="position: relative; width: 45px">
+			<input type="file" id="upload_c" style="position: absolute; top: 0px; left:0px ; opacity:0; z-index: 2;cursor: pointer;width: 53px;height: 30px">
+			<span style="position: absolute; top: 5px; left:3px ;">Import</span>
+		</div>
+		<br>
 		<label style="display: block;clear: both;"> Messages:
 			<input type="text" name="msgbox" id="msgbox"/>
 		</label>
-		<h2 class="subheading">Records</h2>
+		<h2 class="subheading">Records Management</h2>
 		<div id="ber" class="click smalltx">
-			Export Records
+			Export
 		</div>
-		<div id="bir" class="click smalltx" style="position: relative; width: 110px;">
-			<input type="file" id="upload_r" style="position: absolute; top: 0px; left:0px ; opacity:0; z-index: 2;cursor: pointer;width: 118px;height: 30px">
-			<span style="position: absolute; top: 5px; left:3px ;">Import Records</span>
-		</div>
-		<h2 class="subheading">Chromosomes</h2>
-		<div id="bec" class="click smalltx">
-			Export Chromosomes
-		</div>
-		<div id="bic" class="click smalltx" style="position: relative; width: 155px">
-			<input type="file" id="upload_c" style="position: absolute; top: 0px; left:0px ; opacity:0; z-index: 2;cursor: pointer;width: 163px;height: 30px">
-			<span style="position: absolute; top: 5px; left:3px ;">Import Chromosomes</span>
+		<div id="bir" class="click smalltx" style="position: relative; width: 45px;">
+			<input type="file" id="upload_r" style="position: absolute; top: 0px; left:0px ; opacity:0; z-index: 2;cursor: pointer;width: 53px;height: 30px">
+			<span style="position: absolute; top: 5px; left:3px ;">Import</span>
 		</div>
 		<h2 class="subheading">Player Rankings</h2>
 		<div id="bdr" class="click smalltx">
@@ -114,24 +114,6 @@
 		<div id="ta" class="click smalltx" >
 			Toggle Aggro
 		</div>
-		<br />
-		<br />
-		<br />
-		<div id="mrc" class="click smalltx" >
-			Mass RC
-		</div>
-		<div id="bsc" class="click smalltx">
-			Simulate Multiple
-		</div><label style="visibility: hidden;">
-			<input type="checkbox" id="rb">
-			rb</label>
-		<label style="visibility: hidden;">
-			<input type="checkbox" id="cs" checked>
-			cs</label>
-        <label style="visibility: hidden;">
-			<input type="checkbox" id="rc" checked>
-			rc</label>
-		<br />
 	</body>
 </html>
 
