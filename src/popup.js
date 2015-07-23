@@ -450,18 +450,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("bir").addEventListener("change", irClick);
 	document.getElementById("bec").addEventListener("click", ecClick);
 	document.getElementById("bic").addEventListener("change", icClick);
-	document.getElementById("bsc").addEventListener("click", function() {
-		simulator.evalMutations();
-		simulator.draw();
-	});
 	document.getElementById("ugw").addEventListener("click", function() {
 		simulator.evalMutations("evolution");
 	});
 	document.getElementById("rgw").addEventListener("click", function() {
 		simulator.initializePool();
-	});
-	document.getElementById("mrc").addEventListener("click", function() {
-		simulator.evalMutations("mass");
 	});
 	document.getElementById("tv").addEventListener("click", tvClick);
 	document.getElementById("ta").addEventListener("click", taClick);
