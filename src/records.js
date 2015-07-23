@@ -301,7 +301,12 @@ var ic = function(f) {
 	//get the chromosomes currently saved in the list
 	chrome.storage.local.get(["chromosomes_v1"], function(results) {
 		var chromosomes = results.chromosomes_v1;
-		chromosomes[0] = chromosome;
+		if (chromosomes) {
+			chromosomes[0] = chromosome;
+		}
+		else {
+			chromosomes = [chromosome];
+		}
 		chrome.storage.local.set({
 			'chromosomes_v1' : chromosomes
 		}, function() {
