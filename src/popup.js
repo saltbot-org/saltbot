@@ -456,6 +456,7 @@ Simulator.prototype.initializePool = function() {
 
 };
 
+simulator = new Simulator();
 roundsOfEvolution = 0;
 
 document.addEventListener('DOMContentLoaded', function() {
