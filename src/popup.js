@@ -1,3 +1,19 @@
+$(document).ready(function() {
+	$("#upload_c").on("click", function(e) {
+		e.stopPropagation();
+	});
+	$("#upload_r").on("click", function(e) {
+		e.stopPropagation();
+	});
+	
+	$("#bic").on("click", function (e) {
+		$('#upload_c').trigger('click');		
+	});
+	$("#bir").on("click", function (e) {
+		$('#upload_r').trigger('click');
+	});
+});
+
 var btnClicked = function(clicktype, data) {
 	data = data || null;
 	chrome.tabs.query({
@@ -440,7 +456,6 @@ Simulator.prototype.initializePool = function() {
 
 };
 
-simulator = new Simulator();
 roundsOfEvolution = 0;
 
 document.addEventListener('DOMContentLoaded', function() {
