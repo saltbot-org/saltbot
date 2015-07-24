@@ -18,7 +18,10 @@ chrome.extension.onMessage.addListener(function(details) {
 			if (result.length == 0)
 				chrome.tabs.create({
 					url : "http://www.twitch.tv/saltybet"
-				});
+				}, function(tab) {
+						chrome.tabs.executeScript(tab.id, {code: "location.reload()"});
+					}
+				);
 		});
 	}
 });
