@@ -1,3 +1,18 @@
+chrome.runtime.onInstalled.addListener(function() {
+    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+        chrome.declarativeContent.onPageChanged.addRules([{
+            conditions: [
+                new chrome.declarativeContent.PageStateMatcher({
+                    pageUrl: {
+                        hostEquals: 'www.saltybet.com'
+                    }
+                })
+            ],
+            actions: [new chrome.declarativeContent.ShowPageAction()]
+        }]);
+    });
+});
+
 chrome.extension.onMessage.addListener(function(details) {
 	if (details.message !== undefined) {
 		//Receive message from Waifu, pass it on to salty tab
