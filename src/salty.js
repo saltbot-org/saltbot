@@ -250,9 +250,8 @@ var Controller = function() {
 
 			//skip team matches, mirror matches
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
-				self.currentMatch = new Match(new Observer());
-				console.log("- skipping team match, but placing a Monk");
-				self.currentMatch.init();
+				self.currentMatch = null;
+				console.log("- skipping team match");
 			} else if (self.currentMatch.names[0] == self.currentMatch.names[1]) {
 				self.currentMatch = null;
 				console.log("- skipping mirror match");

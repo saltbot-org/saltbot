@@ -1,3 +1,19 @@
+$(document).ready(function() {
+	$("#upload_c").on("click", function(e) {
+		e.stopPropagation();
+	});
+	$("#upload_r").on("click", function(e) {
+		e.stopPropagation();
+	});
+	
+	$("#bic").on("click", function (e) {
+		$('#upload_c').trigger('click');		
+	});
+	$("#bir").on("click", function (e) {
+		$('#upload_r').trigger('click');
+	});
+});
+
 var btnClicked = function(clicktype, data) {
 	data = data || null;
 	chrome.tabs.query({
@@ -450,18 +466,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("bir").addEventListener("change", irClick);
 	document.getElementById("bec").addEventListener("click", ecClick);
 	document.getElementById("bic").addEventListener("change", icClick);
-	document.getElementById("bsc").addEventListener("click", function() {
-		simulator.evalMutations();
-		simulator.draw();
-	});
 	document.getElementById("ugw").addEventListener("click", function() {
 		simulator.evalMutations("evolution");
 	});
 	document.getElementById("rgw").addEventListener("click", function() {
 		simulator.initializePool();
-	});
-	document.getElementById("mrc").addEventListener("click", function() {
-		simulator.evalMutations("mass");
 	});
 	document.getElementById("tv").addEventListener("click", tvClick);
 	document.getElementById("ta").addEventListener("click", taClick);

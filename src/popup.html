@@ -53,8 +53,8 @@
 		</style>
 		<script type="text/javascript" src="records.js"></script>
 		<script type="text/javascript" src="strategy.js"></script>
-		<script type="text/javascript" src="popup.js"></script>
 		<script type="text/javascript" src="lib/jquery.min.js"></script>
+		<script type="text/javascript" src="popup.js"></script>
 	</head>
 	<body>
 		<h1>SaltBot Controls</h1>
@@ -85,7 +85,7 @@
 			Export
 		</div>
 		<div id="bic" class="click smalltx" style="position: relative; width: 45px">
-			<input type="file" id="upload_c" style="position: absolute; top: 0px; left:0px ; opacity:0; z-index: 2;cursor: pointer;width: 53px;height: 30px">
+			<input type="file" id="upload_c" style="display: none">
 			<span style="position: absolute; top: 5px; left:3px ;">Import</span>
 		</div>
 		<br>
@@ -97,8 +97,8 @@
 			Export
 		</div>
 		<div id="bir" class="click smalltx" style="position: relative; width: 45px;">
-			<input type="file" id="upload_r" style="position: absolute; top: 0px; left:0px ; opacity:0; z-index: 2;cursor: pointer;width: 53px;height: 30px">
-			<span style="position: absolute; top: 5px; left:3px ;">Import</span>
+			<input type="file" id="upload_r" style="display: none">
+			<span id="text_upload_r" style="position: absolute; top: 5px; left:3px ;">Import</span>
 		</div>
 		<h2 class="subheading">Player Rankings</h2>
 		<div id="bdr" class="click smalltx">
