@@ -1,3 +1,18 @@
+chrome.runtime.onInstalled.addListener(function() {
+    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+        chrome.declarativeContent.onPageChanged.addRules([{
+            conditions: [
+                new chrome.declarativeContent.PageStateMatcher({
+                    pageUrl: {
+                        hostEquals: 'saltybet.com'
+                    }
+                })
+            ],
+            actions: [new chrome.declarativeContent.ShowPageAction()]
+        }]);
+    });
+});
+
 chrome.extension.onMessage.addListener(function(details) {
 	if (details.message !== undefined) {
 		//Receive message from Waifu, pass it on to salty tab
@@ -18,7 +33,10 @@ chrome.extension.onMessage.addListener(function(details) {
 			if (result.length == 0)
 				chrome.tabs.create({
 					url : "http://www.twitch.tv/saltybet"
-				});
+				}, function(tab) {
+						chrome.tabs.executeScript(tab.id, {code: "location.reload()"});
+					}
+				);
 		});
 	}
 });
