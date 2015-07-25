@@ -4,7 +4,7 @@ chrome.runtime.onInstalled.addListener(function() {
             conditions: [
                 new chrome.declarativeContent.PageStateMatcher({
                     pageUrl: {
-                        hostEquals: 'saltybet.com'
+                        hostSuffix: 'saltybet.com'
                     }
                 })
             ],
@@ -33,10 +33,7 @@ chrome.extension.onMessage.addListener(function(details) {
 			if (result.length == 0)
 				chrome.tabs.create({
 					url : "http://www.twitch.tv/saltybet"
-				}, function(tab) {
-						chrome.tabs.executeScript(tab.id, {code: "location.reload()"});
-					}
-				);
+				});
 		});
 	}
 });
