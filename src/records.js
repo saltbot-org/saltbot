@@ -120,6 +120,89 @@ Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
 
 };
 
+var RankingTree = function(){
+	this.red = null;
+	this.blue = null;
+	this.branches = [];
+};
+RankingTree.prototype.fromArray = function(array){ // for loading from Chrome storage
+	this.branches = array;
+}
+RankingTree.prototype.toArray = function(){
+	return this.branches;
+}
+RankingTree.prototype.getCharacterRed = function(name) {
+	this.red = name;
+}
+RankingTree.prototype.getCharacterBlue = function(name) {
+	this.blue = name;
+}
+RankingTree.prototype.flip = function(branch, i1, i2) {
+	var temporary = branch[i1];
+	branch[i1] = branch[i2];
+	branch[i2] = temporary;
+}
+RankingTree.prototype.process = function(wasRed) {
+	// get winner and loser
+	var winner = wasRed?this.red:this.blue;
+	var loser = wasRed?this.blue:this.red;
+	this.red = null;
+	this.blue = null;
+
+	var winnerBranchIndex = -1;
+	var loserBranchIndex = -1;
+	var winnerCharacterIndex = -1;
+	var loserCharacterIndex = -1;
+
+	// locate characters in branches if they exist
+	for (var i=0; i<this.branches.length; i++){
+		var branch = this.branches[i];
+		if (winnerCharacterIndex==-1){//haven't found winner character yet
+			winnerCharacterIndex = branch.indexOf(winner);
+			if(winnerCharacterIndex!=-1) winnerBranchIndex = i;
+		}
+		if (loserCharacterIndex==-1){//haven't found loser character yet
+            loserCharacterIndex = branch.indexOf(loser);
+            if(loserCharacterIndex!=-1) loserBranchIndex = i;
+        }
+	}
+
+	// adjust branches accordingly ---- [0] is the top
+	if (winnerBranchIndex==-1 && loserBranchIndex==-1){ // neither character is in a branch yet
+		this.branches.push([winner, loser]);
+	} else if (winnerBranchIndex==loserBranchIndex){ // both characters in the same branch
+		if (loserCharacterIndex > winnerCharacterIndex) { // if the loser character is higher ranked
+			var rankingDelta = Math.abs(winnerCharacterIndex)-Math.abs(loserCharacterIndex);
+			if (rankingDelta==0){ // if they're touching, flip them
+				this.flip(this.branches[winnerBranchIndex], winnerCharacterIndex, loserCharacterIndex);
+			} else if (rankingDelta==1) { // if there's a single character between them, only move the winner up
+				this.flip(this.branches[winnerBranchIndex], winnerCharacterIndex, winnerCharacterIndex-1);
+			} else {
+				this.flip(this.branches[winnerBranchIndex], loserCharacterIndex, loserCharacterIndex+1); // loser moves down
+				this.flip(this.branches[winnerBranchIndex], winnerCharacterIndex, winnerCharacterIndex-1); // winner moves up
+			}
+		} else {
+			// push down and up, but not beyond the borders of the array
+			if(this.branches[winnerCharacterIndex-1] !== undefined)
+				this.flip(this.branches[winnerBranchIndex], winnerCharacterIndex, winnerCharacterIndex-1);
+			if(this.branches[loserCharacterIndex+1] !== undefined)
+            	this.flip(this.branches[loserBranchIndex], loserCharacterIndex, loserCharacterIndex+1);
+		}
+
+	} else if (winnerBranchIndex!=-1 && loserBranchIndex!=-1
+		&& winnerBranchIndex!=loserBranchIndex) { // characters in different branches
+		// intersperse
+	} else { // one of the characters is in a tree
+		// it's the winner
+
+		// it's the loser
+		
+	}
+
+
+
+}
+
 var dr = function(sortByMoney) {
 	chrome.storage.local.get(["matches_v1", "characters_v1", "bettors_v1"], function(results) {
 		var bw10 = [];
