@@ -138,9 +138,11 @@ RankingTree.prototype.getCharacterBlue = function(name) {
 	this.blue = name;
 }
 RankingTree.prototype.flip = function(branch, i1, i2) {
-	var temporary = branch[i1];
-	branch[i1] = branch[i2];
-	branch[i2] = temporary;
+	if(branch[i1] !== undefined && branch[i2] !== undefined) { // don't push past the borders
+		var temporary = branch[i1];
+        branch[i1] = branch[i2];
+        branch[i2] = temporary;
+	}
 }
 RankingTree.prototype.process = function(wasRed) {
 	// get winner and loser
@@ -183,24 +185,41 @@ RankingTree.prototype.process = function(wasRed) {
 			}
 		} else {
 			// push down and up, but not beyond the borders of the array
-			if(this.branches[winnerCharacterIndex-1] !== undefined)
-				this.flip(this.branches[winnerBranchIndex], winnerCharacterIndex, winnerCharacterIndex-1);
-			if(this.branches[loserCharacterIndex+1] !== undefined)
-            	this.flip(this.branches[loserBranchIndex], loserCharacterIndex, loserCharacterIndex+1);
+			this.flip(this.branches[loserBranchIndex], loserCharacterIndex, loserCharacterIndex+1);
+			this.flip(this.branches[winnerBranchIndex], winnerCharacterIndex, winnerCharacterIndex-1);
 		}
-
 	} else if (winnerBranchIndex!=-1 && loserBranchIndex!=-1
 		&& winnerBranchIndex!=loserBranchIndex) { // characters in different branches
 		// intersperse
 	} else { // one of the characters is in a tree
+		var bumpDownIndex = -1;
+		var branch = null;
+		var bumpPositionCharacter = null;
 		// it's the winner
-
+		if (winnerBranchIndex!=-1) {
+			bumpDownIndex = winnerCharacterIndex + 1;
+			branch = this.branches[winnerBranchIndex];
+			bumpPositionCharacter = loser;
+		}
 		// it's the loser
-		
+		else if (loserBranchIndex!=-1) {
+			bumpDownIndex = loserCharacterIndex;
+			branch = this.branches[loserBranchIndex];
+			bumpPositionCharacter = winner;
+		}
+
+		// first, bump everything down
+		for (var i=branch.length-1; i>=0; i--) {
+			if (i >= bumpDownIndex) {
+				branch[i+1] = branch[i];
+				branch[i] = null;
+			} else {
+				break;
+			}
+		}
+		// then place the bump character
+		branch[bumpDownIndex] = bumpPositionCharacter;
 	}
-
-
-
 }
 
 var dr = function(sortByMoney) {
