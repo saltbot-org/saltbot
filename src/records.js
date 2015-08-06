@@ -168,29 +168,52 @@ RankingTree.prototype.process = function(wasRed) {
             if(loserCharacterIndex!=-1) loserBranchIndex = i;
         }
 	}
+	var winnerBranch = this.branches[winnerBranchIndex];
+	var loserBranch = this.branches[loserBranchIndex];
 
 	// adjust branches accordingly ---- [0] is the top
 	if (winnerBranchIndex==-1 && loserBranchIndex==-1){ // neither character is in a branch yet
 		this.branches.push([winner, loser]);
 	} else if (winnerBranchIndex==loserBranchIndex){ // both characters in the same branch
 		if (loserCharacterIndex > winnerCharacterIndex) { // if the loser character is higher ranked
-			var rankingDelta = Math.abs(winnerCharacterIndex)-Math.abs(loserCharacterIndex);
-			if (rankingDelta==0){ // if they're touching, flip them
-				this.flip(this.branches[winnerBranchIndex], winnerCharacterIndex, loserCharacterIndex);
-			} else if (rankingDelta==1) { // if there's a single character between them, only move the winner up
-				this.flip(this.branches[winnerBranchIndex], winnerCharacterIndex, winnerCharacterIndex-1);
+			var delta = Math.abs(winnerCharacterIndex)-Math.abs(loserCharacterIndex);
+			if (delta==0){ // if they're touching, flip them
+				this.flip(winnerBranch, winnerCharacterIndex, loserCharacterIndex);
+			} else if (delta==1) { // if there's a single character between them, only move the winner up (biases towards loser)
+				this.flip(winnerBranch, winnerCharacterIndex, winnerCharacterIndex-1);
 			} else {
-				this.flip(this.branches[winnerBranchIndex], loserCharacterIndex, loserCharacterIndex+1); // loser moves down
-				this.flip(this.branches[winnerBranchIndex], winnerCharacterIndex, winnerCharacterIndex-1); // winner moves up
+				this.flip(winnerBranch, loserCharacterIndex, loserCharacterIndex+1); // loser moves down
+				this.flip(winnerBranch, winnerCharacterIndex, winnerCharacterIndex-1); // winner moves up
 			}
 		} else {
 			// push down and up, but not beyond the borders of the array
-			this.flip(this.branches[loserBranchIndex], loserCharacterIndex, loserCharacterIndex+1);
-			this.flip(this.branches[winnerBranchIndex], winnerCharacterIndex, winnerCharacterIndex-1);
+			this.flip(winnerBranch, loserCharacterIndex, loserCharacterIndex+1);
+			this.flip(winnerBranch, winnerCharacterIndex, winnerCharacterIndex-1);
 		}
 	} else if (winnerBranchIndex!=-1 && loserBranchIndex!=-1
 		&& winnerBranchIndex!=loserBranchIndex) { // characters in different branches
-		// intersperse
+		// intersperse, align at winner/loser
+		var delta = Math.abs(winnerCharacterIndex - loserCharacterIndex);
+		var deltaBranch = winnerCharacterIndex > loserCharacterIndex ? winnerBranch : loserBranch;
+		var newBranch = [];
+		for (var i=0; i<delta; i++) {
+			newBranch.push(deltaBranch.shift());
+		}
+		while (winnerBranch.length > 0 || loserBranch.length > 0) {
+			if (winnerBranch.length > 0)
+				newBranch.push(winnerBranch.shift());
+			if (loserBranch.length > 0)
+            	newBranch.push(loserBranch.shift());
+		}
+		// remove old useless branches, add new one
+		if (winnerBranchIndex > loserBranchIndex) {
+			delete this.branches[loserBranchIndex];
+			delete this.branches[winnerBranchIndex];
+		} else {
+			delete this.branches[winnerBranchIndex];
+			delete this.branches[loserBranchIndex];
+		}
+		this.branches.push(newBranch);
 	} else { // one of the characters is in a tree
 		var bumpDownIndex = -1;
 		var branch = null;
@@ -198,13 +221,13 @@ RankingTree.prototype.process = function(wasRed) {
 		// it's the winner
 		if (winnerBranchIndex!=-1) {
 			bumpDownIndex = winnerCharacterIndex + 1;
-			branch = this.branches[winnerBranchIndex];
+			branch = winnerBranch;
 			bumpPositionCharacter = loser;
 		}
 		// it's the loser
 		else if (loserBranchIndex!=-1) {
 			bumpDownIndex = loserCharacterIndex;
-			branch = this.branches[loserBranchIndex];
+			branch = loserBranch;
 			bumpPositionCharacter = winner;
 		}
 
