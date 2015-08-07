@@ -176,11 +176,8 @@ RankingTree.prototype.process = function(wasRed) {
 		this.branches.push([winner, loser]);
 	} else if (winnerBranchIndex==loserBranchIndex){ // both characters in the same branch
 		if (loserCharacterIndex > winnerCharacterIndex) { // if the loser character is higher ranked
-			var delta = Math.abs(winnerCharacterIndex)-Math.abs(loserCharacterIndex);
-			if (delta==1){ // if they're touching, flip them
-				this.flip(winnerBranch, winnerCharacterIndex, loserCharacterIndex);
-			} else { // only move the winner up
-				this.flip(winnerBranch, winnerCharacterIndex, winnerCharacterIndex-1);
+			//move the winner up
+			this.flip(winnerBranch, winnerCharacterIndex, winnerCharacterIndex-1);
 		} else {
 			// do nothing
 		}
