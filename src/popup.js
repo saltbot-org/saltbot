@@ -148,13 +148,29 @@ Simulator.prototype.getBetAmount = function(strategy, index) {
 };
 Simulator.prototype.applyPenalties = function(c) {
 	// anti-domination
+	var penalized = 0.05;
+
 	var adOdds = c.timeWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
 	var adTime = c.oddsWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
 	var adWPer = c.oddsWeight + c.timeWeight + c.crowdFavorWeight + c.illumFavorWeight;
 	var adCFW = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.illumFavorWeight;
 	var adIFW = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.crowdFavorWeight;
-	if (c.oddsWeight > adOdds || c.timeWeight > adTime || c.winPercentageWeight > adWPer || c.crowdFavorWeight > adCFW || c.illumFavorWeight > adIFW)
-		return 0.05;
+	if (c.rankingTreeWeight){// for the un-upgraded, do this check
+		var adRT = c.oddsWeight + c.timeWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
+		if (c.rankingTreeWeight > adRT)
+			return penalized;
+		adOdds += c.rankingTreeWeight;
+        adTime += c.rankingTreeWeight;
+        adWPer += c.rankingTreeWeight;
+        adCFW += c.rankingTreeWeight;
+        adIFW += c.rankingTreeWeight;
+	}
+	if (c.oddsWeight > adOdds ||
+		c.timeWeight > adTime ||
+		c.winPercentageWeight > adWPer ||
+		c.crowdFavorWeight > adCFW ||
+		c.illumFavorWeight > adIFW)
+		return penalized;
 	return 1;
 };
 Simulator.prototype.evalMutations = function(mode) {

@@ -125,7 +125,8 @@ var Controller = function() {
 						var matches_v1 = null;
 						var characters_v1 = null;
 						var bettors_v1 = null;
-						// self.best_chromosome=results.best_chromosome;
+
+						//TODO: update tree
 
 						//store new match record
 						if (results.hasOwnProperty("matches_v1")) {

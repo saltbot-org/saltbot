@@ -197,6 +197,7 @@ var Chromosome = function() {
 	this.winPercentageWeight = 1;
 	this.crowdFavorWeight = 1;
 	this.illumFavorWeight = 1;
+	this.rankingTreeWeight = 1;
 	// confidence nerf
 	this.minimumCombinedConfidenceForLargeBet = 0.5;
 	this.minimumMatchesForLargeBet = 3;
@@ -362,13 +363,30 @@ ConfidenceScore.prototype.execute = function(info) {
 	var c1 = info.character1;
 	var c2 = info.character2;
 	var matches = info.matches;
+	var tree = info.tree;
 	//
 	var oddsWeight = this.chromosome.oddsWeight;
 	var timeWeight = this.chromosome.timeWeight;
 	var winPercentageWeight = this.chromosome.winPercentageWeight;
 	var crowdFavorWeight = this.chromosome.crowdFavorWeight;
 	var illumFavorWeight = this.chromosome.illumFavorWeight;
-	var totalWeight = oddsWeight + timeWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
+	var rankingTreeWeight = this.chromosome.rankingTreeWeight | 0;
+	var totalWeight = oddsWeight + timeWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight + rankingTreeWeight;
+
+
+	// the weights come in from the chromosome
+    var c1Score = 0;
+    var c2Score = 0;
+
+	//
+	if (tree){
+		var rankingTree = new RankingTree();
+		rankingTree.fromArray(tree);
+		var rtp = rankingTree.predict(c1.name, c2.name);
+		if (rtp==1) c1Score += rankingTreeWeight;
+		else if (rtp==2) c2Score += rankingTreeWeight;
+	}
+
 	//
 	var c1Stats = new CSStats(c1, this.chromosome);
 	var c2Stats = new CSStats(c2, this.chromosome);
@@ -384,12 +402,6 @@ ConfidenceScore.prototype.execute = function(info) {
 			console.log("- cannot predict odds: one or both characters missing odds");
 	}
 
-	// the weights come in from the chromosome
-	var c1Score = 0;
-	var c2Score = 0;
-
-	//var c1WW = c1Stats.wins - c1Stats.losses;
-	//var c2WW = c2Stats.wins - c2Stats.losses;
 	var c1WT = c1Stats.wins + c1Stats.losses;
 	var c2WT = c2Stats.wins + c2Stats.losses;
 	var c1WP = (c1WT != 0) ? c1Stats.wins / c1WT : 0;

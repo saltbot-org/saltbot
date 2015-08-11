@@ -235,6 +235,9 @@ RankingTree.prototype.process = function(wasRed) {
 		branch[bumpDownIndex] = bumpPositionCharacter;
 	}
 }
+RankingTree.prototype.predict = function(red, blue) { // returns 1 for red, 2 for blue, 0 for no result
+	return 0;//TODO
+}
 
 var dr = function(sortByMoney) {
 	chrome.storage.local.get(["matches_v1", "characters_v1", "bettors_v1"], function(results) {
@@ -376,12 +379,15 @@ var ir = function(f) {
 	}
 	var nmr = matchRecords.length;
 	var ncr = characterRecords.length;
+	var rtr = ranking.toArray().length;
 	//All records have been rebuilt, so update them
 	chrome.storage.local.set({
 		'matches_v1' : matchRecords,
-		'characters_v1' : characterRecords
+		'characters_v1' : characterRecords,
+		'rankings_v1' : ranking.toArray()
 	}, function() {
 		console.log("-\nrecords imported:\n" + nmr + " match records\n" + ncr + " character records");
+		console.log("-\nbranches: "+rtr);
 	});
 };
 
