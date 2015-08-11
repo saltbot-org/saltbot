@@ -327,6 +327,7 @@ var ir = function(f) {
 	var matchRecords = [];
 	var characterRecords = [];
 	var namesOfCharactersWhoAlreadyHaveRecords = [];
+	var ranking = new RankingTree();
 
 	//numberOfProperties refers to c1, c2, w, sn, etc.
 	var numberOfProperties = 11;
@@ -340,12 +341,15 @@ var ir = function(f) {
 			case 0:
 				mObj = {};
 				mObj.c1 = match[j];
+				ranking.getCharacterRed(match[j]);
 				break;
 			case 1:
 				mObj.c2 = match[j];
+				ranking.getCharacterBlue(match[j]);
 				break;
 			case 2:
 				mObj.w = parseInt(match[j]);
+				ranking.process(mObj.w==0);
 				break;
 			case 3:
 				mObj.sn = match[j];
