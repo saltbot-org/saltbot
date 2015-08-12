@@ -1,3 +1,14 @@
+var removeEmptyElements = function(arr) {
+	var new_array = [];
+	
+	for (var i=0; i < arr.length; ++i) {
+		if (arr[i] !== undefined) {
+			new_array.push(arr[i]);
+		}
+	}
+	return new_array;
+}
+
 var Bettor = function(name) {
 	this.name = name;
 	this.wins = 0;
@@ -159,7 +170,12 @@ RankingTree.prototype.process = function(wasRed) {
 	// locate characters in branches if they exist
 	for (var i=0; i<this.branches.length; i++){
 		var branch = this.branches[i];
-		if (winnerCharacterIndex==-1){//haven't found winner character yet
+		
+		if (branch === undefined) {
+			console.log("undefined branch");
+		}
+		
+		if (winnerCharacterIndex==-1){//haven't found winner character yet			
 			winnerCharacterIndex = branch.indexOf(winner);
 			if(winnerCharacterIndex!=-1) winnerBranchIndex = i;
 		}
@@ -213,12 +229,13 @@ RankingTree.prototype.process = function(wasRed) {
 		}
 
 		if (winnerBranch) //winnerBranch was not deleted
-			branches[winnerBranchIndex] = winnerBranch;
+			this.branches[winnerBranchIndex] = winnerBranch;
 
 		if (loserBranch) //loserBranch was not deleted
-			branches[loserBranchIndex] = loserBranch;
+			this.branches[loserBranchIndex] = loserBranch;
 
-		branches.push(newBranch);
+		this.branches.push(newBranch);
+		this.branches = removeEmptyElements(this.branches);
 	} else { // one of the characters is in a tree
 		var bumpDownIndex = -1;
 		var branch = null;
@@ -254,8 +271,8 @@ RankingTree.prototype.predict = function(red, blue) { // returns 1 for red, 2 fo
 		return 0;
 	}
 	
-	for (var i = 0; i < branches.length; ++i) {
-		var branch = branches[i];
+	for (var i = 0; i < this.branches.length; ++i) {
+		var branch = this.branches[i];
 		
 		var redIndex = branch.indexOf(red);
 		var blueIndex = branch.indexOf(blue);
@@ -403,11 +420,13 @@ var ir = function(f) {
 				var c1Obj = updater.getCharacter(mObj.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
 				var c2Obj = updater.getCharacter(mObj.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
 				updater.updateCharactersFromMatch(mObj, c1Obj, c2Obj);
-
+				
 				break;
 			}
 		}
 	}
+		
+	
 	var nmr = matchRecords.length;
 	var ncr = characterRecords.length;
 	var rtr = ranking.toArray().length;
