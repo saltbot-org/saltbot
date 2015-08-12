@@ -184,27 +184,41 @@ RankingTree.prototype.process = function(wasRed) {
 	} else if (winnerBranchIndex!=-1 && loserBranchIndex!=-1
 		&& winnerBranchIndex!=loserBranchIndex) { // characters in different branches
 		// intersperse, align at winner/loser
-		var delta = Math.abs(winnerCharacterIndex - loserCharacterIndex);
-		var deltaBranch = winnerCharacterIndex > loserCharacterIndex ? winnerBranch : loserBranch;
-		var newBranch = [];
-		for (var i=0; i<delta; i++) {
-			newBranch.push(deltaBranch.shift());
+		var newBranch = winnerBranch.slice(0, winnerCharacterIndex+1);
+		newBranch = newBranch.concat(loserBranch.slice(loserCharacterIndex, loserBranch.length));
+
+		winnerBranch = winnerBranch.slice(winnerCharacterIndex, winnerBranch.length);
+		loserBranch = loserBranch.slice(0, loserCharacterIndex+1);
+
+		if (winnerBranchIndex < loserBranchIndex) {
+			if (loserBranch.length <= 1) { //only the loser is left in the branch -> remove branch
+				delete this.branches[loserBranchIndex];
+				loserBranch = null;
+			}
+			if (winnerBranch.length <= 1) { //only the winner is left in the branch -> remove branch
+				delete this.branches[winnerBranchIndex];
+				winnerBranch = null;
+			}
 		}
-		while (winnerBranch.length > 0 || loserBranch.length > 0) {
-			if (winnerBranch.length > 0)
-				newBranch.push(winnerBranch.shift());
-			if (loserBranch.length > 0)
-            	newBranch.push(loserBranch.shift());
+
+		else {
+			if (winnerBranch.length <= 1) { //only the winner is left in the branch -> remove branch
+				delete this.branches[winnerBranchIndex];
+				winnerBranch = null;
+			}
+			if (loserBranch.length <= 1) { //only the loser is left in the branch -> remove branch
+				delete this.branches[loserBranchIndex];
+				loserBranch = null;
+			}
 		}
-		// remove old useless branches, add new one
-		if (winnerBranchIndex > loserBranchIndex) {
-			delete this.branches[loserBranchIndex];
-			delete this.branches[winnerBranchIndex];
-		} else {
-			delete this.branches[winnerBranchIndex];
-			delete this.branches[loserBranchIndex];
-		}
-		this.branches.push(newBranch);
+
+		if (winnerBranch) //winnerBranch was not deleted
+			branches[winnerBranchIndex] = winnerBranch;
+
+		if (loserBranch) //loserBranch was not deleted
+			branches[loserBranchIndex] = loserBranch;
+
+		branches.push(newBranch);
 	} else { // one of the characters is in a tree
 		var bumpDownIndex = -1;
 		var branch = null;
@@ -236,7 +250,24 @@ RankingTree.prototype.process = function(wasRed) {
 	}
 }
 RankingTree.prototype.predict = function(red, blue) { // returns 1 for red, 2 for blue, 0 for no result
-	return 0;//TODO
+	if (!this.branches || this.branches.length == 0) {
+		return 0;
+	}
+	
+	for (var i = 0; i < branches.length; ++i) {
+		var branch = branches[i];
+		
+		var redIndex = branch.indexOf(red);
+		var blueIndex = branch.indexOf(blue);
+		
+		//both found in the same branch
+		if (redIndex != -1 && blueIndex != -1) {
+			return redIndex < blueIndex ? 1 : 2;
+		}
+	}
+	
+	//no branch with both characters found
+	return 0;
 }
 
 var dr = function(sortByMoney) {
