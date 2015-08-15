@@ -1,5 +1,5 @@
 if (window.location.href == "http://www.twitch.tv/saltybet") {
-	window.onload = function() {
+	var doEverything = function() {
 		// remove the video window
 		var killVideo=function() {
 			var parent = document.getElementsByClassName("ember-view full")[0];
@@ -52,5 +52,18 @@ if (window.location.href == "http://www.twitch.tv/saltybet") {
 			childList : true,
 			attributes : true
 		});
+	};
+	
+	window.onload = function() {
+		if (document.getElementsByClassName('ember-view full').length == 0) {
+			$(document).on('DOMNodeInserted', function(e) {
+				if (e.target.className == 'ember-view full') { 
+					doEverything();
+				}
+			});
+		}
+		else {
+			doEverything();
+		}
 	};
 }

@@ -12,7 +12,7 @@
 		},
 		{
 			"matches": ["http://www.twitch.tv/saltybet"],
-			"js": ["twitch_content.js"]
+			"js": ["lib/FileSaver.min.js", "twitch_content.js"]
 		}
 	],
 	"background": {

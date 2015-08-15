@@ -171,18 +171,20 @@ RankingTree.prototype.process = function(wasRed) {
 	for (var i=0; i<this.branches.length; i++){
 		var branch = this.branches[i];
 		
-		if (branch === undefined) {
-			console.log("undefined branch");
+		if (branch.indexOf(winner) != -1) {
+			//get the largest branch with the winner in it
+			if (winnerBranchIndex == -1 || branch.length > this.branches[winnerBranchIndex].length) {
+				winnerCharacterIndex = branch.indexOf(winner);
+				winnerBranchIndex = i;
+			}
 		}
-		
-		if (winnerCharacterIndex==-1){//haven't found winner character yet			
-			winnerCharacterIndex = branch.indexOf(winner);
-			if(winnerCharacterIndex!=-1) winnerBranchIndex = i;
+		if (branch.indexOf(loser) != -1) {
+			//get the largest branch with the loser in it
+			if (loserBranchIndex == -1 || branch.length > this.branches[loserBranchIndex].length) {
+				loserCharacterIndex = branch.indexOf(loser);
+				loserBranchIndex = i;
+			}
 		}
-		if (loserCharacterIndex==-1){//haven't found loser character yet
-            loserCharacterIndex = branch.indexOf(loser);
-            if(loserCharacterIndex!=-1) loserBranchIndex = i;
-        }
 	}
 	var winnerBranch = this.branches[winnerBranchIndex];
 	var loserBranch = this.branches[loserBranchIndex];
@@ -191,7 +193,7 @@ RankingTree.prototype.process = function(wasRed) {
 	if (winnerBranchIndex==-1 && loserBranchIndex==-1){ // neither character is in a branch yet
 		this.branches.push([winner, loser]);
 	} else if (winnerBranchIndex==loserBranchIndex){ // both characters in the same branch
-		if (loserCharacterIndex > winnerCharacterIndex) { // if the loser character is higher ranked
+		if (loserCharacterIndex < winnerCharacterIndex) { // if the loser character is higher ranked
 			//move the winner up
 			this.flip(winnerBranch, winnerCharacterIndex, winnerCharacterIndex-1);
 		} else {
@@ -234,7 +236,7 @@ RankingTree.prototype.process = function(wasRed) {
 		if (loserBranch) //loserBranch was not deleted
 			this.branches[loserBranchIndex] = loserBranch;
 
-		this.branches.push(newBranch);
+		this.branches.unshift(newBranch);
 		this.branches = removeEmptyElements(this.branches);
 	} else { // one of the characters is in a tree
 		var bumpDownIndex = -1;
@@ -267,7 +269,7 @@ RankingTree.prototype.process = function(wasRed) {
 	}
 }
 RankingTree.prototype.predict = function(red, blue) { // returns 1 for red, 2 for blue, 0 for no result
-	if (!this.branches || this.branches.length == 0) {
+	if (!this.branches) {
 		return 0;
 	}
 	
