@@ -171,19 +171,13 @@ RankingTree.prototype.process = function(wasRed) {
 	for (var i=0; i<this.branches.length; i++){
 		var branch = this.branches[i];
 		
-		if (branch.indexOf(winner) != -1) {
-			//get the largest branch with the winner in it
-			if (winnerBranchIndex == -1 || branch.length > this.branches[winnerBranchIndex].length) {
-				winnerCharacterIndex = branch.indexOf(winner);
-				winnerBranchIndex = i;
-			}
+		if (winnerCharacterIndex==-1){//haven't found winner character yet			
+			winnerCharacterIndex = branch.indexOf(winner);
+			if(winnerCharacterIndex!=-1) winnerBranchIndex = i;
 		}
-		if (branch.indexOf(loser) != -1) {
-			//get the largest branch with the loser in it
-			if (loserBranchIndex == -1 || branch.length > this.branches[loserBranchIndex].length) {
-				loserCharacterIndex = branch.indexOf(loser);
-				loserBranchIndex = i;
-			}
+		if (loserCharacterIndex==-1){//haven't found loser character yet
+            loserCharacterIndex = branch.indexOf(loser);
+            if(loserCharacterIndex!=-1) loserBranchIndex = i;
 		}
 	}
 	var winnerBranch = this.branches[winnerBranchIndex];
@@ -201,40 +195,18 @@ RankingTree.prototype.process = function(wasRed) {
 		}
 	} else if (winnerBranchIndex!=-1 && loserBranchIndex!=-1
 		&& winnerBranchIndex!=loserBranchIndex) { // characters in different branches
-		// intersperse, align at winner/loser
-		var newBranch = winnerBranch.slice(0, winnerCharacterIndex+1);
-		newBranch = newBranch.concat(loserBranch.slice(loserCharacterIndex, loserBranch.length));
-
-		winnerBranch = winnerBranch.slice(winnerCharacterIndex, winnerBranch.length);
-		loserBranch = loserBranch.slice(0, loserCharacterIndex+1);
-
+		//merge branches
+		var newBranch = winnerBranch.concat(loserBranch);
+		
 		if (winnerBranchIndex < loserBranchIndex) {
-			if (loserBranch.length <= 1) { //only the loser is left in the branch -> remove branch
-				delete this.branches[loserBranchIndex];
-				loserBranch = null;
-			}
-			if (winnerBranch.length <= 1) { //only the winner is left in the branch -> remove branch
-				delete this.branches[winnerBranchIndex];
-				winnerBranch = null;
-			}
+			delete this.branches[loserBranchIndex];
+			delete this.branches[winnerBranchIndex];
 		}
 
 		else {
-			if (winnerBranch.length <= 1) { //only the winner is left in the branch -> remove branch
-				delete this.branches[winnerBranchIndex];
-				winnerBranch = null;
-			}
-			if (loserBranch.length <= 1) { //only the loser is left in the branch -> remove branch
-				delete this.branches[loserBranchIndex];
-				loserBranch = null;
-			}
+			delete this.branches[winnerBranchIndex];
+			delete this.branches[loserBranchIndex];
 		}
-
-		if (winnerBranch) //winnerBranch was not deleted
-			this.branches[winnerBranchIndex] = winnerBranch;
-
-		if (loserBranch) //loserBranch was not deleted
-			this.branches[loserBranchIndex] = loserBranch;
 
 		this.branches.unshift(newBranch);
 		this.branches = removeEmptyElements(this.branches);
