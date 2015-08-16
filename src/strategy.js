@@ -193,17 +193,11 @@ RatioConfidence.prototype.execute = function(info) {
 var Chromosome = function() {
 	// confidence weights
 	this.oddsWeight = 1;
-	this.timeWeight = 0.5;
+	this.timeWeight = 1;
 	this.winPercentageWeight = 1;
 	this.crowdFavorWeight = 1;
 	this.illumFavorWeight = 1;
 	this.rankingTreeWeight = 1;
-	// confidence nerf
-	this.minimumCombinedConfidenceForLargeBet = 0.5;
-	this.minimumMatchesForLargeBet = 3;
-	this.useMinCon = 0.51;
-	this.useMinMat = 0.51;
-	this.useSimilarAbility = 0.51;
 	// tier scoring
 	this.wX = 5;
 	this.wS = 4;
@@ -255,8 +249,9 @@ Chromosome.prototype.loadFromObject = function(obj) {
 Chromosome.prototype.toDisplayString = function() {
 	var results = "-\nchromosome:";
 	for (var i in this) {
-		if ( typeof this[i] != "function")
+		if ( typeof this[i] != "function") {
 			results += "\n" + i + " : " + this[i];
+		}
 	}
 	return results;
 };
@@ -268,7 +263,7 @@ Chromosome.prototype.mate = function(other) {
 			// 20% chance of mutation
 			var radiation = Math.random() + Math.random();
 			radiation *= radiation;
-			if (Math.random() < 0.2 && offspring[i] != null)
+			if (Math.random() < 0.8 && offspring[i] != null)
 				offspring[i] *= radiation;
 		}
 	}

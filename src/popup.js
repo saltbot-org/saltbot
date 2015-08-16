@@ -365,12 +365,21 @@ Simulator.prototype.evalMutations = function(mode) {
 			var sortingArray = [];
 			var parents = [];
 			var nextGeneration = [];
+			var accuracy = false;
+			var money = true;
+			var unshackle = true;
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
-					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l], self.applyPenalties(orders[l].chromosome)]);
+					var penalty = self.applyPenalties(orders[l].chromosome);
+					if (unshackle) penalty = 1;
+					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l], penalty]);
 				}
 				sortingArray.sort(function(a, b) {
+					if (accuracy && !money)
+						return (b[1] * b[3]) - (a[1] * a[3]);
+					if (!accuracy && money)
+						return (b[2] * b[3]) - (a[2] * a[3]);
 					return (b[1] * b[2] * b[3]) - (a[1] * a[2] * a[3]);
 				});
 
