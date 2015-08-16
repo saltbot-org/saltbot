@@ -195,21 +195,20 @@ RankingTree.prototype.process = function(wasRed) {
 		}
 	} else if (winnerBranchIndex!=-1 && loserBranchIndex!=-1
 		&& winnerBranchIndex!=loserBranchIndex) { // characters in different branches
-		//merge branches
-		var newBranch = winnerBranch.concat(loserBranch);
-		
-		if (winnerBranchIndex < loserBranchIndex) {
-			delete this.branches[loserBranchIndex];
-			delete this.branches[winnerBranchIndex];
+		//merge branches only if they can be cleanly merged, otherwise do not resolve
+		if (winnerCharacterIndex==this.branches[winnerBranchIndex].length-1
+			&& loserCharacterIndex==0) {
+			var newBranch = winnerBranch.concat(loserBranch);
+            if (winnerBranchIndex < loserBranchIndex) {
+                delete this.branches[loserBranchIndex];
+                delete this.branches[winnerBranchIndex];
+            } else {
+                delete this.branches[winnerBranchIndex];
+                delete this.branches[loserBranchIndex];
+            }
+            this.branches.push(newBranch);
+            this.branches = removeEmptyElements(this.branches);
 		}
-
-		else {
-			delete this.branches[winnerBranchIndex];
-			delete this.branches[loserBranchIndex];
-		}
-
-		this.branches.unshift(newBranch);
-		this.branches = removeEmptyElements(this.branches);
 	} else { // one of the characters is in a tree
 		var bumpDownIndex = -1;
 		var branch = null;
