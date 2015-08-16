@@ -184,6 +184,7 @@ Simulator.prototype.evalMutations = function(mode) {
 		var totalPercentCorrect = [];
 		self.money = [];
 		var updater = new Updater();
+		var tree = new RankingTree();
 
 		// create orders from string passed in
 		var orders = [];
@@ -251,11 +252,14 @@ Simulator.prototype.evalMutations = function(mode) {
 
 		// process matches
 		for (var i = 0; i < matches.length; i++) {
-
+			tree.getCharacterRed(matches[i].c1);
+			tree.getCharacterBlue(matches[i].c2);
+			tree.process(matches[i].w==0);
 			var info = {
 				"character1" : updater.getCharacter(matches[i].c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
 				"character2" : updater.getCharacter(matches[i].c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
-				"matches" : results.matches_v1
+				"matches" : results.matches_v1,
+				"tree": tree
 			};
 
 			for (var n = 0; n < strategies.length; n++) {
@@ -361,12 +365,21 @@ Simulator.prototype.evalMutations = function(mode) {
 			var sortingArray = [];
 			var parents = [];
 			var nextGeneration = [];
+			var accuracy = false;
+			var money = true;
+			var unshackle = true;
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
-					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l], self.applyPenalties(orders[l].chromosome)]);
+					var penalty = self.applyPenalties(orders[l].chromosome);
+					if (unshackle) penalty = 1;
+					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l], penalty]);
 				}
 				sortingArray.sort(function(a, b) {
+					if (accuracy && !money)
+						return (b[1] * b[3]) - (a[1] * a[3]);
+					if (!accuracy && money)
+						return (b[2] * b[3]) - (a[2] * a[3]);
 					return (b[1] * b[2] * b[3]) - (a[1] * a[2] * a[3]);
 				});
 
