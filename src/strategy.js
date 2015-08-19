@@ -51,7 +51,7 @@ Strategy.prototype.flatBet = function(balance, debug) {
 Strategy.prototype.adjustLevel = function(balance) {
 	if (!this.level)
 		this.level = 0;
-
+	//this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100], [1000000, 5000000, 250]];
 	var valley = 0;
 	var peak = 1;
 	var maxLv = this.levels.length - 1;
@@ -62,6 +62,7 @@ Strategy.prototype.adjustLevel = function(balance) {
 		if (this.level + 1 <= maxLv && balance >= this.levels[this.level][peak]) {
 			this.level += 1;
 			changed = true;
+			if (balance >= this.levels[this.level][valley]) return;
 		} else if (this.level - 1 >= minLv && balance <= this.levels[this.level][valley]) {
 			this.level -= 1;
 			changed = true;
@@ -123,6 +124,12 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 
 var CoinToss = function() {
 	Strategy.call(this, "ct");
+};
+var formatString = function(s, len){
+	while (s.length < len) {
+		s+=" ";
+	}
+	return s.substring(0, len);
 };
 CoinToss.prototype = Object.create(Strategy.prototype);
 CoinToss.prototype.execute = function(info) {
@@ -197,12 +204,6 @@ var Chromosome = function() {
 	this.winPercentageWeight = 1;
 	this.crowdFavorWeight = 1;
 	this.illumFavorWeight = 1;
-	// confidence nerf
-	this.minimumCombinedConfidenceForLargeBet = 0.5;
-	this.minimumMatchesForLargeBet = 3;
-	this.useMinCon = 0.51;
-	this.useMinMat = 0.51;
-	this.useSimilarAbility = 0.51;
 	// tier scoring
 	this.wX = 5;
 	this.wS = 4;
@@ -286,14 +287,18 @@ var CSStats = function(cObj, chromosome) {
 	var oddsSum = 0;
 	var oddsCount = 0;
 	var winTimesTotal = 0;
+	var winTimesTotalRaw = 0; // "Raw" for display message, unweighted
 	var lossTimesTotal = 0;
+	var lossTimesTotalRaw = 0;
 	var timedWonMatchesCount = 0;
 	var timedLostMatchesCount = 0;
 	this.wins = 0;
 	this.losses = 0;
 	this.averageOdds = null;
 	this.averageWinTime = null;
+	this.averageWinTimeRaw = null;
 	this.averageLossTime = null;
+	this.averageLossTimeRaw = null;
 	this.cfPercent = null;
 	this.ifPercent = null;
 
@@ -314,17 +319,21 @@ var CSStats = function(cObj, chromosome) {
 	for (var j = 0; j < cObj.winTimes.length; j++) {
 		if (cObj.winTimes[j] != 0) {
 			winTimesTotal += cObj.winTimes[j] * chromosome["wt" + cObj.wins[j]];
+			winTimesTotalRaw += cObj.winTimes[j];
 			timedWonMatchesCount += 1;
 		}
 	}
 	this.averageWinTime = (winTimesTotal != 0) ? winTimesTotal / timedWonMatchesCount : null;
+	this.averageWinTimeRaw = (winTimesTotal != 0) ? winTimesTotalRaw / timedWonMatchesCount : null;
 	for (var k = 0; k < cObj.lossTimes.length; k++) {
 		if (cObj.winTimes[k] != 0) {
 			lossTimesTotal += cObj.lossTimes[k] * chromosome["lt" + cObj.losses[k]];
+			lossTimesTotalRaw += cObj.lossTimes[k];
 			timedLostMatchesCount += 1;
 		}
 	}
 	this.averageLossTime = (lossTimesTotal != 0) ? lossTimesTotal / timedLostMatchesCount : null;
+	this.averageLossTimeRaw = (lossTimesTotal != 0) ? lossTimesTotalRaw / timedLostMatchesCount : null;
 
 	// expert opinion section
 	if (cObj.crowdFavor.length > 0) {
@@ -369,6 +378,22 @@ ConfidenceScore.prototype.execute = function(info) {
 	var crowdFavorWeight = this.chromosome.crowdFavorWeight;
 	var illumFavorWeight = this.chromosome.illumFavorWeight;
 	var totalWeight = oddsWeight + timeWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
+
+	// messages
+	var oddsMessage = null;
+	var timeMessage = null;
+	var winsMessage = null;
+	var crwdMessage = null;
+	var ilumMessage = null;
+	var messagelength = 15;
+
+	// the weights come in from the chromosome
+    var c1Score = 0;
+    var c2Score = 0;
+
+	//
+
+
 	//
 	var c1Stats = new CSStats(c1, this.chromosome);
 	var c2Stats = new CSStats(c2, this.chromosome);
@@ -376,24 +401,23 @@ ConfidenceScore.prototype.execute = function(info) {
 	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
 		var lesserOdds = (c1Stats.averageOdds < c2Stats.averageOdds) ? c1Stats.averageOdds : c2Stats.averageOdds;
 		this.oddsConfidence = [(c1Stats.averageOdds / lesserOdds), (c2Stats.averageOdds / lesserOdds)];
-		if (this.debug)
-			console.log("- predicted odds: " + (this.oddsConfidence[0]).toFixed(2) + " : " + (this.oddsConfidence[1]).toFixed(2));
+		if (this.debug) oddsMessage = "predicted odds -> ("+formatString(""+(this.oddsConfidence[0]).toFixed(2)+" : "+(this.oddsConfidence[1]).toFixed(2), messagelength)+")"
 	} else {
 		this.oddsConfidence = null;
-		if (this.debug)
-			console.log("- cannot predict odds: one or both characters missing odds");
 	}
 
-	// the weights come in from the chromosome
-	var c1Score = 0;
-	var c2Score = 0;
-
-	//var c1WW = c1Stats.wins - c1Stats.losses;
-	//var c2WW = c2Stats.wins - c2Stats.losses;
 	var c1WT = c1Stats.wins + c1Stats.losses;
 	var c2WT = c2Stats.wins + c2Stats.losses;
 	var c1WP = (c1WT != 0) ? c1Stats.wins / c1WT : 0;
 	var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
+
+	var wpTotal = c1WP+c2WP;
+	var c1WPDisplay = wpTotal>0?c1WP/wpTotal:0;
+	var c2WPDisplay = wpTotal>0?c2WP/wpTotal:0;
+	if (this.debug) winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> ("+(c1WPDisplay*100).toFixed(0)+" : "+(c2WPDisplay*100).toFixed(0)+")"+
+				  "  ::  unweighted (red W:L)(blue W:L) -> ("+ c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length+")"+
+				  "  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
+				                                  "(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
 
 	if (c1WP > c2WP)
 		c1Score += winPercentageWeight;
@@ -407,23 +431,37 @@ ConfidenceScore.prototype.execute = function(info) {
 			c2Score += oddsWeight;
 	}
 
-	if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null)
+	if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null) {
 		if (c1Stats.averageWinTime < c2Stats.averageWinTime)
-			c1Score += timeWeight / 2;
-		else if (c1Stats.averageWinTime > c2Stats.averageWinTime)
-			c2Score += timeWeight / 2;
+            c1Score += timeWeight / 2;
+        else if (c1Stats.averageWinTime > c2Stats.averageWinTime)
+            c2Score += timeWeight / 2;
+        if (this.debug) timeMessage = "avg win time (red:blue) -> ("+formatString(c1Stats.averageWinTimeRaw.toFixed(0)+" : "+c2Stats.averageWinTimeRaw.toFixed(0), messagelength)+")";
+	}
 
-	if (c1Stats.averageLossTime != null && c2Stats.averageLossTime != null)
+
+	if (c1Stats.averageLossTime != null && c2Stats.averageLossTime != null) {
 		if (c1Stats.averageLossTime > c2Stats.averageLossTime)
 			c1Score += timeWeight / 2;
 		else if (c1Stats.averageLossTime < c2Stats.averageLossTime)
 			c2Score += timeWeight / 2;
+		if (this.debug) {
+			var msg = "  ::  avg loss time (red:blue) -> ("+formatString(c1Stats.averageLossTimeRaw.toFixed(0)+" : "+c2Stats.averageLossTimeRaw.toFixed(0), messagelength)+")";
+			if (timeMessage)
+				timeMessage += msg;
+			else
+				timeMessage = msg;
+		}
+	}
 
 	if (c1Stats.cfPercent != null && c2Stats.cfPercent != null) {
 		if (c1Stats.cfPercent > c2Stats.cfPercent)
 			c1Score += crowdFavorWeight;
 		else if (c1Stats.cfPercent < c2Stats.cfPercent)
 			c2Score += crowdFavorWeight;
+		var cfPercentTotal = c1Stats.cfPercent + c2Stats.cfPercent;
+		if (this.debug) crwdMessage = "crowd favor (red:blue) -> ("+formatString((c1Stats.cfPercent/cfPercentTotal*100).toFixed(0)+
+							 " : "+(c2Stats.cfPercent/cfPercentTotal*100).toFixed(0), messagelength)+")";
 	}
 
 	if (c1Stats.ifPercent != null && c2Stats.ifPercent != null) {
@@ -431,20 +469,34 @@ ConfidenceScore.prototype.execute = function(info) {
 			c1Score += illumFavorWeight;
 		else if (c1Stats.ifPercent < c2Stats.ifPercent)
 			c2Score += illumFavorWeight;
+		var ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
+		if (this.debug) ilumMessage = "illuminati favor (red:blue) -> ("+formatString((c1Stats.ifPercent/ifPercentTotal*100).toFixed(0)+
+        							 " : "+(c2Stats.ifPercent/ifPercentTotal*100).toFixed(0), messagelength)+")";
+	}
+
+	if (this.debug){
+		console.log("\n");
+		console.log("\xBB PREDICTION STATS for ("+c1.name+" VS "+c2.name+") \xBB");
+		console.log(winsMessage);
+		var line2 = "\xBB ";
+		if (oddsMessage) line2 += oddsMessage;
+		if (timeMessage) line2 += "  ::  " + timeMessage;
+		if (line2.length>2) console.log(line2);
+		var line3 = "\xBB ";
+		if (crwdMessage) line3 += crwdMessage;
+		if (ilumMessage) line3 += "  ::  " + ilumMessage;
+		if (line3.length>2) console.log(line3);
+		console.log("\n");
 	}
 
 	// final decision
 
 	// figure out prediction, confidence
-
 	this.prediction = (c1Score > c2Score) ? c1.name : c2.name;
 
 	var winnerPoints = (this.prediction == c1.name) ? c1Score : c2Score;
 	var totalAvailablePoints = c1Score + c2Score;
 	this.confidence = parseFloat((winnerPoints / totalWeight));
-
-	if (this.debug)
-		console.log("- " + this.prediction + " has a better W score (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), betting " + this.prediction + ",-- r: (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" + "(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")");
 
 	/*---------------------------------------------------------------------------------------------------*/
 	// CONFIDENCE ADJUSTMENT SECTION
