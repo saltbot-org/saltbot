@@ -62,7 +62,7 @@ Strategy.prototype.adjustLevel = function(balance) {
 		if (this.level + 1 <= maxLv && balance >= this.levels[this.level][peak]) {
 			this.level += 1;
 			changed = true;
-			if (balance >= this.levels[this.level][valley]) return;
+			if (balance == this.levels[this.level][valley]) return;
 		} else if (this.level - 1 >= minLv && balance <= this.levels[this.level][valley]) {
 			this.level -= 1;
 			changed = true;
@@ -411,9 +411,9 @@ ConfidenceScore.prototype.execute = function(info) {
 	var c1WP = (c1WT != 0) ? c1Stats.wins / c1WT : 0;
 	var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
 
-	var wpTotal = c1WP+c2WP;
-	var c1WPDisplay = wpTotal>0?c1WP/wpTotal:0;
-	var c2WPDisplay = wpTotal>0?c2WP/wpTotal:0;
+	var wpTotal = c1Stats.wins+c2Stats.wins;
+	var c1WPDisplay = wpTotal>0?c1Stats.wins/wpTotal:0;
+	var c2WPDisplay = wpTotal>0?c2Stats.wins/wpTotal:0;
 	if (this.debug) winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> ("+(c1WPDisplay*100).toFixed(0)+" : "+(c2WPDisplay*100).toFixed(0)+")"+
 				  "  ::  unweighted (red W:L)(blue W:L) -> ("+ c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length+")"+
 				  "  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +

@@ -117,7 +117,7 @@ var Controller = function() {
 					var c1 = records[1];
 					var c2 = records[2];
 
-					console.log("match results: " + "\ncharacter 1: " + mr.c1 + "\ncharacter 2: " + mr.c2 + "\nwinner: " + mr.w + "\nstrategy: " + mr.sn + "\tprediction: " + mr.pw + "\ntier: " + mr.t + "\t\tmode: " + mr.m + "\nodds: " + mr.o + "\ttime: " + mr.ts);
+					console.log("- match result code: " + "c1:" + mr.c1 + "_c2:" + mr.c2 + "_w:" + mr.w + "_s:" + mr.sn + "_p:" + mr.pw + "_t:" + mr.t + "_m:" + mr.m + "_o:" + mr.o + "_t:" + mr.ts);
 
 					var s = self;
 					chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1", "bettors_v1"], function(results) {
