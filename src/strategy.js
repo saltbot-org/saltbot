@@ -8,7 +8,13 @@ var Strategy = function(sn) {
 	this.strategyName = sn;
 	this.prediction = null;
 	this.debug = true;
-	this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100], [1000000, 5000000, 250]];
+	this.levels = [[0, 1000, 0],
+				   [1000, 10000, 1],
+				   [10000, 100000, 10],
+				   [100000, 500000, 25],
+				   [500000, 1000000, 100],
+				   [1000000, 5000000, 250],
+				   [5000000, 20000000, 300]];
 };
 Strategy.prototype.getBailout = function(tournament){
 	var nameSpan = document.getElementsByTagName("h2")[0].children[2];
