@@ -14,6 +14,21 @@ $(document).ready(function() {
 	});
 });
 
+var elementChanged = function(changetype, data) {
+	data = data || null;
+	chrome.tabs.query({
+		active : true,
+		currentWindow : true
+	}, function(tabs) {
+		chrome.tabs.sendMessage(tabs[0].id, {
+			type : changetype,
+			text : data
+		}, function(response) {
+			console.log(response.farewell);
+		});
+	});
+}
+
 var btnClicked = function(clicktype, data) {
 	data = data || null;
 	chrome.tabs.query({
@@ -47,6 +62,17 @@ var tvClick = function() {
 var taClick = function() {
 	btnClicked("ta");
 };
+var teClick = function() {
+	btnClicked("te");
+}
+var limitChange = function() {
+	if (document.getElementById("tl").checked) {
+		elementChanged("limit_enable", document.getElementById("limit").value);
+	}
+	else {
+		elementChanged("limit_disable", document.getElementById("limit").value);
+	}
+}
 
 var changeStrategyClickO = function() {
 	btnClicked("cs_o");
@@ -469,6 +495,17 @@ simulator = new Simulator();
 roundsOfEvolution = 0;
 
 document.addEventListener('DOMContentLoaded', function() {
+	chrome.storage.local.get('settings_v1', function(result) {
+		if (result) {
+			document.getElementById("tl").checked = result.settings_v1.limit_enabled;
+			document.getElementById("limit").value = result.settings_v1.limit || 10000;
+			console.log(document.getElementById("tl"));
+			console.log(document.getElementById("limit").value);
+		}
+		console.log(result);
+	});
+	
+	
 	document.getElementById("bdr").addEventListener("click", drClick);
 	document.getElementById("bpr").addEventListener("click", prClick);
 	document.getElementById("ber").addEventListener("click", erClick);
@@ -483,10 +520,14 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 	document.getElementById("tv").addEventListener("click", tvClick);
 	document.getElementById("ta").addEventListener("click", taClick);
+	document.getElementById("te").addEventListener("click", teClick);
 	document.getElementById("cs_o").addEventListener("click", changeStrategyClickO);
 	document.getElementById("cs_cs").addEventListener("click", changeStrategyClickCS);
 	document.getElementById("cs_rc").addEventListener("click", changeStrategyClickRC);
 	document.getElementById("cs_ipu").addEventListener("click", changeStrategyClickIPU);
+	
+	document.getElementById("tl").addEventListener("change", limitChange);
+	document.getElementById("limit").addEventListener("change", limitChange);
 	chrome.alarms.create("chromosome update", {
 		delayInMinutes : 0.1,
 		periodInMinutes : 1.0

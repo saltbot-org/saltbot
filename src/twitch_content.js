@@ -29,60 +29,61 @@ $.fn.waitUntilExists    = function (handler, shouldRunHandlerOnce, isChild) {
 
 }(jQuery));
 
-if (window.location.href == "http://www.twitch.tv/saltybet") {
-	window.onload = function() {
-		// remove the video window
-		$(".dynamic-player").waitUntilExists(function() {
-			var parent = document.getElementsByClassName("dynamic-player")[0];
-			while (parent.childNodes.length > 0) {
-				parent.removeChild(parent.childNodes[0]);
-			}
-		});
-		
-		
-		$(".scroll.chat-messages.js-chat-messages").waitUntilExists(function() {
-			// put a mutation observer on the chat which reports back to the main content script whenever Waifu speaks
-			var chatWindow = document.getElementsByClassName("scroll chat-messages js-chat-messages")[0];
-			if (chatWindow === undefined)
-				chatWindow = document.getElementById("right_col");
-			var oldWaifuMessages = [];
-			var observer = new MutationObserver(function(mutations) {
+var addListener = function() {
+	$(".scroll.chat-messages.js-chat-messages").waitUntilExists(function() {
+		// put a mutation observer on the chat which reports back to the main content script whenever Waifu speaks
+		var chatWindow = document.getElementsByClassName("scroll chat-messages js-chat-messages")[0];
+		var oldWaifuMessages = [];
+		var observer = new MutationObserver(function(mutations) {
 
-				var chatLines = chatWindow.getElementsByClassName("ember-view chat-line");
-				var Waifu4uLines = [];
-				for (var i = 0; i < chatLines.length; i++) {
+			var chatLines = chatWindow.getElementsByClassName("ember-view chat-line");
+			var Waifu4uLines = [];
+			for (var i = 0; i < chatLines.length; i++) {
 
-					var line = chatLines[i];
-					var from = line.getElementsByClassName("from")[0].innerHTML;
+				var line = chatLines[i];
+				var from = line.getElementsByClassName("from")[0].innerHTML;
 
-					if (from == "Waifu4u") {
+				if (from == "Waifu4u") {
 
-						var message = line.getElementsByClassName("message")[0].innerHTML;
-						if (oldWaifuMessages.indexOf(message) == -1) {
-							oldWaifuMessages.push(message);
-							Waifu4uLines.push(message);
-						}
-
+					var message = line.getElementsByClassName("message")[0].innerHTML;
+					if (oldWaifuMessages.indexOf(message) == -1) {
+						oldWaifuMessages.push(message);
+						Waifu4uLines.push(message);
 					}
 
 				}
 
-				// at this point, we've captured input from Waifu
-				for (var j = 0; j < Waifu4uLines.length; j++) {
-					chrome.runtime.sendMessage({
-						message : Waifu4uLines[j]
-					}, function(response) {
-						console.log("response received in twitch content");
-					});
-					console.log("-\nnew message from Waifu:\n" + Waifu4uLines[j]);
-				}
-				observer.takeRecords();
-			});
-			observer.observe(chatWindow, {
-				subtree : true,
-				childList : true,
-				attributes : true
-			});
+			}
+
+			// at this point, we've captured input from Waifu
+			for (var j = 0; j < Waifu4uLines.length; j++) {
+				chrome.runtime.sendMessage({
+					message : Waifu4uLines[j]
+				}, function(response) {
+					console.log("response received in twitch content");
+				});
+				console.log("-\nnew message from Waifu:\n" + Waifu4uLines[j]);
+			}
+			observer.takeRecords();
 		});
-	};
+		observer.observe(chatWindow, {
+			subtree : true,
+			childList : true,
+			attributes : true
+		});
+	});
+}
+
+var triggered = false;
+document.onreadystatechange = function () {
+	if (document.readyState == "complete") {
+		triggered = true;
+		addListener();
+	}
+};
+
+if (!triggered && document.readyState == "complete") {
+	//site was already loaded when the script activated
+	triggered = true;
+	addListener();
 }

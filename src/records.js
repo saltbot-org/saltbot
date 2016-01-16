@@ -192,7 +192,7 @@ var er = function() {
 		var blobM = new Blob(lines, {
 			type : "text/plain;charset=utf-8"
 		});
-		var timeStr = "" + time.getFullYear() + "-" + time.getMonth() + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+		var timeStr = "" + time.getFullYear() + "-" + time.getMonth() + 1 + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
 		saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
 	});
 };
@@ -279,7 +279,7 @@ var ec = function() {
 			var blobM = new Blob(lines, {
 				type : "text/plain;charset=utf-8"
 			});
-			var timeStr = "" + time.getFullYear() + "-" + time.getMonth() + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+			var timeStr = "" + time.getFullYear() + "-" + time.getMonth() + 1 + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
 			saveAs(blobM, "chromosome--" + timeStr + ".txt");
 		}
 		else {
@@ -344,6 +344,9 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 		case "ta":
 			ctrl.toggleAggro();
 			break;
+		case "te":
+			ctrl.toggleExhibitions();
+			break;
 		case "cs_o":
 			ctrl.changeStrategy(request.type);
 			break;
@@ -361,6 +364,12 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 			break;
 		case "cs_ipu":
 			ctrl.changeStrategy(request.type);
+			break;
+		case "limit_enable":
+			ctrl.setLimit(true, request.text);
+			break;
+		case "limit_disable":
+			ctrl.setLimit(false, request.text);
 			break;
 		}
 	});

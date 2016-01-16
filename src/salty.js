@@ -1,8 +1,13 @@
 var Settings = function() {
 	this.nextStrategy = null;
 	this.video = true;
+	this.exhibitions = true;
 	// used for tiered betting:
 	this.level = 0;
+	
+	//limit for stopping
+	this.limit_enabled = false;
+	this.limit = 10000;
 };
 
 var StatusScanner = function() {
@@ -207,16 +212,20 @@ var Controller = function() {
 					console.log("- failed to determine winner, matches this cycle: " + matchesProcessed);
 					if (matchesProcessed >= matchesBeforeReset)
 						location.reload();
-				}
-				//
-				matchesProcessed += 1;
+				}				
 			}
 			
 			//set up next strategy
 			if (matchesProcessed == 0 && self.bestChromosome==null) {
 				//always observe the first match in the cycle, due to chrome alarm mandatory timing delay
 				self.currentMatch = new Match(new Observer());
-			} else {
+			}
+			else if (self.settings.limit_enabled && self.currentMatch && self.currentMatch.getBalance() >= self.settings.limit) {
+				//only observe after the limit is reached
+				console.log("- limit of " + self.settings.limit + " is reached, observing");
+				self.currentMatch = new Match(new Observer());
+			}
+			else {
 				var level;
 				if (self.currentMatch && self.currentMatch.strategy) {
 					level = self.currentMatch.strategy.level;
@@ -226,6 +235,8 @@ var Controller = function() {
 					nullMatch.strategy.adjustLevel(nullMatch.getBalance());
 					level = nullMatch.strategy.level;
 				}
+				
+				
 				switch(self.settings.nextStrategy) {
 				case "o":
 					self.currentMatch = new Match(new Observer());
@@ -245,6 +256,11 @@ var Controller = function() {
 				}
 				//set aggro:
 				self.currentMatch.setAggro(self.settings.aggro);
+				if (self.infoFromWaifu.length > 0) {
+					//copy mode and tier from infoFromWaifu
+					self.currentMatch.mode = self.infoFromWaifu[self.infoFromWaifu.length - 1].mode;
+					self.currentMatch.tier = self.infoFromWaifu[self.infoFromWaifu.length - 1].tier;
+				}
 
 			}
 
@@ -258,9 +274,16 @@ var Controller = function() {
 			} else if (self.currentMatch.names[0].indexOf(",") > -1 || self.currentMatch.names[1].indexOf(",") > -1) {
 				self.currentMatch = null;
 				console.log("- skipping match, comma in name, too lazy to deal with escape characters");
-			} else {
+			} else if (self.currentMatch.mode.charAt(0) == 'e' && self.settings.exhibitions !== undefined && !self.settings.exhibitions) {
+				self.currentMatch = null;
+				console.log("- skipping exhibition match because it is deactivated");
+			} 
+			
+			else {
 				self.currentMatch.init();
 			}
+			
+			matchesProcessed += 1;
 			//this may be a little out of asynch but I don't think it matters
 			bettingEntered = true;
 		}
@@ -301,6 +324,17 @@ Controller.prototype.toggleAggro = function() {
 	this.settings.aggro = !this.settings.aggro;
 	this.saveSettings("- settings updated, aggro: " + this.settings.aggro);
 };
+Controller.prototype.toggleExhibitions = function() {
+	this.settings.exhibitions = !this.settings.exhibitions;
+	this.saveSettings("- settings updated, exhibition betting : " + this.settings.exhibitions);
+}
+Controller.prototype.setLimit = function(enabled, limit) {
+	if (limit) {
+		this.settings.limit = parseInt(limit);
+	}
+	this.settings.limit_enabled = enabled;
+	this.saveSettings("- settings updated, limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
+}
 Controller.prototype.changeStrategy = function(sn, data) {
 	var t="";
 	switch(sn) {
@@ -340,6 +374,7 @@ Controller.prototype.saveSettings = function(msg) {
 	});
 };
 
+
 ctrl = null;
 if (window.location.href == "http://www.saltybet.com/" || window.location.href == "http://mugen.saltybet.com/") {
 	ctrl = new Controller();
@@ -378,12 +413,20 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 				//Bets are OPEN for Rydia of mist vs Zatanna EX3! (B Tier) (matchmaking) www.saltybet.com
 				// Bets are OPEN for Valdoll vs Adam! (A Tier) tournament bracket
 				//Bets are OPEN for Team RyokoAndHerTrainingPartner vs Team Aliens! (S / S Tier) (Requested by Pendaflex) (exhibitions) www.saltybet.com
+				//Bets are OPEN for Geegus vs Chris! (Requested by Yajirobe) (exhibitions) <a href="http://www.saltybet.com" target="_blank">www.saltybet.com</a>
 				var regex = /(?:Bets are OPEN for )(.*)(?: vs )(.*)(?:! \()(X|S|A|B|P|NEW)(?: Tier\))(.*)/g;
 				var matches = regex.exec(message);
 				if (matches == null) {
-					var regexLoose = /(?:Bets are OPEN for )(.*)(?: vs )(.*)!/g;
+					var regexLoose = /(?:Bets are OPEN for )(.*)(?: vs )(.*)!(.*)/g;
 					matches = regexLoose.exec(message);
-					matches.push("U", "U");
+					matches.push(matches[3]);
+					if (matches[3] == "") {
+						//no mode detected, set to U
+						matches[3] = "U";
+					}
+					
+					//set tier to U
+					matches[3] = "U";
 				}
 				if (matches[4].indexOf("matchmaking") > -1)
 					matches[4] = "m";

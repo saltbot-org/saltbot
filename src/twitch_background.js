@@ -28,11 +28,11 @@ chrome.extension.onMessage.addListener(function(details) {
 	}
 	if (details.getTwitch !== undefined) {
 		chrome.tabs.query({
-			url : "http://www.twitch.tv/saltybet"
+			url : "http://www.twitch.tv/saltybet/chat"
 		}, function(result) {
 			if (result.length == 0)
 				chrome.tabs.create({
-					url : "http://www.twitch.tv/saltybet"
+					url : "http://www.twitch.tv/saltybet/chat"
 				});
 		});
 	}
