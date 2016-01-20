@@ -33,10 +33,7 @@ Strategy.prototype.getBailout = function(tournament){
 	}
 
 	if(isIlluminati)
-		if (tournament)
-			return 3000 + level*50;
-		else
-			return 2000 + level*50;	
+		return 3000 + level*50;
 	else
 		if (tournament)
 			return 1000 + level*25;
