@@ -36,7 +36,7 @@ var addListener = function() {
 		var oldWaifuMessages = [];
 		var observer = new MutationObserver(function(mutations) {
 
-			var chatLines = chatWindow.getElementsByClassName("ember-view chat-line");
+			var chatLines = chatWindow.getElementsByClassName("chat-line");
 			var Waifu4uLines = [];
 			for (var i = 0; i < chatLines.length; i++) {
 
