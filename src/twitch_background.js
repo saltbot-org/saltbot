@@ -27,18 +27,17 @@ chrome.extension.onMessage.addListener(function(details) {
 		});
 	}
 	if (details.getTwitch !== undefined) {
-		chrome.tabs.query({
-			url : "http://www.twitch.tv/saltybet/chat"
-		}, function(result) {
-			if (result.length == 0) {
+		chrome.tabs.query({}, function(result) {
+			var urls = result.map(function(t) {return t.url;});
+			console.log(urls);
+			
+			if (urls.indexOf("http://www.twitch.tv/saltybet/chat") == -1 &&
+				urls.indexOf("https://www.twitch.tv/saltybet/chat") == -1) {
+				//no twitch tab found
 				chrome.tabs.create({
 					url : "http://www.twitch.tv/saltybet/chat"
 				}, function(tab) {
 					console.log("The new tab has the url '" + tab.url + "'");
-				});
-				chrome.tabs.query({}, function(result) {
-					var urls = result.map(function(t) {return t.url;});
-					console.log(urls);
 				});
 			}
 		});
