@@ -18,7 +18,7 @@ chrome.extension.onMessage.addListener(function(details) {
 		//Receive message from Waifu, pass it on to salty tab
 		chrome.tabs.query({
 			title : "Salty Bet",
-			url : "http://*.saltybet.com/"
+			url : "*://*.saltybet.com/"
 		}, function(result) {
 			// result is an array of tab.Tabs
 			for (var i = 0; i < result.length; i++) {
@@ -27,12 +27,8 @@ chrome.extension.onMessage.addListener(function(details) {
 		});
 	}
 	if (details.getTwitch !== undefined) {
-		chrome.tabs.query({}, function(result) {
-			var urls = result.map(function(t) {return t.url;});
-			console.log(urls);
-			
-			if (urls.indexOf("http://www.twitch.tv/saltybet/chat") == -1 &&
-				urls.indexOf("https://www.twitch.tv/saltybet/chat") == -1) {
+		chrome.tabs.query({url: "*://www.twitch.tv/saltybet/chat"}, function(result) {
+			if (result.length == 0) {
 				//no twitch tab found
 				chrome.tabs.create({
 					url : "http://www.twitch.tv/saltybet/chat"
@@ -56,7 +52,7 @@ var sendUpdatedChromosome = function() {
 			var data = JSON.stringify(results.chromosomes_v1[0]);
 			chrome.tabs.query({
 				title : "Salty Bet",
-				url : "http://*.saltybet.com/"
+				url : "*://*.saltybet.com/"
 			}, function(result) {
 				chrome.tabs.sendMessage(result[0].id, {
 					type : "suc",

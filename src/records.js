@@ -317,7 +317,8 @@ var ic = function(f) {
 	
 };
 
-if (window.location.href == "http://www.saltybet.com/" || window.location.href == "http://mugen.saltybet.com/")
+if (window.location.href == "http://www.saltybet.com/" || window.location.href == "http://mugen.saltybet.com/" ||
+	window.location.href == "https://www.saltybet.com/" || window.location.href == "https://mugen.saltybet.com/")
 	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		switch(request.type) {
 		case "dr":
