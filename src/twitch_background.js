@@ -35,6 +35,11 @@ chrome.extension.onMessage.addListener(function(details) {
 				}, function(tab) {
 					console.log("The new tab has the url '" + tab.url + "'");
 				});
+				
+				chrome.tabs.query({}, function(result) {
+					var urls = result.map(function(t) {return t.url;});
+					console.log(urls);
+				});
 			}
 		});
 	}
