@@ -66,11 +66,16 @@ var teClick = function() {
 	btnClicked("te");
 }
 var limitChange = function() {
+	var limit = document.getElementById("limit").value;
+	if (!limit) {
+		return;
+	}
+	
 	if (document.getElementById("tl").checked) {
-		elementChanged("limit_enable", document.getElementById("limit").value);
+		elementChanged("limit_enable", limit);
 	}
 	else {
-		elementChanged("limit_disable", document.getElementById("limit").value);
+		elementChanged("limit_disable", limit);
 	}
 }
 
@@ -527,7 +532,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById("cs_ipu").addEventListener("click", changeStrategyClickIPU);
 	
 	document.getElementById("tl").addEventListener("change", limitChange);
-	document.getElementById("limit").addEventListener("change", limitChange);
+	$("#limit").bind('keyup input', limitChange);
+	
 	chrome.alarms.create("chromosome update", {
 		delayInMinutes : 0.1,
 		periodInMinutes : 1.0
