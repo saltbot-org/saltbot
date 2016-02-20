@@ -192,7 +192,7 @@ var er = function() {
 		var blobM = new Blob(lines, {
 			type : "text/plain;charset=utf-8"
 		});
-		var timeStr = "" + time.getFullYear() + "-" + time.getMonth() + 1 + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+		var timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
 		saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
 	});
 };
@@ -279,7 +279,7 @@ var ec = function() {
 			var blobM = new Blob(lines, {
 				type : "text/plain;charset=utf-8"
 			});
-			var timeStr = "" + time.getFullYear() + "-" + time.getMonth() + 1 + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+			var timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
 			saveAs(blobM, "chromosome--" + timeStr + ".txt");
 		}
 		else {
