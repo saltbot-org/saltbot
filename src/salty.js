@@ -122,7 +122,7 @@ var Controller = function() {
 					var c1 = records[1];
 					var c2 = records[2];
 
-					console.log("- match result code: " + "c1:" + mr.c1 + "_c2:" + mr.c2 + "_w:" + mr.w + "_s:" + mr.sn + "_p:" + mr.pw + "_t:" + mr.t + "_m:" + mr.m + "_o:" + mr.o + "_t:" + mr.ts);
+					console.log("- match result code: " + "c1:" + mr.c1 + "|c2:" + mr.c2 + "|w:" + mr.w + "|s:" + mr.sn + "|p:" + mr.pw + "|t:" + mr.t + "|m:" + mr.m + "|o:" + mr.o + "|t:" + mr.ts);
 
 					var s = self;
 					chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1", "bettors_v1"], function(results) {

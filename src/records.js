@@ -184,6 +184,8 @@ var er = function() {
 			record += (match.hasOwnProperty("cf")) ? match.cf : 2;
 			record += ",";
 			record += (match.hasOwnProperty("if")) ? match.if : 2;
+			record += ",";
+			record += (match.hasOwnProperty("dt")) ? match.dt : new Date().toString("dd-MM-yyyy");
 			record += "\n";
 			lines.push(record);
 		}
@@ -197,6 +199,12 @@ var er = function() {
 	});
 };
 
+function parseDate(input) {
+  var parts = input.split('-');
+  // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
+  return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
+}
+
 var ir = function(f) {
 	var updater = new Updater();
 	var matchRecords = [];
@@ -204,7 +212,7 @@ var ir = function(f) {
 	var namesOfCharactersWhoAlreadyHaveRecords = [];
 
 	//numberOfProperties refers to c1, c2, w, sn, etc.
-	var numberOfProperties = 11;
+	var numberOfProperties = 12;
 	var mObj = null;
 	var lines = f.split("\n");
 	for (var i = 0; i < lines.length; i++) {
@@ -249,7 +257,9 @@ var ir = function(f) {
 				var c1Obj = updater.getCharacter(mObj.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
 				var c2Obj = updater.getCharacter(mObj.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
 				updater.updateCharactersFromMatch(mObj, c1Obj, c2Obj);
-
+				break;
+			case 11:
+				mObj.dt = parseDate(match[j]);
 				break;
 			}
 		}

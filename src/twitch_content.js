@@ -87,3 +87,8 @@ if (!triggered && document.readyState == "complete") {
 	triggered = true;
 	addListener();
 }
+
+//reload every hour
+setTimeout(function(){
+   window.location.reload(1);
+}, 3600000);

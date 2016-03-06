@@ -56,7 +56,8 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 			"o" : this.odds,
 			"ts" : this.time,
 			"cf" : this.crowdFavor,
-			"if" : this.illumFavor
+			"if" : this.illumFavor,
+			"dt" : new Date().toString("dd-MM-yyyy")
 		};
 
 		updater.updateCharactersFromMatch(mr, this.character1, this.character2);
@@ -85,6 +86,10 @@ Match.prototype.betAmount = function(tournament) {
 		if (amountToBet > balance)
 			amountToBet = balance;
 		console.log("AGGRO multiplier active, increasing bet to "+amountToBet);
+	}
+	if (amountToBet == 0) {
+		//bet at least 1
+		amountToBet = 1;
 	}
 
 	wagerBox.value = amountToBet.toString();
