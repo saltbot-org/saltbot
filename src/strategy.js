@@ -14,7 +14,7 @@ var Strategy = function(sn) {
 				   [100000, 500000, 25],
 				   [500000, 1000000, 100],
 				   [1000000, 5000000, 250],
-				   [5000000, 20000000, 300]];
+				   [5000000, 20000000, 500]];
 };
 Strategy.prototype.getBailout = function(tournament){
 	var nameSpan = document.getElementsByTagName("h2")[0].children[2];
@@ -424,6 +424,16 @@ ConfidenceScore.prototype.execute = function(info) {
 				  "  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
 				                                  "(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
 	
+	/*if (c1WP > c2WP) {
+		c1Score += winPercentageWeight;
+	}
+	else if (c2WP > c1WP) {
+		c2Score += winPercentageWeight;
+	}
+	else {
+		c1Score += 0.5*winPercentageWeight;
+		c2Score += 0.5*winPercentageWeight;
+	}*/
 	var WPSum = c1WP + c2WP;
 	if (WPSum > 0) {
 		c1Score += winPercentageWeight * c1WP/WPSum;
