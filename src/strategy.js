@@ -423,11 +423,16 @@ ConfidenceScore.prototype.execute = function(info) {
 				  "  ::  unweighted (red W:L)(blue W:L) -> ("+ c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length+")"+
 				  "  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
 				                                  "(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
-
-	if (c1WP > c2WP)
-		c1Score += winPercentageWeight;
-	else if (c1WP < c2WP)
-		c2Score += winPercentageWeight;
+	
+	var WPSum = c1WP + c2WP;
+	if (WPSum > 0) {
+		c1Score += winPercentageWeight * c1WP/WPSum;
+		c2Score += winPercentageWeight * c2WP/WPSum;
+	}
+	else {
+		c1Score += winPercentageWeight*0.5;
+		c2Score += winPercentageWeight*0.5;
+	}
 
 	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
 		if (c1Stats.averageOdds > c2Stats.averageOdds)
