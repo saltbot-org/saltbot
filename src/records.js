@@ -199,12 +199,6 @@ var er = function() {
 	});
 };
 
-function parseDate(input) {
-  var parts = input.split('-');
-  // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
-  return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
-}
-
 var ir = function(f) {
 	var updater = new Updater();
 	var matchRecords = [];
@@ -259,7 +253,7 @@ var ir = function(f) {
 				updater.updateCharactersFromMatch(mObj, c1Obj, c2Obj);
 				break;
 			case 11:
-				mObj.dt = parseDate(match[j]);
+				mObj.dt = match[j];
 				break;
 			}
 		}
