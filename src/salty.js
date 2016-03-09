@@ -70,6 +70,7 @@ var Controller = function() {
 	this.bettorsC2 = [];
 	this.settings = null;
 	this.lastMatchCumulativeBetTotal = null;
+	this.savedVideo;
 
 	var self = this;
 
@@ -306,18 +307,28 @@ Controller.prototype.ensureTwitch = function() {
 };
 Controller.prototype.removeVideoWindow = function() {
 	var killVideo = function() {
-		var parent = document.getElementById("video-embed");
-		while (parent.childNodes.length > 0) {
-			parent.removeChild(parent.childNodes[0]);
-		}
+		var parent = $("#video-embed");
+		this.savedVideo = parent.clone(true);
+		parent.remove();
 	};
 	killVideo();
-	setTimeout(killVideo, 20000);
 };
+
+Controller.prototype.enableVideoWindow = function() {
+	var enableVideo = function() {
+		if (this.savedVideo && $("#video-embed").length == 0) {
+			this.savedVideo.appendTo($("#stream"));
+		}
+	};
+	enableVideo();
+};
+
 Controller.prototype.toggleVideoWindow = function() {
 	this.settings.video = !this.settings.video;
 	if (!this.settings.video)
 		this.removeVideoWindow();
+	else
+		this.enableVideoWindow();
 	this.saveSettings("- settings updated, video: " + this.settings.video);
 };
 Controller.prototype.toggleAggro = function() {
