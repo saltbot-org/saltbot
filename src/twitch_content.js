@@ -32,20 +32,20 @@ $.fn.waitUntilExists    = function (handler, shouldRunHandlerOnce, isChild) {
 var addListener = function() {
 	$(".scroll.chat-messages.js-chat-messages").waitUntilExists(function() {
 		// put a mutation observer on the chat which reports back to the main content script whenever Waifu speaks
-		var chatWindow = document.getElementsByClassName("scroll chat-messages js-chat-messages")[0];
+		var chatWindow = $(".scroll.chat-messages.js-chat-messages")[0];
 		var oldWaifuMessages = [];
 		var observer = new MutationObserver(function(mutations) {
 
-			var chatLines = chatWindow.getElementsByClassName("chat-line");
+			var chatLines = $(chatWindow).find(".chat-line");
 			var Waifu4uLines = [];
 			for (var i = 0; i < chatLines.length; i++) {
 
 				var line = chatLines[i];
-				var from = line.getElementsByClassName("from")[0].innerHTML;
+				var from = $(line).find(".from")[0].innerHTML;
 
 				if (from == "Waifu4u") {
 
-					var message = line.getElementsByClassName("message")[0].innerHTML;
+					var message = $(line).find(".message")[0].innerHTML;
 					if (oldWaifuMessages.indexOf(message) == -1) {
 						oldWaifuMessages.push(message);
 						Waifu4uLines.push(message);

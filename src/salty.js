@@ -14,7 +14,7 @@ var StatusScanner = function() {
 	var self = this;
 	this.announcements = [];
 	// find element and create an observer instance
-	var status = document.getElementById("betstatus");
+	var status = $("#betstatus")[0];
 	var observer = new MutationObserver(function(mutations) {
 		self.announcements.push(status.innerHTML);
 		// console.log("- status bar updated: " + status.innerHTML);
@@ -83,7 +83,7 @@ var Controller = function() {
 		self.ticksSinceMatchBegan += 1;
 
 		//check to see if the betting buttons are visible
-		var bettingTable = document.getElementsByClassName("dynamic-view")[0];
+		var bettingTable = $(".dynamic-view")[0];
 		var styleObj = window.getComputedStyle(bettingTable, null);
 		var active = styleObj.display != "none";
 		if (!active)
@@ -464,7 +464,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 				setTimeout(function() {
 					//save the odds
 					try {
-						var oddsBox = document.getElementById("lastbet");
+						var oddsBox = $("#lastbet")[0];
 						// var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
 						var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
 						var c2Odds = oddsBox.childNodes[oddsBox.childNodes.length - 1].innerHTML;
@@ -474,7 +474,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					}
 					//save the betting totals
 					try {
-						var moneyText = document.getElementById("odds").innerHTML.replace(/,/g, "");
+						var moneyText = $("#odds")[0].innerHTML.replace(/,/g, "");
 						var mtMatches = null;
 						var regex = /\$([0-9]*)/g;
 						if (regex.test(moneyText)) {
@@ -488,13 +488,13 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					}
 
 					// save the crowd favor and the illuminati favor
-					var betsForC1 = document.getElementById("sbettors1");
-					var betsForC2 = document.getElementById("sbettors2");
+					var betsForC1 = $("#sbettors1")[0];
+					var betsForC2 = $("#sbettors2")[0];
 					try {
-						var crowdSizeC1 = betsForC1.getElementsByClassName("bettor-line").length;
-						var crowdSizeC2 = betsForC2.getElementsByClassName("bettor-line").length;
-						var illumSizeC1 = betsForC1.getElementsByClassName("goldtext").length;
-						var illumSizeC2 = betsForC2.getElementsByClassName("goldtext").length;
+						var crowdSizeC1 = $(betsForC1).find(".bettor-line").length;
+						var crowdSizeC2 = $(betsForC2).find(".bettor-line").length;
+						var illumSizeC1 = $(betsForC1).find(".goldtext").length;
+						var illumSizeC2 = $(betsForC2).find(".goldtext").length;
 						if (crowdSizeC1 == crowdSizeC2)
 							self.crowdFavor = 2;
 						else
@@ -509,16 +509,16 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					}
 					// save bettor records
 					try {
-						var crowdC1 = betsForC1.getElementsByClassName("bettor-line");
-						var crowdC2 = betsForC2.getElementsByClassName("bettor-line");
+						var crowdC1 = $(betsForC1).find(".bettor-line");
+						var crowdC2 = $(betsForC2).find(".bettor-line");
 						self.bettorsC1 = [];
 						self.bettorsC2 = [];
 						for (var i = 0; i < crowdC1.length; i++) {
-							var e = crowdC1[i].getElementsByTagName("strong")[0];
+							var e = $(crowdC1[i]).find("strong")[0];
 							self.bettorsC1.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 						for (var j = 0; j < crowdC2.length; j++) {
-							var e = crowdC2[j].getElementsByTagName("strong")[0];
+							var e = $(crowdC2[j]).find("strong")[0];
 							self.bettorsC2.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 					} catch(e) {
