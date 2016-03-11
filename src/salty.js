@@ -255,11 +255,22 @@ var Controller = function() {
 					self.currentMatch = new Match(new Observer());
 					break;
 				}
+				
+				//get the mode from the footer
+				var modeInfo = $("#footer-alert")[0].innerHTML;
+				if (modeInfo.indexOf("bracket") > -1 || modeInfo.indexOf("FINAL ROUND") > -1 || modeInfo.indexOf("Tournament mode start") > -1)
+					self.currentMatch.mode = "t";
+				else if (modeInfo.toUpperCase().indexOf("EXHIBITION") > -1)
+					self.currentMatch.mode = "e";
+				else if (modeInfo.indexOf("until the next tournament") > -1)
+					self.currentMatch.mode = "m";
+				else
+					self.currentMatch.mode = "U";
+				
 				//set aggro:
 				self.currentMatch.setAggro(self.settings.aggro);
 				if (self.infoFromWaifu.length > 0) {
-					//copy mode and tier from infoFromWaifu
-					self.currentMatch.mode = self.infoFromWaifu[self.infoFromWaifu.length - 1].mode;
+					//copy tier from infoFromWaifu
 					self.currentMatch.tier = self.infoFromWaifu[self.infoFromWaifu.length - 1].tier;
 				}
 
@@ -309,15 +320,17 @@ Controller.prototype.removeVideoWindow = function() {
 	var killVideo = function() {
 		var parent = $("#video-embed");
 		this.savedVideo = parent.clone(true);
-		parent.remove();
+		parent[0].innerHTML = "";
 	};
 	killVideo();
 };
 
 Controller.prototype.enableVideoWindow = function() {
 	var enableVideo = function() {
-		if (this.savedVideo && $("#video-embed").length == 0) {
+		if (this.savedVideo && $("#video-embed")[0].innerHTML == "") {
+			$("#video-embed").remove();
 			this.savedVideo.appendTo($("#stream"));
+			this.savedVideo = null;
 		}
 	};
 	enableVideo();
@@ -433,12 +446,9 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					matches = regexLoose.exec(message);
 					matches.push(matches[3]);
 					if (matches[3] == "") {
-						//no mode detected, set to U
+						//no tier detected, set to U
 						matches[3] = "U";
 					}
-					
-					//set tier to U
-					matches[3] = "U";
 				}
 				if (matches[4].indexOf("matchmaking") > -1)
 					matches[4] = "m";
