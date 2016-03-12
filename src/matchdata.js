@@ -63,6 +63,10 @@ chrome.storage.local.get("matches_v1", function(result) {
 		lengthMenu: [ 15, 25, 50, 100 ],
 		initComplete: function(settings, json) {
 			$("#loading").hide();
-		}
+		},
+		createdRow: function ( row, data, index ) {
+            $('td', row).eq(data.w).addClass('highlight');
+        },
+		deferRender: true,
 	});
 });
