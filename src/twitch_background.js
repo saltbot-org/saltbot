@@ -1,3 +1,32 @@
+var reimportMatches = function() {
+	chrome.storage.local.get(["matches_v1"], function(results) {
+		if (results.matches_v1) {
+			var updater = new Updater();
+			
+			var characterRecords = [];
+			var namesOfCharactersWhoAlreadyHaveRecords = [];
+			
+			for (var i = 0; i < results.matches_v1.length; i++) {
+				var match = results.matches_v1[i];
+				var c1Obj = updater.getCharacter(match.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
+				var c2Obj = updater.getCharacter(match.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
+				updater.updateCharactersFromMatch(match, c1Obj, c2Obj);
+			}
+			
+			var nmr = results.matches_v1.length;
+			var ncr = characterRecords.length;
+			
+			chrome.storage.local.set({
+				'characters_v1' : characterRecords
+			}, function() {
+				console.log("-\nrecords reimported:\n" + nmr + " match records\n" + ncr + " character records");
+			});
+		}
+		
+		
+	});
+}
+
 chrome.runtime.onInstalled.addListener(function() {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
         chrome.declarativeContent.onPageChanged.addRules([{
@@ -11,6 +40,8 @@ chrome.runtime.onInstalled.addListener(function() {
             actions: [new chrome.declarativeContent.ShowPageAction()]
         }]);
     });
+	
+	reimportMatches();
 });
 
 chrome.extension.onMessage.addListener(function(details) {
