@@ -15,6 +15,7 @@ var Character = function(name) {
 	this.crowdFavor = [];
 	this.illumFavor = [];
 	this.tiers = [];
+	this.totalFights = [];
 };
 
 var Updater = function() {
@@ -82,12 +83,42 @@ Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
 		c2Obj.losses.push(mObj.t);
 		c1Obj.winTimes.push(mObj.ts);
 		c2Obj.lossTimes.push(mObj.ts);
+		
+		c1Obj.totalFights.push(1);
+		c2Obj.totalFights.push(0);
 	} else if (mObj.w == 1) {
 		c2Obj.wins.push(mObj.t);
 		c1Obj.losses.push(mObj.t);
 		c2Obj.winTimes.push(mObj.ts);
 		c1Obj.lossTimes.push(mObj.ts);
+		
+		c1Obj.totalFights.push(0);
+		c2Obj.totalFights.push(1);
 	}
+	
+	var limitRecordsTo = function(charObj, limit) {
+		if (charObj.totalFights.length > limit) {
+			if (charObj.totalFights[0] == 0) {
+				charObj.losses.shift();
+				charObj.lossTimes.shift();
+			}
+				
+			else {
+				charObj.wins.shift();
+				charObj.winTimes.shift();
+			}
+			
+			charObj.totalFights.shift();
+			charObj.odds.shift();
+			charObj.tiers.shift();
+			
+			if (charObj.crowdFavor.length > limit) {
+				charObj.crowdFavor.shift();
+				charObj.illumFavor.shift();
+			}
+		}
+	}
+	
 	// this.tiers will correspond with the odds
 	if (mObj.o != null && mObj.o != "U") {
 		var oc1 = parseFloat(mObj.o.split(":")[0]);
@@ -117,6 +148,9 @@ Updater.prototype.updateCharactersFromMatch = function(mObj, c1Obj, c2Obj) {
 			c2Obj.illumFavor.push(1);
 		}
 	}
+	
+	limitRecordsTo(c1Obj, 15);
+	limitRecordsTo(c2Obj, 15);
 
 };
 
@@ -199,12 +233,6 @@ var er = function() {
 	});
 };
 
-function parseDate(input) {
-  var parts = input.split('-');
-  // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
-  return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
-}
-
 var ir = function(f) {
 	var updater = new Updater();
 	var matchRecords = [];
@@ -253,13 +281,13 @@ var ir = function(f) {
 				break;
 			case 10:
 				mObj.if = parseInt(match[j]);
+				break;
+			case 11:
+				mObj.dt = match[j];
 				matchRecords.push(mObj);
 				var c1Obj = updater.getCharacter(mObj.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
 				var c2Obj = updater.getCharacter(mObj.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
 				updater.updateCharactersFromMatch(mObj, c1Obj, c2Obj);
-				break;
-			case 11:
-				mObj.dt = parseDate(match[j]);
 				break;
 			}
 		}

@@ -68,13 +68,13 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 	}
 };
 Match.prototype.getBalance = function(){
-	var balanceBox = document.getElementById("balance");
+	var balanceBox = $("#balance")[0];
 	var balance = parseInt(balanceBox.innerHTML.replace(/,/g, ""));
 	return balance;
 }
 Match.prototype.betAmount = function(tournament) {
 	var balance = this.getBalance();
-	var wagerBox = document.getElementById("wager");
+	var wagerBox = $("#wager")[0];
 	var amountToBet;
 	var strategy = this.strategy;
 	var debug = true;
@@ -130,7 +130,7 @@ Match.prototype.init = function() {
 				var tournamentModeIndicator = "characters are left in the bracket!";
 				var tournamentModeIndicator2 = "Tournament mode start";
 				var tournamentModeIndicator3 = "FINAL ROUND! Stay tuned for exhibitions after the tournament!";
-				var footer = document.getElementById("footer-alert");
+				var footer = $("#footer-alert")[0];
 				var tournament = footer != null && (footer.innerHTML.indexOf(tournamentModeIndicator) > -1 || footer.innerHTML.indexOf(tournamentModeIndicator2) > -1 ||
 													footer.innerHTML.indexOf(tournamentModeIndicator3) > -1);
 

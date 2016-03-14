@@ -1,8 +1,8 @@
 var Strategy = function(sn) {
-	this.btn10 = document.getElementById("interval1");
-	this.btn50 = document.getElementById("interval5");
-	this.btnP1 = document.getElementById("player1");
-	this.btnP2 = document.getElementById("player2");
+	this.btn10 = $("#interval1")[0];
+	this.btn50 = $("#interval5")[0];
+	this.btnP1 = $("#player1")[0];
+	this.btnP2 = $("#player2")[0];
 	this.p1name = this.btnP1.getAttribute("value");
 	this.p2name = this.btnP2.getAttribute("value");
 	this.strategyName = sn;
@@ -14,10 +14,10 @@ var Strategy = function(sn) {
 				   [100000, 500000, 25],
 				   [500000, 1000000, 100],
 				   [1000000, 5000000, 250],
-				   [5000000, 20000000, 300]];
+				   [5000000, 20000000, 500]];
 };
 Strategy.prototype.getBailout = function(tournament){
-	var nameSpan = document.getElementsByTagName("h2")[0].children[2];
+	var nameSpan = $("h2")[0].children[2];
 	var isIlluminati = false;
 	try { // the html is different for illuminati??
 		isIlluminati = nameSpan && nameSpan.children[0].classList && nameSpan.children[0].classList.contains("goldtext");
@@ -25,7 +25,7 @@ Strategy.prototype.getBailout = function(tournament){
 		isIlluminati = nameSpan && nameSpan.classList && nameSpan.classList.contains("goldtext");
 	}
 	var level = 1;
-	var rank = document.getElementById("rank");
+	var rank = $("#rank")[0];
 	if (rank!=null){
 		var re=/rank([0-9]{1,2})\.png/g;
 		var match=re.exec(rank.childNodes[0].src);
@@ -423,11 +423,26 @@ ConfidenceScore.prototype.execute = function(info) {
 				  "  ::  unweighted (red W:L)(blue W:L) -> ("+ c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length+")"+
 				  "  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
 				                                  "(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
-
-	if (c1WP > c2WP)
+	
+	/*if (c1WP > c2WP) {
 		c1Score += winPercentageWeight;
-	else if (c1WP < c2WP)
+	}
+	else if (c2WP > c1WP) {
 		c2Score += winPercentageWeight;
+	}
+	else {
+		c1Score += 0.5*winPercentageWeight;
+		c2Score += 0.5*winPercentageWeight;
+	}*/
+	var WPSum = c1WP + c2WP;
+	if (WPSum > 0) {
+		c1Score += winPercentageWeight * c1WP/WPSum;
+		c2Score += winPercentageWeight * c2WP/WPSum;
+	}
+	else {
+		c1Score += winPercentageWeight*0.5;
+		c2Score += winPercentageWeight*0.5;
+	}
 
 	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
 		if (c1Stats.averageOdds > c2Stats.averageOdds)

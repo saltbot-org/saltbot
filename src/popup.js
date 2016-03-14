@@ -74,12 +74,12 @@ var teClick = function() {
 	btnClicked("te");
 }
 var limitChange = function() {
-	var limit = document.getElementById("limit").value;
+	var limit = $("#limit")[0].value;
 	if (!limit) {
 		return;
 	}
 	
-	if (document.getElementById("tl").checked) {
+	if ($("#tl")[0].checked) {
 		elementChanged("limit_enable", limit);
 	}
 	else {
@@ -119,7 +119,7 @@ var onFileReadChromosome = function(e) {
 }
 var irClick = function() {
 	console.log("Attempting records import...");
-	var files = document.getElementById('upload_r').files;
+	var files = $("#upload_r")[0].files;
 	if(files.length>0)
 		console.log("Upload successful.");
 	else 
@@ -133,7 +133,7 @@ var irClick = function() {
 };
 var icClick = function() {
 	console.log("Attempting chromosome import...");
-	var files = document.getElementById('upload_c').files;
+	var files = $("#upload_c")[0].files;
 	if(files.length>0)
 		console.log("Upload successful.");
 	else 
@@ -218,18 +218,18 @@ Simulator.prototype.evalMutations = function(mode) {
 					orders.push(new Order("cs", new Chromosome().loadFromObject(chromosomes[z])));
 			} else {
 				var msg = "Pool not initialized.";
-				document.getElementById('msgbox').value = msg;
+				$("#msgbox")[0].value = msg;
 				throw msg;
 			}
 		} else if (mode == "mass") {
 
 			orders.push(new Order("cs", new Chromosome().loadFromObject(results.chromosomes_v1[0])));
 		} else {
-			if (document.getElementById("ct").checked)
+			if ($("#ct")[0].checked)
 				orders.push(new Order("ct"));
-			if (document.getElementById("cs").checked)
+			if ($("#cs")[0].checked)
 				orders.push(new Order("cs", new Chromosome().loadFromObject(results.chromosomes_v1[0])));
-			if (document.getElementById("rc").checked)
+			if ($("#rc")[0].checked)
 				orders.push(new Order("rc"));
 		}
 
@@ -443,7 +443,7 @@ Simulator.prototype.evalMutations = function(mode) {
 				}, function() {
 					roundsOfEvolution += 1;
 					console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "%m -> " + bestPercent.toFixed(1) + "%c, $" + bestMoney.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "   -----------------\n\n");
-					document.getElementById('msgbox').value = "g(" + roundsOfEvolution + "), best: " + bestPercent.toFixed(1) + "%, $" + bestMoney.toFixed(0);
+					$("#msgbox")[0].value = "g(" + roundsOfEvolution + "), best: " + bestPercent.toFixed(1) + "%, $" + bestMoney.toFixed(0);
 					setTimeout(function() {
 						simulator.evalMutations("evolution");
 					}, 5000);
@@ -499,7 +499,7 @@ Simulator.prototype.initializePool = function() {
 	chrome.storage.local.set({
 		'chromosomes_v1' : newPool
 	}, function() {
-		document.getElementById('msgbox').value = "initial pool population complete";
+		$("#msgbox")[0].value = "initial pool population complete";
 	});
 
 };
@@ -510,36 +510,36 @@ roundsOfEvolution = 0;
 document.addEventListener('DOMContentLoaded', function() {
 	chrome.storage.local.get('settings_v1', function(result) {
 		if (result) {
-			document.getElementById("tl").checked = result.settings_v1.limit_enabled;
-			document.getElementById("limit").value = result.settings_v1.limit || 10000;
-			console.log(document.getElementById("tl"));
-			console.log(document.getElementById("limit").value);
+			$("#tl")[0].checked = result.settings_v1.limit_enabled;
+			$("#limit")[0].value = result.settings_v1.limit || 10000;
+			console.log($("#tl")[0]);
+			console.log($("#limit")[0].value);
 		}
 		console.log(result);
 	});
 	
 	
-	document.getElementById("bdr").addEventListener("click", drClick);
-	document.getElementById("bpr").addEventListener("click", prClick);
-	document.getElementById("ber").addEventListener("click", erClick);
-	document.getElementById("bir").addEventListener("change", irClick);
-	document.getElementById("bec").addEventListener("click", ecClick);
-	document.getElementById("bic").addEventListener("change", icClick);
-	document.getElementById("ugw").addEventListener("click", function() {
+	$("#bdr")[0].addEventListener("click", drClick);
+	$("#bpr")[0].addEventListener("click", prClick);
+	$("#ber")[0].addEventListener("click", erClick);
+	$("#bir")[0].addEventListener("change", irClick);
+	$("#bec")[0].addEventListener("click", ecClick);
+	$("#bic")[0].addEventListener("change", icClick);
+	$("#ugw")[0].addEventListener("click", function() {
 		simulator.evalMutations("evolution");
 	});
-	document.getElementById("rgw").addEventListener("click", function() {
+	$("#rgw")[0].addEventListener("click", function() {
 		simulator.initializePool();
 	});
-	document.getElementById("tv").addEventListener("click", tvClick);
-	document.getElementById("ta").addEventListener("click", taClick);
-	document.getElementById("te").addEventListener("click", teClick);
-	document.getElementById("cs_o").addEventListener("click", changeStrategyClickO);
-	document.getElementById("cs_cs").addEventListener("click", changeStrategyClickCS);
-	document.getElementById("cs_rc").addEventListener("click", changeStrategyClickRC);
-	document.getElementById("cs_ipu").addEventListener("click", changeStrategyClickIPU);
+	$("#tv")[0].addEventListener("click", tvClick);
+	$("#ta")[0].addEventListener("click", taClick);
+	$("#te")[0].addEventListener("click", teClick);
+	$("#cs_o")[0].addEventListener("click", changeStrategyClickO);
+	$("#cs_cs")[0].addEventListener("click", changeStrategyClickCS);
+	$("#cs_rc")[0].addEventListener("click", changeStrategyClickRC);
+	$("#cs_ipu")[0].addEventListener("click", changeStrategyClickIPU);
 	
-	document.getElementById("tl").addEventListener("change", limitChange);
+	$("#tl")[0].addEventListener("change", limitChange);
 	$("#limit").bind('keyup input', limitChange);
 	
 	chrome.alarms.create("chromosome update", {

@@ -14,7 +14,7 @@ var StatusScanner = function() {
 	var self = this;
 	this.announcements = [];
 	// find element and create an observer instance
-	var status = document.getElementById("betstatus");
+	var status = $("#betstatus")[0];
 	var observer = new MutationObserver(function(mutations) {
 		self.announcements.push(status.innerHTML);
 		// console.log("- status bar updated: " + status.innerHTML);
@@ -70,6 +70,7 @@ var Controller = function() {
 	this.bettorsC2 = [];
 	this.settings = null;
 	this.lastMatchCumulativeBetTotal = null;
+	this.savedVideo;
 
 	var self = this;
 
@@ -82,7 +83,7 @@ var Controller = function() {
 		self.ticksSinceMatchBegan += 1;
 
 		//check to see if the betting buttons are visible
-		var bettingTable = document.getElementsByClassName("dynamic-view")[0];
+		var bettingTable = $(".dynamic-view")[0];
 		var styleObj = window.getComputedStyle(bettingTable, null);
 		var active = styleObj.display != "none";
 		if (!active)
@@ -254,11 +255,22 @@ var Controller = function() {
 					self.currentMatch = new Match(new Observer());
 					break;
 				}
+				
+				//get the mode from the footer
+				var modeInfo = $("#footer-alert")[0].innerHTML;
+				if (modeInfo.indexOf("bracket") > -1 || modeInfo.indexOf("FINAL ROUND") > -1 || modeInfo.indexOf("Tournament mode start") > -1)
+					self.currentMatch.mode = "t";
+				else if (modeInfo.toUpperCase().indexOf("EXHIBITION") > -1)
+					self.currentMatch.mode = "e";
+				else if (modeInfo.indexOf("until the next tournament") > -1)
+					self.currentMatch.mode = "m";
+				else
+					self.currentMatch.mode = "U";
+				
 				//set aggro:
 				self.currentMatch.setAggro(self.settings.aggro);
 				if (self.infoFromWaifu.length > 0) {
-					//copy mode and tier from infoFromWaifu
-					self.currentMatch.mode = self.infoFromWaifu[self.infoFromWaifu.length - 1].mode;
+					//copy tier from infoFromWaifu
 					self.currentMatch.tier = self.infoFromWaifu[self.infoFromWaifu.length - 1].tier;
 				}
 
@@ -306,18 +318,30 @@ Controller.prototype.ensureTwitch = function() {
 };
 Controller.prototype.removeVideoWindow = function() {
 	var killVideo = function() {
-		var parent = document.getElementById("video-embed");
-		while (parent.childNodes.length > 0) {
-			parent.removeChild(parent.childNodes[0]);
-		}
+		var parent = $("#video-embed");
+		this.savedVideo = parent.clone(true);
+		parent[0].innerHTML = "";
 	};
 	killVideo();
-	setTimeout(killVideo, 20000);
 };
+
+Controller.prototype.enableVideoWindow = function() {
+	var enableVideo = function() {
+		if (this.savedVideo && $("#video-embed")[0].innerHTML == "") {
+			$("#video-embed").remove();
+			this.savedVideo.appendTo($("#stream"));
+			this.savedVideo = null;
+		}
+	};
+	enableVideo();
+};
+
 Controller.prototype.toggleVideoWindow = function() {
 	this.settings.video = !this.settings.video;
 	if (!this.settings.video)
 		this.removeVideoWindow();
+	else
+		this.enableVideoWindow();
 	this.saveSettings("- settings updated, video: " + this.settings.video);
 };
 Controller.prototype.toggleAggro = function() {
@@ -422,12 +446,9 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					matches = regexLoose.exec(message);
 					matches.push(matches[3]);
 					if (matches[3] == "") {
-						//no mode detected, set to U
+						//no tier detected, set to U
 						matches[3] = "U";
 					}
-					
-					//set tier to U
-					matches[3] = "U";
 				}
 				if (matches[4].indexOf("matchmaking") > -1)
 					matches[4] = "m";
@@ -453,7 +474,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 				setTimeout(function() {
 					//save the odds
 					try {
-						var oddsBox = document.getElementById("lastbet");
+						var oddsBox = $("#lastbet")[0];
 						// var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
 						var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
 						var c2Odds = oddsBox.childNodes[oddsBox.childNodes.length - 1].innerHTML;
@@ -463,7 +484,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					}
 					//save the betting totals
 					try {
-						var moneyText = document.getElementById("odds").innerHTML.replace(/,/g, "");
+						var moneyText = $("#odds")[0].innerHTML.replace(/,/g, "");
 						var mtMatches = null;
 						var regex = /\$([0-9]*)/g;
 						if (regex.test(moneyText)) {
@@ -477,13 +498,13 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					}
 
 					// save the crowd favor and the illuminati favor
-					var betsForC1 = document.getElementById("sbettors1");
-					var betsForC2 = document.getElementById("sbettors2");
+					var betsForC1 = $("#sbettors1")[0];
+					var betsForC2 = $("#sbettors2")[0];
 					try {
-						var crowdSizeC1 = betsForC1.getElementsByClassName("bettor-line").length;
-						var crowdSizeC2 = betsForC2.getElementsByClassName("bettor-line").length;
-						var illumSizeC1 = betsForC1.getElementsByClassName("goldtext").length;
-						var illumSizeC2 = betsForC2.getElementsByClassName("goldtext").length;
+						var crowdSizeC1 = $(betsForC1).find(".bettor-line").length;
+						var crowdSizeC2 = $(betsForC2).find(".bettor-line").length;
+						var illumSizeC1 = $(betsForC1).find(".goldtext").length;
+						var illumSizeC2 = $(betsForC2).find(".goldtext").length;
 						if (crowdSizeC1 == crowdSizeC2)
 							self.crowdFavor = 2;
 						else
@@ -498,16 +519,16 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					}
 					// save bettor records
 					try {
-						var crowdC1 = betsForC1.getElementsByClassName("bettor-line");
-						var crowdC2 = betsForC2.getElementsByClassName("bettor-line");
+						var crowdC1 = $(betsForC1).find(".bettor-line");
+						var crowdC2 = $(betsForC2).find(".bettor-line");
 						self.bettorsC1 = [];
 						self.bettorsC2 = [];
 						for (var i = 0; i < crowdC1.length; i++) {
-							var e = crowdC1[i].getElementsByTagName("strong")[0];
+							var e = $(crowdC1[i]).find("strong")[0];
 							self.bettorsC1.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 						for (var j = 0; j < crowdC2.length; j++) {
-							var e = crowdC2[j].getElementsByTagName("strong")[0];
+							var e = $(crowdC2[j]).find("strong")[0];
 							self.bettorsC2.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 					} catch(e) {
