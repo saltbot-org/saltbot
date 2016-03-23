@@ -1,3 +1,9 @@
+chrome.runtime.sendMessage({
+	browserAction: true
+}, function(response) {
+	console.debug("Activated browser action");
+});
+
 var Settings = function() {
 	this.nextStrategy = null;
 	this.video = true;

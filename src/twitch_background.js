@@ -29,22 +29,13 @@ var reimportMatches = function() {
 
 chrome.runtime.onInstalled.addListener(function() {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-        chrome.declarativeContent.onPageChanged.addRules([{
-            conditions: [
-                new chrome.declarativeContent.PageStateMatcher({
-                    pageUrl: {
-                        hostSuffix: 'saltybet.com'
-                    }
-                })
-            ],
-            actions: [new chrome.declarativeContent.ShowPageAction()]
-        }]);
+        
     });
 	
 	reimportMatches();
 });
 
-chrome.extension.onMessage.addListener(function(details) {
+chrome.extension.onMessage.addListener(function(details, sender, sendResponse) {
 	if (details.message !== undefined) {
 		//Receive message from Waifu, pass it on to salty tab
 		chrome.tabs.query({
@@ -73,6 +64,10 @@ chrome.extension.onMessage.addListener(function(details) {
 				});
 			}
 		});
+	}
+	
+	if (details.browserAction !== undefined) {
+		chrome.pageAction.show(sender.tab.id);
 	}
 });
 var sendUpdatedChromosome = function() {
