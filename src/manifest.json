@@ -3,7 +3,7 @@
 
 	"name": "SaltBot",
 	"description": "This extension automates betting on SaltyBet.com.",
-	"version": "2.2.6",
+	"version": "2.2.7",
 	"permissions": ["storage", "unlimitedStorage", "declarativeContent", "tabs", "alarms"],
 	"content_scripts": [
 		{
