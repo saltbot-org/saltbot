@@ -260,7 +260,7 @@ var Controller = function() {
 				}
 				
 				//get the mode from the footer
-				var modeInfo = lastFooterMessage;
+				var modeInfo = this.lastFooterMessage;
 				if (modeInfo.indexOf("bracket") > -1 || modeInfo.indexOf("FINAL ROUND") > -1 || modeInfo.indexOf("Tournament mode start") > -1)
 					self.currentMatch.mode = "t";
 				else if (modeInfo.toUpperCase().indexOf("EXHIBITION") > -1)
