@@ -70,7 +70,8 @@ var Controller = function() {
 	this.bettorsC2 = [];
 	this.settings = null;
 	this.lastMatchCumulativeBetTotal = null;
-	this.savedVideo;
+	this.savedVideo = null;
+	this.lastFooterMessage = null;
 
 	var self = this;
 
@@ -82,10 +83,10 @@ var Controller = function() {
 
 		self.ticksSinceMatchBegan += 1;
 
-		//check to see if the betting buttons are visible
+		//check to see if the betting buttons are visible and the footer message already changed
 		var bettingTable = $(".dynamic-view")[0];
 		var styleObj = window.getComputedStyle(bettingTable, null);
-		var active = styleObj.display != "none";
+		var active = styleObj.display != "none" && $("#footer-alert")[0].innerHTML != this.lastFooterMessage;
 		if (!active)
 			bettingAvailable = false;
 
@@ -216,6 +217,8 @@ var Controller = function() {
 				}				
 			}
 			
+			this.lastFooterMessage = $("#footer-alert")[0].innerHTML;
+			
 			//set up next strategy
 			if (matchesProcessed == 0 && self.bestChromosome==null) {
 				//always observe the first match in the cycle, due to chrome alarm mandatory timing delay
@@ -257,7 +260,7 @@ var Controller = function() {
 				}
 				
 				//get the mode from the footer
-				var modeInfo = $("#footer-alert")[0].innerHTML;
+				var modeInfo = lastFooterMessage;
 				if (modeInfo.indexOf("bracket") > -1 || modeInfo.indexOf("FINAL ROUND") > -1 || modeInfo.indexOf("Tournament mode start") > -1)
 					self.currentMatch.mode = "t";
 				else if (modeInfo.toUpperCase().indexOf("EXHIBITION") > -1)
@@ -313,7 +316,7 @@ Controller.prototype.ensureTwitch = function() {
 	chrome.runtime.sendMessage({
 		getTwitch : true
 	}, function(response) {
-		console.log("response received in salty");
+		console.debug("response received in salty");
 	});
 };
 Controller.prototype.removeVideoWindow = function() {
