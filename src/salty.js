@@ -425,6 +425,9 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 				self.settings.level = 0;
 				self.saveSettings("- settings upgraded");
 			}
+			if (self.settings.exhibitions === undefined) {
+				self.settings.exhibitions = true;
+			}
 		} else {
 			self.settings = new Settings();
 			self.settings.nextStrategy = "o";
