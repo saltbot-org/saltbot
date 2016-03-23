@@ -77,7 +77,7 @@ var Controller = function() {
 	this.settings = null;
 	this.lastMatchCumulativeBetTotal = null;
 	this.savedVideo = null;
-	this.lastFooterMessage = null;
+	this.lastFooterMessage = $("#footer-alert").length ? $("#footer-alert")[0].innerHTML : null;
 
 	var self = this;
 
