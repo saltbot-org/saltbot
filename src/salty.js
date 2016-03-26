@@ -420,7 +420,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 			if (!self.settings.video)
 				self.removeVideoWindow();
 			if(self.settings.aggro)
-				console.log("aggro state: "+aggro);
+				console.log("aggro state: "+self.settings.aggro);
 			if (!self.settings.level) {
 				self.settings.level = 0;
 				self.saveSettings("- settings upgraded");
