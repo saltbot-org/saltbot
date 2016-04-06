@@ -92,18 +92,16 @@ var Controller = function() {
 		//check to see if the betting buttons are visible and the footer message already changed
 		var bettingTable = $(".dynamic-view")[0];
 		var styleObj = window.getComputedStyle(bettingTable, null);
-		var active = styleObj.display != "none" && $("#footer-alert")[0].innerHTML != this.lastFooterMessage;
-		if (!active)
-			bettingAvailable = false;
+		bettingAvailable = styleObj.display != "none" && $("#footer-alert")[0].innerHTML != this.lastFooterMessage;
 
-		if (active && bettingComplete == true) {
-			bettingAvailable = true;
+		if (bettingAvailable && bettingComplete) {
 			bettingEntered = false;
 			bettingComplete = false;
 		}
 
 		if (bettingAvailable && !bettingEntered) {
-
+			bettingEntered = true;
+			
 			//Deal with old match
 			if (self.currentMatch != null) {
 				var winner = self.statusScanner.getWinner();
@@ -305,13 +303,10 @@ var Controller = function() {
 			}
 			
 			matchesProcessed += 1;
-			//this may be a little out of asynch but I don't think it matters
-			bettingEntered = true;
 		}
 
-		if (!active && bettingEntered) {
+		if (!bettingAvailable && bettingEntered) {
 			bettingComplete = true;
-			bettingAvailable = false;
 		}
 
 	}, timerInterval);
