@@ -1,146 +1,125 @@
 //enable links
-$(document).ready(function(){
-   $('body').on('click', 'a', function(){
-     chrome.tabs.create({url: $(this).attr('href')});
-     return false;
-   });
+$(document).ready(function () {
+	$('body').on('click', 'a', function () {
+		chrome.tabs.create({url: $(this).attr('href')});
+		return false;
+	});
 });
 
-$(document).ready(function() {
-	$("#upload_c").on("click", function(e) {
+$(document).ready(function () {
+	$("#upload_c").on("click", function (e) {
 		e.stopPropagation();
 	});
-	$("#upload_r").on("click", function(e) {
+	$("#upload_r").on("click", function (e) {
 		e.stopPropagation();
 	});
-	
+
 	$("#bic").on("click", function (e) {
-		$('#upload_c').trigger('click');		
+		$('#upload_c').trigger('click');
 	});
 	$("#bir").on("click", function (e) {
 		$('#upload_r').trigger('click');
 	});
 });
 
-var elementChanged = function(changetype, data) {
-	data = data || null;
-	chrome.tabs.query({
-		active : true,
-		currentWindow : true
-	}, function(tabs) {
-		chrome.tabs.sendMessage(tabs[0].id, {
-			type : changetype,
-			text : data
-		}, function(response) {
-			console.log(response.farewell);
-		});
-	});
+var elementChanged = function (changetype, data) {
+	btnClicked(changetype, data);
 }
 
-var btnClicked = function(clicktype, data) {
+var btnClicked = function (clicktype, data) {
 	data = data || null;
 	chrome.tabs.query({
-		active : true,
-		currentWindow : true
-	}, function(tabs) {
+		active: true,
+		currentWindow: true
+	}, function (tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, {
-			type : clicktype,
-			text : data
-		}, function(response) {
+			type: clicktype,
+			text: data
+		}, function (response) {
 			console.log(response.farewell);
 		});
 	});
 };
 
-var drClick = function() {
-	btnClicked("dr");
-};
-var prClick = function() {
-	btnClicked("pr");
-};
-var erClick = function() {
+var erClick = function () {
 	btnClicked("er");
 };
-var ecClick = function() {
+var ecClick = function () {
 	btnClicked("ec");
 }
-var tvClick = function() {
+var tvClick = function () {
 	btnClicked("tv");
 };
-var taClick = function() {
+var taClick = function () {
 	btnClicked("ta");
 };
-var teClick = function() {
-	btnClicked("te");
-}
-var limitChange = function() {
+var limitChange = function () {
 	var limit = $("#limit")[0].value;
 	if (!limit) {
 		return;
 	}
-	
-	if ($("#tl")[0].checked) {
-		elementChanged("limit_enable", limit);
+
+	if (limit < 1000) {
+		return;
 	}
-	else {
-		elementChanged("limit_disable", limit);
-	}
+
+	elementChanged("limit_" + (($("#tl")[0].checked) ? "enable" : "disable"), limit);
 }
 
-var changeStrategyClickO = function() {
+var changeStrategyClickO = function () {
 	btnClicked("cs_o");
 };
-var changeStrategyClickCS = function() {
-	chrome.storage.local.get(["chromosomes_v1"], function(results) {
+var changeStrategyClickCS = function () {
+	chrome.storage.local.get(["chromosomes_v1"], function (results) {
 		console.log(results);
-		if (Object.keys(results).length === 0){
+		if (Object.keys(results).length === 0) {
 			btnClicked("cs_cs_warning");
-		}else {
+		} else {
 			var data = JSON.stringify(results.chromosomes_v1[0]);
-        	btnClicked("cs_cs", data);
+			btnClicked("cs_cs", data);
 		}
 	});
 };
-var changeStrategyClickRC = function() {
+var changeStrategyClickRC = function () {
 	btnClicked("cs_rc");
 };
-var changeStrategyClickIPU = function() {
+var changeStrategyClickIPU = function () {
 	btnClicked("cs_ipu");
 };
-var onFileReadRecord = function(e) {
+var onFileReadRecord = function (e) {
 	console.log("File read successful.");
 	var t = e.target.result;
 	btnClicked("ir", t);
 };
-var onFileReadChromosome = function(e) {
+var onFileReadChromosome = function (e) {
 	console.log("File read successful.");
 	var t = e.target.result;
 	btnClicked("ic", t);
 }
-var irClick = function() {
+var irClick = function () {
 	console.log("Attempting records import...");
 	var files = $("#upload_r")[0].files;
-	if(files.length>0)
+	if (files.length > 0)
 		console.log("Upload successful.");
-	else 
-		console.log("Upload canceled.");	
+	else
+		console.log("Upload canceled.");
 	console.log("Attempting to read file...");
-	
-	var file = files[0];	
+
+	var file = files[0];
 	var reader = new FileReader();
 	reader.onload = onFileReadRecord;
 	reader.readAsText(file);
 };
-var icClick = function() {
+var icClick = function () {
 	console.log("Attempting chromosome import...");
 	var files = $("#upload_c")[0].files;
-	if(files.length>0)
+	if (files.length > 0)
 		console.log("Upload successful.");
-	else 
-		console.log("Upload canceled.");	
+	else
+		console.log("Upload canceled.");
 	console.log("Attempting to read file...");
-	
-	var file = files[0];	
+
+	var file = files[0];
 	var reader = new FileReader();
 	reader.onload = onFileReadChromosome;
 	reader.readAsText(file);
@@ -150,16 +129,16 @@ var icClick = function() {
 // SIMULATOR SECTION
 //---------------------------------------------------------------------------------------------------------
 
-var Order = function(typeStr, chromosome) {
+var Order = function (typeStr, chromosome) {
 	this.type = typeStr;
 	this.chromosome = chromosome;
 };
-var Simulator = function() {
+var Simulator = function () {
 	this.data = [];
 	this.money = [];
 	this.minimum = 400;
 };
-Simulator.prototype.updateMoney = function(index, odds, selection, amount, correct) {
+Simulator.prototype.updateMoney = function (index, odds, selection, amount, correct) {
 	var oddsArr = odds.split(":");
 	if (!correct) {
 		this.money[index] -= amount;
@@ -172,7 +151,7 @@ Simulator.prototype.updateMoney = function(index, odds, selection, amount, corre
 			this.money[index] += amount * parseFloat(oddsArr[0]) / parseFloat(oddsArr[1]);
 	}
 };
-Simulator.prototype.getBetAmount = function(strategy, index) {
+Simulator.prototype.getBetAmount = function (strategy, index) {
 	var amountToBet;
 	var tournament = false;
 	var debug = false;
@@ -185,7 +164,7 @@ Simulator.prototype.getBetAmount = function(strategy, index) {
 
 	return amountToBet;
 };
-Simulator.prototype.applyPenalties = function(c) {
+Simulator.prototype.applyPenalties = function (c) {
 	// anti-domination
 	var adOdds = c.timeWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
 	var adTime = c.oddsWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
@@ -196,9 +175,9 @@ Simulator.prototype.applyPenalties = function(c) {
 		return 0.05;
 	return 1;
 };
-Simulator.prototype.evalMutations = function(mode) {
+Simulator.prototype.evalMutations = function (mode) {
 	var self = this;
-	chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1"], function(results) {
+	chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1"], function (results) {
 		var matches = results.matches_v1;
 		var data = [];
 		var correct = [];
@@ -237,19 +216,19 @@ Simulator.prototype.evalMutations = function(mode) {
 		for (var h = 0; h < orders.length; h++) {
 			var order = orders[h];
 			var strategy;
-			switch(order.type) {
-			case "ct":
-				strategy = new CoinToss();
-				break;
-			case "cs":
-				strategy = new ConfidenceScore(order.chromosome);
-				break;
-			case "rc":
-				strategy = new RatioConfidence();
-				break;
-			case "ipu":
-				strategy = new InternetPotentialUpset(order.chromosome);
-				break;
+			switch (order.type) {
+				case "ct":
+					strategy = new CoinToss();
+					break;
+				case "cs":
+					strategy = new ConfidenceScore(order.chromosome);
+					break;
+				case "rc":
+					strategy = new RatioConfidence();
+					break;
+				case "ipu":
+					strategy = new InternetPotentialUpset(order.chromosome);
+					break;
 			}
 			strategy.debug = false;
 
@@ -269,16 +248,16 @@ Simulator.prototype.evalMutations = function(mode) {
 		var denominators = [];
 		var upsetsBetOn = 0;
 		var nonUpsetsBetOn = 0;
-		var minimizedLosses=0;
-		var lossMinimizationAmount=0;
+		var minimizedLosses = 0;
+		var lossMinimizationAmount = 0;
 
 		// process matches
 		for (var i = 0; i < matches.length; i++) {
 
 			var info = {
-				"character1" : updater.getCharacter(matches[i].c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
-				"character2" : updater.getCharacter(matches[i].c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
-				"matches" : results.matches_v1
+				"character1": updater.getCharacter(matches[i].c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
+				"character2": updater.getCharacter(matches[i].c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
+				"matches": results.matches_v1
 			};
 
 			for (var n = 0; n < strategies.length; n++) {
@@ -328,12 +307,12 @@ Simulator.prototype.evalMutations = function(mode) {
 								if (predictionWasCorrect)
 									nonUpsetsBetOn += 1;
 							}
-							
-							if (!predictionWasCorrect && strategy.confidence && strategy.confidence< 0.9){
-								lossMinimizationAmount+=1-strategy.confidence;
-								minimizedLosses+=1;
+
+							if (!predictionWasCorrect && strategy.confidence && strategy.confidence < 0.9) {
+								lossMinimizationAmount += 1 - strategy.confidence;
+								minimizedLosses += 1;
 							}
-								
+
 
 							// var avgOddsC1 = updater.getCharAvgOdds(matches[i].c1);
 							// var avgOddsC2 = updater.getCharAvgOdds(matches[i].c2);
@@ -371,11 +350,11 @@ Simulator.prototype.evalMutations = function(mode) {
 				nudSum += nonupsetDenominators[zzz];
 			}
 
-			console.log("avg denom: " + (dSum / denominators.length).toFixed(0) + ", avg upset: " + (udSum / upsetDenominators.length).toFixed(0) + ", avg nonupset: " + (nudSum / nonupsetDenominators.length).toFixed(0) + 
-			", \nupsets called correctly: " + (upsetsBetOn / upsetDenominators.length * 100).toFixed(2) + "%, (" + upsetsBetOn + "/" + upsetDenominators.length + ")"+
-			", \nnonupsets called correctly: " + (nonUpsetsBetOn / nonupsetDenominators.length * 100).toFixed(2) + "%, (" + nonUpsetsBetOn + "/" + nonupsetDenominators.length + ")"+
-			", \nminimized losses: "+ (minimizedLosses / matches.length * 100).toFixed(2) + "%, (" + minimizedLosses + "/" + matches.length + "), avg loss minimization amount: "
-			+(lossMinimizationAmount/minimizedLosses * 100).toFixed(2) + "%");
+			console.log("avg denom: " + (dSum / denominators.length).toFixed(0) + ", avg upset: " + (udSum / upsetDenominators.length).toFixed(0) + ", avg nonupset: " + (nudSum / nonupsetDenominators.length).toFixed(0) +
+				", \nupsets called correctly: " + (upsetsBetOn / upsetDenominators.length * 100).toFixed(2) + "%, (" + upsetsBetOn + "/" + upsetDenominators.length + ")" +
+				", \nnonupsets called correctly: " + (nonUpsetsBetOn / nonupsetDenominators.length * 100).toFixed(2) + "%, (" + nonUpsetsBetOn + "/" + nonupsetDenominators.length + ")" +
+				", \nminimized losses: " + (minimizedLosses / matches.length * 100).toFixed(2) + "%, (" + minimizedLosses + "/" + matches.length + "), avg loss minimization amount: "
+				+ (lossMinimizationAmount / minimizedLosses * 100).toFixed(2) + "%");
 
 		}
 
@@ -394,7 +373,7 @@ Simulator.prototype.evalMutations = function(mode) {
 					if (unshackle) penalty = 1;
 					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l], penalty]);
 				}
-				sortingArray.sort(function(a, b) {
+				sortingArray.sort(function (a, b) {
 					if (!money && accuracy)
 						return (b[1] * b[3]) - (a[1] * a[3]);
 					if (money && !accuracy)
@@ -438,13 +417,13 @@ Simulator.prototype.evalMutations = function(mode) {
 				bestMoney = sortingArray[0][2];
 
 				chrome.storage.local.set({
-					'chromosomes_v1' : nextGeneration,
-					'best_chromosome' : sortingArray[0][0]
-				}, function() {
+					'chromosomes_v1': nextGeneration,
+					'best_chromosome': sortingArray[0][0]
+				}, function () {
 					roundsOfEvolution += 1;
 					console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "%m -> " + bestPercent.toFixed(1) + "%c, $" + bestMoney.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "   -----------------\n\n");
 					$("#msgbox")[0].value = "g(" + roundsOfEvolution + "), best: " + bestPercent.toFixed(1) + "%, $" + bestMoney.toFixed(0);
-					setTimeout(function() {
+					setTimeout(function () {
 						simulator.evalMutations("evolution");
 					}, 5000);
 				});
@@ -469,7 +448,7 @@ Simulator.prototype.evalMutations = function(mode) {
 
 	});
 };
-Simulator.prototype.initializePool = function() {
+Simulator.prototype.initializePool = function () {
 	var pool = [new Chromosome(), new Chromosome()];
 	while (pool.length < 100) {
 		if (pool.length < 20) {
@@ -497,18 +476,18 @@ Simulator.prototype.initializePool = function() {
 		}
 	}
 	chrome.storage.local.set({
-		'chromosomes_v1' : newPool
-	}, function() {
+		'chromosomes_v1': newPool
+	}, function () {
 		$("#msgbox")[0].value = "initial pool population complete";
 	});
 
 };
 
 simulator = new Simulator();
-roundsOfEvolution = 0;
+var roundsOfEvolution = 0;
 
-document.addEventListener('DOMContentLoaded', function() {
-	chrome.storage.local.get('settings_v1', function(result) {
+document.addEventListener('DOMContentLoaded', function () {
+	chrome.storage.local.get('settings_v1', function (result) {
 		if (result) {
 			$("#tl")[0].checked = result.settings_v1.limit_enabled;
 			$("#limit")[0].value = result.settings_v1.limit || 10000;
@@ -517,34 +496,30 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 		console.log(result);
 	});
-	
-	
-	$("#bdr")[0].addEventListener("click", drClick);
-	$("#bpr")[0].addEventListener("click", prClick);
+
 	$("#ber")[0].addEventListener("click", erClick);
 	$("#bir")[0].addEventListener("change", irClick);
 	$("#bec")[0].addEventListener("click", ecClick);
 	$("#bic")[0].addEventListener("change", icClick);
-	$("#ugw")[0].addEventListener("click", function() {
+	$("#ugw")[0].addEventListener("click", function () {
 		simulator.evalMutations("evolution");
 	});
-	$("#rgw")[0].addEventListener("click", function() {
+	$("#rgw")[0].addEventListener("click", function () {
 		simulator.initializePool();
 	});
 	$("#tv")[0].addEventListener("click", tvClick);
 	$("#ta")[0].addEventListener("click", taClick);
-	$("#te")[0].addEventListener("click", teClick);
 	$("#cs_o")[0].addEventListener("click", changeStrategyClickO);
 	$("#cs_cs")[0].addEventListener("click", changeStrategyClickCS);
 	$("#cs_rc")[0].addEventListener("click", changeStrategyClickRC);
 	$("#cs_ipu")[0].addEventListener("click", changeStrategyClickIPU);
-	
+
 	$("#tl")[0].addEventListener("change", limitChange);
 	$("#limit").bind('keyup input', limitChange);
-	
+
 	chrome.alarms.create("chromosome update", {
-		delayInMinutes : 0.1,
-		periodInMinutes : 1.0
+		delayInMinutes: 0.1,
+		periodInMinutes: 1.0
 	});
 
 });

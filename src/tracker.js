@@ -1,4 +1,14 @@
-var Match = function(strat) {
+var detectTournament = function() {
+	var tournamentModeIndicator = "characters are left in the bracket!";
+	var tournamentModeIndicator2 = "Tournament mode start";
+	var tournamentModeIndicator3 = "FINAL ROUND! Stay tuned for exhibitions after the tournament!";
+	var footer = $("#footer-alert")[0];
+	var tournament = footer != null && (footer.innerHTML.indexOf(tournamentModeIndicator) > -1 || footer.innerHTML.indexOf(tournamentModeIndicator2) > -1 ||
+		footer.innerHTML.indexOf(tournamentModeIndicator3) > -1);
+	return tournament;
+}
+
+var Match = function (strat) {
 	this.names = [strat.p1name, strat.p2name];
 	this.strategy = strat;
 	this.character1 = null;
@@ -12,7 +22,7 @@ var Match = function(strat) {
 	this.crowdFavor = 2;
 	this.illumFavor = 2;
 };
-Match.prototype.update = function(infoFromWaifu, odds, timeInfo, crowdFavor, illumFavor) {
+Match.prototype.update = function (infoFromWaifu, odds, timeInfo, crowdFavor, illumFavor) {
 	for (var i = 0; i < infoFromWaifu.length; i++) {
 		var ifw = infoFromWaifu[i];
 		if (this.names[0] == ifw.c1 && this.names[1] == ifw.c2) {
@@ -36,7 +46,7 @@ Match.prototype.update = function(infoFromWaifu, odds, timeInfo, crowdFavor, ill
 	this.crowdFavor = crowdFavor;
 	this.illumFavor = illumFavor;
 };
-Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the string "draw"
+Match.prototype.getRecords = function (w) {//in the event of a draw, pass in the string "draw"
 	if (this.names.indexOf(w) > -1) {
 		var updater = new Updater();
 		this.winner = (w == this.character1.name) ? 0 : 1;
@@ -46,18 +56,18 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 		else
 			pw = (this.strategy.prediction == this.names[this.winner]) ? "t" : "f";
 		var mr = {
-			"c1" : this.character1.name,
-			"c2" : this.character2.name,
-			"w" : this.winner,
-			"sn" : this.strategy.strategyName,
-			"pw" : pw,
-			"t" : this.tier,
-			"m" : this.mode.charAt(0),
-			"o" : this.odds,
-			"ts" : this.time,
-			"cf" : this.crowdFavor,
-			"if" : this.illumFavor,
-			"dt" : new Date().toString("dd-MM-yyyy")
+			"c1": this.character1.name,
+			"c2": this.character2.name,
+			"w": this.winner,
+			"sn": this.strategy.strategyName,
+			"pw": pw,
+			"t": this.tier,
+			"m": this.mode.charAt(0),
+			"o": this.odds,
+			"ts": this.time,
+			"cf": this.crowdFavor,
+			"if": this.illumFavor,
+			"dt": new Date().toString("dd-MM-yyyy")
 		};
 
 		updater.updateCharactersFromMatch(mr, this.character1, this.character2);
@@ -67,12 +77,12 @@ Match.prototype.getRecords = function(w) {//in the event of a draw, pass in the 
 		return null;
 	}
 };
-Match.prototype.getBalance = function(){
+Match.prototype.getBalance = function () {
 	var balanceBox = $("#balance")[0];
 	var balance = parseInt(balanceBox.innerHTML.replace(/,/g, ""));
 	return balance;
 }
-Match.prototype.betAmount = function(tournament) {
+Match.prototype.betAmount = function (tournament) {
 	var balance = this.getBalance();
 	var wagerBox = $("#wager")[0];
 	var amountToBet;
@@ -85,7 +95,7 @@ Match.prototype.betAmount = function(tournament) {
 		amountToBet *= 10;
 		if (amountToBet > balance)
 			amountToBet = balance;
-		console.log("AGGRO multiplier active, increasing bet to "+amountToBet);
+		console.log("AGGRO multiplier active, increasing bet to " + amountToBet);
 	}
 	if (amountToBet == 0) {
 		//bet at least 1
@@ -94,11 +104,11 @@ Match.prototype.betAmount = function(tournament) {
 
 	wagerBox.value = amountToBet.toString();
 };
-Match.prototype.init = function() {
+Match.prototype.init = function () {
 	var s = this;
 
 	//Attempt to get character objects from storage, if they don't exist create them
-	chrome.storage.local.get(["matches_v1", "characters_v1"], function(result) {
+	chrome.storage.local.get(["matches_v1", "characters_v1"], function (result) {
 		var self = s;
 		var baseSeconds = 2000;
 		var recs = result.characters_v1;
@@ -120,24 +130,17 @@ Match.prototype.init = function() {
 		self.character2 = (self.character2 == null) ? new Character(self.names[1]) : self.character2;
 
 		var prediction = self.strategy.execute({
-			"character1" : self.character1,
-			"character2" : self.character2,
-			"matches" : result.matches_v1
+			"character1": self.character1,
+			"character2": self.character2,
+			"matches": result.matches_v1
 		});
 
 		if (prediction != null || self.strategy.lowBet) {
-			setTimeout(function() {
-				var tournamentModeIndicator = "characters are left in the bracket!";
-				var tournamentModeIndicator2 = "Tournament mode start";
-				var tournamentModeIndicator3 = "FINAL ROUND! Stay tuned for exhibitions after the tournament!";
-				var footer = $("#footer-alert")[0];
-				var tournament = footer != null && (footer.innerHTML.indexOf(tournamentModeIndicator) > -1 || footer.innerHTML.indexOf(tournamentModeIndicator2) > -1 ||
-													footer.innerHTML.indexOf(tournamentModeIndicator3) > -1);
-
-				self.betAmount(tournament);
+			setTimeout(function () {
+				self.betAmount(detectTournament());
 
 			}, Math.floor(Math.random() * baseSeconds));
-			setTimeout(function() {
+			setTimeout(function () {
 				if (prediction == self.strategy.p1name) {
 					self.strategy.btnP1.click();
 				} else {
@@ -148,6 +151,6 @@ Match.prototype.init = function() {
 
 	});
 };
-Match.prototype.setAggro = function(aggro) {
+Match.prototype.setAggro = function (aggro) {
 	this.strategy.aggro = aggro;
 };

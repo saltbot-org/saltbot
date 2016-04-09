@@ -1,4 +1,4 @@
-var Strategy = function(sn) {
+var Strategy = function (sn) {
 	this.btn10 = $("#interval1")[0];
 	this.btn50 = $("#interval5")[0];
 	this.btnP1 = $("#player1")[0];
@@ -9,14 +9,14 @@ var Strategy = function(sn) {
 	this.prediction = null;
 	this.debug = true;
 	this.levels = [[0, 1000, 0],
-				   [1000, 10000, 1],
-				   [10000, 100000, 10],
-				   [100000, 500000, 25],
-				   [500000, 1000000, 100],
-				   [1000000, 5000000, 250],
-				   [5000000, 20000000, 500]];
+		[1000, 10000, 1],
+		[10000, 100000, 10],
+		[100000, 500000, 25],
+		[500000, 1000000, 100],
+		[1000000, 5000000, 250],
+		[5000000, 20000000, 500]];
 };
-Strategy.prototype.getBailout = function(tournament){
+Strategy.prototype.getBailout = function (tournament) {
 	var nameSpan = $("h2")[0].children[2];
 	var isIlluminati = false;
 	try { // the html is different for illuminati??
@@ -26,21 +26,20 @@ Strategy.prototype.getBailout = function(tournament){
 	}
 	var level = 1;
 	var rank = $("#rank")[0];
-	if (rank!=null){
-		var re=/rank([0-9]{1,2})\.png/g;
-		var match=re.exec(rank.childNodes[0].src);
-		level=parseInt(match[1]);
+	if (rank != null) {
+		var re = /rank([0-9]{1,2})\.png/g;
+		var match = re.exec(rank.childNodes[0].src);
+		level = parseInt(match[1]);
 	}
 
-	if(isIlluminati)
-		return 3000 + level*50;
+	if (isIlluminati)
+		return 3000 + level * 50;
+	else if (tournament)
+		return 1000 + level * 25;
 	else
-		if (tournament)
-			return 1000 + level*25;
-		else
-			return 100 + level*25;
+		return 100 + level * 25;
 };
-Strategy.prototype.flatBet = function(balance, debug) {
+Strategy.prototype.flatBet = function (balance, debug) {
 	var flatAmount = 100;
 	var multiplierIndex = 2;
 	var intendedBet = flatAmount * this.levels[this.level][multiplierIndex] * this.confidence;
@@ -51,7 +50,7 @@ Strategy.prototype.flatBet = function(balance, debug) {
 	else
 		return Math.ceil(intendedBet);
 };
-Strategy.prototype.adjustLevel = function(balance) {
+Strategy.prototype.adjustLevel = function (balance) {
 	if (!this.level)
 		this.level = 0;
 	//this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100], [1000000, 5000000, 250]];
@@ -72,32 +71,34 @@ Strategy.prototype.adjustLevel = function(balance) {
 		}
 	} while (changed);
 };
-Strategy.prototype.getWinner = function(ss) {
+Strategy.prototype.getWinner = function (ss) {
 	return ss.getWinner();
 };
-Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
+Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 	if (!this.confidence)
 		this.confidence = 1;
 
-	var minimum = 100 + Math.round(Math.random() * 50);
 	var amountToBet;
 	var bailout = this.getBailout(tournament);
 
 	if (tournament) {
-		var allIn = balance <= 2*bailout || this.confidence > 0.9 || (1 - this.confidence) * balance <= bailout;
+		var allIn = ctrl.settings.allInTourney ||
+			balance <= 2 * bailout ||
+			this.confidence > 0.9 ||
+			(1 - this.confidence) * balance <= bailout;
 		amountToBet = (!allIn) ? Math.round(balance * (this.confidence || 0.5)) : balance;
-		var bailoutMessage=0;
-		if (amountToBet < bailout){
+		var bailoutMessage = 0;
+		if (amountToBet < bailout) {
 			bailoutMessage = amountToBet;
 			amountToBet = bailout;
 		}
 		if (amountToBet > balance)
-        	amountToBet = balance;
+			amountToBet = balance;
 		if (debug) {
 			if (allIn)
 				console.log("- ALL IN: " + balance);
-			else if(bailoutMessage!=0)
-				console.log("- amount is less than bailout ("+bailoutMessage+"), betting bailout: "+amountToBet);
+			else if (bailoutMessage != 0)
+				console.log("- amount is less than bailout (" + bailoutMessage + "), betting bailout: " + amountToBet);
 			else if (this.confidence)
 				console.log("- betting: " + balance + " x  cf(" + (this.confidence * 100).toFixed(2) + "%) = " + amountToBet);
 			else
@@ -107,9 +108,9 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 		amountToBet = Math.round(balance * .1 * this.confidence);
 		if (amountToBet > balance * .1)
 			amountToBet = Math.round(balance * .1);
-		if (amountToBet < bailout){
+		if (amountToBet < bailout) {
 			if (debug)
-				console.log("- amount is less than bailout ("+amountToBet+"), betting bailout: "+bailout);
+				console.log("- amount is less than bailout (" + amountToBet + "), betting bailout: " + bailout);
 			amountToBet = bailout;
 		} else if (debug)
 			console.log("- betting: " + balance + " x .10 =(" + (balance * .1) + ") x cf(" + (this.confidence * 100).toFixed(2) + "%) = " + amountToBet);
@@ -118,36 +119,36 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 		var cb = Math.ceil(balance * this.confidence);
 		amountToBet = (p05 < cb) ? p05 : cb;
 		if (amountToBet < bailout)
-        	amountToBet = bailout;
+			amountToBet = bailout;
 		if (debug)
 			console.log("- betting without confidence: " + amountToBet);
 	}
 	return amountToBet;
 };
 
-var CoinToss = function() {
+var CoinToss = function () {
 	Strategy.call(this, "ct");
 };
-var formatString = function(s, len){
+var formatString = function (s, len) {
 	while (s.length < len) {
-		s+=" ";
+		s += " ";
 	}
 	return s.substring(0, len);
 };
 CoinToss.prototype = Object.create(Strategy.prototype);
-CoinToss.prototype.execute = function(info) {
+CoinToss.prototype.execute = function (info) {
 	var c1 = info.character1;
 	var c2 = info.character2;
 	this.prediction = (Math.random() > .5) ? c1.name : c2.name;
 	return this.prediction;
 };
 
-var RatioConfidence = function() {
+var RatioConfidence = function () {
 	Strategy.call(this, "rc");
 	this.abstain = false;
 };
 RatioConfidence.prototype = Object.create(Strategy.prototype);
-RatioConfidence.prototype.execute = function(info) {
+RatioConfidence.prototype.execute = function (info) {
 	var self = this;
 	var c1 = info.character1;
 	var c2 = info.character2;
@@ -173,7 +174,7 @@ RatioConfidence.prototype.execute = function(info) {
 		//confidence score
 		self.confidence = (pChar.name == c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
 		self.confidence += 0.5;
-		if (self.confidence>1)self.confidence=1;
+		if (self.confidence > 1)self.confidence = 1;
 		if (self.confidence < 0.6) {
 			if (this.debug)
 				console.log("- Cowboy has insufficient confidence (confidence: " + self.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
@@ -202,7 +203,7 @@ RatioConfidence.prototype.execute = function(info) {
 	}
 };
 
-var Chromosome = function() {
+var Chromosome = function () {
 	// confidence weights
 	this.oddsWeight = 1;
 	this.timeWeight = 0.5;
@@ -244,31 +245,31 @@ var Chromosome = function() {
 	this.ltU = 0.5;
 	return this;
 };
-Chromosome.prototype.loadFromJSON = function(json) {
+Chromosome.prototype.loadFromJSON = function (json) {
 	var copy = JSON.parse(json);
 	for (var i in copy) {
 		this[i] = parseFloat(copy[i]);
 	}
 	return this;
 };
-Chromosome.prototype.loadFromObject = function(obj) {
+Chromosome.prototype.loadFromObject = function (obj) {
 	for (var i in obj) {
 		this[i] = parseFloat(obj[i]);
 	}
 	return this;
 };
-Chromosome.prototype.toDisplayString = function() {
+Chromosome.prototype.toDisplayString = function () {
 	var results = "-\nchromosome:";
 	for (var i in this) {
-		if ( typeof this[i] != "function")
+		if (typeof this[i] != "function")
 			results += "\n" + i + " : " + this[i];
 	}
 	return results;
 };
-Chromosome.prototype.mate = function(other) {
+Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		if ( typeof offspring[i] != "function") {
+		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			// 20% chance of mutation
 			var radiation = Math.random() + Math.random();
@@ -279,16 +280,16 @@ Chromosome.prototype.mate = function(other) {
 	}
 	return offspring;
 };
-Chromosome.prototype.equals = function(other) {
+Chromosome.prototype.equals = function (other) {
 	var anyDifference = false;
 	for (var i in other) {
-		if ( typeof other[i] != "function")
+		if (typeof other[i] != "function")
 			if (this[i] != other[i])
 				anyDifference = true;
 	}
 	return !anyDifference;
 };
-var CSStats = function(cObj, chromosome) {
+var CSStats = function (cObj, chromosome) {
 	var oddsSum = 0;
 	var oddsCount = 0;
 	var winTimesTotal = 0;
@@ -356,7 +357,7 @@ var CSStats = function(cObj, chromosome) {
 		this.ifPercent = ifSum / cObj.illumFavor.length;
 	}
 };
-var ConfidenceScore = function(chromosome, level, lastMatchCumulativeBetTotal) {
+var ConfidenceScore = function (chromosome, level, lastMatchCumulativeBetTotal) {
 	Strategy.call(this, "cs");
 	this.abstain = false;
 	this.confidence = null;
@@ -367,12 +368,12 @@ var ConfidenceScore = function(chromosome, level, lastMatchCumulativeBetTotal) {
 };
 ConfidenceScore.prototype = Object.create(Strategy.prototype);
 ConfidenceScore.prototype.__super__ = Strategy;
-ConfidenceScore.prototype.getBetAmount = function(balance, tournament, debug) {
+ConfidenceScore.prototype.getBetAmount = function (balance, tournament, debug) {
 	if (tournament)
 		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
 	return this.__super__.prototype.flatBet.call(this, balance, debug);
 };
-ConfidenceScore.prototype.execute = function(info) {
+ConfidenceScore.prototype.execute = function (info) {
 	var c1 = info.character1;
 	var c2 = info.character2;
 	var matches = info.matches;
@@ -393,8 +394,8 @@ ConfidenceScore.prototype.execute = function(info) {
 	var messagelength = 15;
 
 	// the weights come in from the chromosome
-    var c1Score = 0;
-    var c2Score = 0;
+	var c1Score = 0;
+	var c2Score = 0;
 
 	//
 
@@ -406,7 +407,7 @@ ConfidenceScore.prototype.execute = function(info) {
 	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
 		var lesserOdds = (c1Stats.averageOdds < c2Stats.averageOdds) ? c1Stats.averageOdds : c2Stats.averageOdds;
 		this.oddsConfidence = [(c1Stats.averageOdds / lesserOdds), (c2Stats.averageOdds / lesserOdds)];
-		if (this.debug) oddsMessage = "predicted odds -> ("+formatString(""+(this.oddsConfidence[0]).toFixed(2)+" : "+(this.oddsConfidence[1]).toFixed(2), messagelength)+")"
+		if (this.debug) oddsMessage = "predicted odds -> (" + formatString("" + (this.oddsConfidence[0]).toFixed(2) + " : " + (this.oddsConfidence[1]).toFixed(2), messagelength) + ")"
 	} else {
 		this.oddsConfidence = null;
 	}
@@ -416,32 +417,32 @@ ConfidenceScore.prototype.execute = function(info) {
 	var c1WP = (c1WT != 0) ? c1Stats.wins / c1WT : 0;
 	var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
 
-	var wpTotal = c1Stats.wins+c2Stats.wins;
-	var c1WPDisplay = wpTotal>0?c1Stats.wins/wpTotal:0;
-	var c2WPDisplay = wpTotal>0?c2Stats.wins/wpTotal:0;
-	if (this.debug) winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> ("+(c1WPDisplay*100).toFixed(0)+" : "+(c2WPDisplay*100).toFixed(0)+")"+
-				  "  ::  unweighted (red W:L)(blue W:L) -> ("+ c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length+")"+
-				  "  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
-				                                  "(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
-	
+	var wpTotal = c1Stats.wins + c2Stats.wins;
+	var c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
+	var c2WPDisplay = wpTotal > 0 ? c2Stats.wins / wpTotal : 0;
+	if (this.debug) winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> (" + (c1WPDisplay * 100).toFixed(0) + " : " + (c2WPDisplay * 100).toFixed(0) + ")" +
+		"  ::  unweighted (red W:L)(blue W:L) -> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")" +
+		"  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
+		"(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
+
 	/*if (c1WP > c2WP) {
-		c1Score += winPercentageWeight;
-	}
-	else if (c2WP > c1WP) {
-		c2Score += winPercentageWeight;
-	}
-	else {
-		c1Score += 0.5*winPercentageWeight;
-		c2Score += 0.5*winPercentageWeight;
-	}*/
+	 c1Score += winPercentageWeight;
+	 }
+	 else if (c2WP > c1WP) {
+	 c2Score += winPercentageWeight;
+	 }
+	 else {
+	 c1Score += 0.5*winPercentageWeight;
+	 c2Score += 0.5*winPercentageWeight;
+	 }*/
 	var WPSum = c1WP + c2WP;
 	if (WPSum > 0) {
-		c1Score += winPercentageWeight * c1WP/WPSum;
-		c2Score += winPercentageWeight * c2WP/WPSum;
+		c1Score += winPercentageWeight * c1WP / WPSum;
+		c2Score += winPercentageWeight * c2WP / WPSum;
 	}
 	else {
-		c1Score += winPercentageWeight*0.5;
-		c2Score += winPercentageWeight*0.5;
+		c1Score += winPercentageWeight * 0.5;
+		c2Score += winPercentageWeight * 0.5;
 	}
 
 	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
@@ -453,10 +454,10 @@ ConfidenceScore.prototype.execute = function(info) {
 
 	if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null) {
 		if (c1Stats.averageWinTime < c2Stats.averageWinTime)
-            c1Score += timeWeight / 2;
-        else if (c1Stats.averageWinTime > c2Stats.averageWinTime)
-            c2Score += timeWeight / 2;
-        if (this.debug) timeMessage = "avg win time (red:blue) -> ("+formatString(c1Stats.averageWinTimeRaw.toFixed(0)+" : "+c2Stats.averageWinTimeRaw.toFixed(0), messagelength)+")";
+			c1Score += timeWeight / 2;
+		else if (c1Stats.averageWinTime > c2Stats.averageWinTime)
+			c2Score += timeWeight / 2;
+		if (this.debug) timeMessage = "avg win time (red:blue) -> (" + formatString(c1Stats.averageWinTimeRaw.toFixed(0) + " : " + c2Stats.averageWinTimeRaw.toFixed(0), messagelength) + ")";
 	}
 
 
@@ -466,7 +467,7 @@ ConfidenceScore.prototype.execute = function(info) {
 		else if (c1Stats.averageLossTime < c2Stats.averageLossTime)
 			c2Score += timeWeight / 2;
 		if (this.debug) {
-			var msg = "  ::  avg loss time (red:blue) -> ("+formatString(c1Stats.averageLossTimeRaw.toFixed(0)+" : "+c2Stats.averageLossTimeRaw.toFixed(0), messagelength)+")";
+			var msg = "  ::  avg loss time (red:blue) -> (" + formatString(c1Stats.averageLossTimeRaw.toFixed(0) + " : " + c2Stats.averageLossTimeRaw.toFixed(0), messagelength) + ")";
 			if (timeMessage)
 				timeMessage += msg;
 			else
@@ -480,8 +481,8 @@ ConfidenceScore.prototype.execute = function(info) {
 		else if (c1Stats.cfPercent < c2Stats.cfPercent)
 			c2Score += crowdFavorWeight;
 		var cfPercentTotal = c1Stats.cfPercent + c2Stats.cfPercent;
-		if (this.debug) crwdMessage = "crowd favor (red:blue) -> ("+formatString((c1Stats.cfPercent/cfPercentTotal*100).toFixed(0)+
-							 " : "+(c2Stats.cfPercent/cfPercentTotal*100).toFixed(0), messagelength)+")";
+		if (this.debug) crwdMessage = "crowd favor (red:blue) -> (" + formatString((c1Stats.cfPercent / cfPercentTotal * 100).toFixed(0) +
+				" : " + (c2Stats.cfPercent / cfPercentTotal * 100).toFixed(0), messagelength) + ")";
 	}
 
 	if (c1Stats.ifPercent != null && c2Stats.ifPercent != null) {
@@ -490,22 +491,22 @@ ConfidenceScore.prototype.execute = function(info) {
 		else if (c1Stats.ifPercent < c2Stats.ifPercent)
 			c2Score += illumFavorWeight;
 		var ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
-		if (this.debug) ilumMessage = "illuminati favor (red:blue) -> ("+formatString((c1Stats.ifPercent/ifPercentTotal*100).toFixed(0)+
-        							 " : "+(c2Stats.ifPercent/ifPercentTotal*100).toFixed(0), messagelength)+")";
+		if (this.debug) ilumMessage = "illuminati favor (red:blue) -> (" + formatString((c1Stats.ifPercent / ifPercentTotal * 100).toFixed(0) +
+				" : " + (c2Stats.ifPercent / ifPercentTotal * 100).toFixed(0), messagelength) + ")";
 	}
 
-	if (this.debug){
+	if (this.debug) {
 		console.log("\n");
-		console.log("\xBB PREDICTION STATS for ("+c1.name+" VS "+c2.name+") \xBB");
+		console.log("\xBB PREDICTION STATS for (" + c1.name + " VS " + c2.name + ") \xBB");
 		console.log(winsMessage);
 		var line2 = "\xBB ";
 		if (oddsMessage) line2 += oddsMessage;
 		if (timeMessage) line2 += "  ::  " + timeMessage;
-		if (line2.length>2) console.log(line2);
+		if (line2.length > 2) console.log(line2);
 		var line3 = "\xBB ";
 		if (crwdMessage) line3 += crwdMessage;
 		if (ilumMessage) line3 += "  ::  " + ilumMessage;
-		if (line3.length>2) console.log(line3);
+		if (line3.length > 2) console.log(line3);
 		console.log("\n");
 	}
 
@@ -544,13 +545,13 @@ ConfidenceScore.prototype.execute = function(info) {
 	return this.prediction;
 };
 
-var ChromosomeIPU = function() {
+var ChromosomeIPU = function () {
 	Strategy.call(this);
 	this.baseBettingTier = 1500;
 };
 ChromosomeIPU.prototype = Object.create(Chromosome.prototype);
 ;
-var InternetPotentialUpset = function(cipu, level) {
+var InternetPotentialUpset = function (cipu, level) {
 	Strategy.call(this, "ipu");
 	this.debug = true;
 	this.ct = new CoinToss();
@@ -561,24 +562,24 @@ var InternetPotentialUpset = function(cipu, level) {
 };
 InternetPotentialUpset.prototype = Object.create(Strategy.prototype);
 InternetPotentialUpset.prototype.__super__ = Strategy;
-InternetPotentialUpset.prototype.execute = function(info) {
+InternetPotentialUpset.prototype.execute = function (info) {
 	this.prediction = this.ct.execute(info);
 	if (this.debug)
 		console.log("- Lunatic is 50% confident, bBT: " + this.chromosome.baseBettingTier);
 	return this.prediction;
 };
-InternetPotentialUpset.prototype.getBetAmount = function(balance, tournament, debug) {
+InternetPotentialUpset.prototype.getBetAmount = function (balance, tournament, debug) {
 	if (tournament)
 		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
 	return this.__super__.prototype.flatBet.call(this, balance, debug);
 };
 
-var Observer = function() {
+var Observer = function () {
 	Strategy.call(this, "obs");
 	this.abstain = true;
 };
 Observer.prototype = Object.create(Strategy.prototype);
-Observer.prototype.execute = function(info) {
+Observer.prototype.execute = function (info) {
 	if (this.debug)
 		console.log("- Monk does not bet");
 	this.abstain = true;

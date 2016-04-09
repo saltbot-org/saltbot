@@ -1,46 +1,49 @@
 chrome.runtime.sendMessage({
 	browserAction: true
-}, function(response) {
+}, function (response) {
 	console.debug("Activated browser action");
 });
 
-var Settings = function() {
+var Settings = function () {
 	this.nextStrategy = null;
 	this.video = true;
 	this.exhibitions = true;
 	// used for tiered betting:
 	this.level = 0;
-	
+
 	//limit for stopping
 	this.limit_enabled = false;
 	this.limit = 10000;
+	this.allInTourney = true;
+	this.tourneyLimit = 100000;
+	this.tourneyLimit_enabled = false;
 };
 
-var StatusScanner = function() {
+var StatusScanner = function () {
 	var self = this;
 	this.announcements = [];
 	// find element and create an observer instance
 	var status = $("#betstatus")[0];
-	var observer = new MutationObserver(function(mutations) {
+	var observer = new MutationObserver(function (mutations) {
 		self.announcements.push(status.innerHTML);
 		// console.log("- status bar updated: " + status.innerHTML);
 		observer.takeRecords();
 	});
 	observer.observe(status, {
-		subtree : true,
-		childList : true,
-		attributes : true
+		subtree: true,
+		childList: true,
+		attributes: true
 	});
 	var winIndicator = " wins";
 
-	this.getAnnouncements = function(preserve) {
+	this.getAnnouncements = function (preserve) {
 		var copy = self.announcements.slice(0);
 		if (!preserve) {
 			self.announcements = [];
 		}
 		return copy;
 	};
-	this.getWinner = function() {
+	this.getWinner = function () {
 		var recent = self.getAnnouncements();
 		recent.reverse();
 		for (var i = 0; i < recent.length; i++) {
@@ -52,7 +55,7 @@ var StatusScanner = function() {
 	};
 };
 
-var Controller = function() {
+var Controller = function () {
 	var bettingAvailable = false;
 	var bettingEntered = false;
 	var bettingComplete = true;
@@ -83,7 +86,7 @@ var Controller = function() {
 
 	var debugMode = true;
 
-	setInterval(function() {
+	setInterval(function () {
 		if (!self.settings)
 			return;
 
@@ -101,7 +104,7 @@ var Controller = function() {
 
 		if (bettingAvailable && !bettingEntered) {
 			bettingEntered = true;
-			
+
 			//Deal with old match
 			if (self.currentMatch != null) {
 				var winner = self.statusScanner.getWinner();
@@ -120,8 +123,8 @@ var Controller = function() {
 					attemptsToProcess = 0;
 					//before processing match, add tier information if we have it
 					self.currentMatch.update(self.infoFromWaifu, self.odds, {
-						"ticks" : self.ticksSinceMatchBegan,
-						"interval" : timerInterval
+						"ticks": self.ticksSinceMatchBegan,
+						"interval": timerInterval
 					}, self.crowdFavor, self.illumFavor);
 					var records = self.currentMatch.getRecords(winner);
 					var mr = records[0];
@@ -131,7 +134,7 @@ var Controller = function() {
 					console.log("- match result code: " + "c1:" + mr.c1 + "|c2:" + mr.c2 + "|w:" + mr.w + "|s:" + mr.sn + "|p:" + mr.pw + "|t:" + mr.t + "|m:" + mr.m + "|o:" + mr.o + "|t:" + mr.ts);
 
 					var s = self;
-					chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1", "bettors_v1"], function(results) {
+					chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1", "bettors_v1"], function (results) {
 						var self = s;
 						var matches_v1 = null;
 						var characters_v1 = null;
@@ -179,7 +182,7 @@ var Controller = function() {
 						var updater = new Updater();
 						var namesOfBettorsWhoAlreadyHaveRecords = [];
 						for (var l in bettors_v1)
-						namesOfBettorsWhoAlreadyHaveRecords.push(bettors_v1[l].name);
+							namesOfBettorsWhoAlreadyHaveRecords.push(bettors_v1[l].name);
 						var bc1 = [];
 						var bc2 = [];
 						for (var j in self.bettorsC1) {
@@ -200,10 +203,10 @@ var Controller = function() {
 						var mbr = matchesBeforeReset;
 						var mp = matchesProcessed;
 						chrome.storage.local.set({
-							'matches_v1' : matches_v1,
-							'characters_v1' : characters_v1,
-							'bettors_v1' : bettors_v1
-						}, function() {
+							'matches_v1': matches_v1,
+							'characters_v1': characters_v1,
+							'bettors_v1': bettors_v1
+						}, function () {
 							if (debugMode) {
 								console.log("- records saved, matches this cycle: " + mp);
 							}
@@ -218,21 +221,30 @@ var Controller = function() {
 					console.log("- failed to determine winner, matches this cycle: " + matchesProcessed);
 					if (matchesProcessed >= matchesBeforeReset)
 						location.reload();
-				}				
+				}
 			}
-			
+
 			this.lastFooterMessage = $("#footer-alert")[0].innerHTML;
-			
+
+			var tournament = detectTournament();
+
 			//set up next strategy
-			if (matchesProcessed == 0 && self.bestChromosome==null) {
+			if (matchesProcessed == 0 && self.bestChromosome == null) {
 				//always observe the first match in the cycle, due to chrome alarm mandatory timing delay
 				self.currentMatch = new Match(new Observer());
 			}
-			else if (self.settings.limit_enabled && self.currentMatch && self.currentMatch.getBalance() >= self.settings.limit) {
+			else if (!tournament && self.settings.limit_enabled && self.currentMatch && self.currentMatch.getBalance() >= self.settings.limit) {
 				//only observe after the limit is reached
 				console.log("- limit of " + self.settings.limit + " is reached, observing");
 				self.currentMatch = new Match(new Observer());
 			}
+
+			else if (tournament && self.settings.tourneyLimit_enabled && self.currentMatch && self.currentMatch.getBalance() >= self.settings.tourneyLimit) {
+				//only observe after the tourney limit is reached
+				console.log("- tourney limit of " + self.settings.limit + " is reached, observing");
+				self.currentMatch = new Match(new Observer());
+			}
+
 			else {
 				var level;
 				if (self.currentMatch && self.currentMatch.strategy) {
@@ -243,26 +255,26 @@ var Controller = function() {
 					nullMatch.strategy.adjustLevel(nullMatch.getBalance());
 					level = nullMatch.strategy.level;
 				}
-				
-				
-				switch(self.settings.nextStrategy) {
-				case "o":
-					self.currentMatch = new Match(new Observer());
-					break;
-				case "rc":
-					self.currentMatch = new Match(new RatioConfidence());
-					break;
-				case "cs":
-					self.currentMatch = new Match(new ConfidenceScore(self.bestChromosome, level, self.lastMatchCumulativeBetTotal));
-					break;
-				case "ipu":
-					self.currentMatch = new Match(new InternetPotentialUpset(new ChromosomeIPU(), level));
-					break;
-				default:
-					self.currentMatch = new Match(new Observer());
-					break;
+
+
+				switch (self.settings.nextStrategy) {
+					case "o":
+						self.currentMatch = new Match(new Observer());
+						break;
+					case "rc":
+						self.currentMatch = new Match(new RatioConfidence());
+						break;
+					case "cs":
+						self.currentMatch = new Match(new ConfidenceScore(self.bestChromosome, level, self.lastMatchCumulativeBetTotal));
+						break;
+					case "ipu":
+						self.currentMatch = new Match(new InternetPotentialUpset(new ChromosomeIPU(), level));
+						break;
+					default:
+						self.currentMatch = new Match(new Observer());
+						break;
 				}
-				
+
 				//get the mode from the footer
 				var modeInfo = this.lastFooterMessage;
 				if (modeInfo.indexOf("bracket") > -1 || modeInfo.indexOf("FINAL ROUND") > -1 || modeInfo.indexOf("Tournament mode start") > -1)
@@ -273,7 +285,7 @@ var Controller = function() {
 					self.currentMatch.mode = "m";
 				else
 					self.currentMatch.mode = "U";
-				
+
 				//set aggro:
 				self.currentMatch.setAggro(self.settings.aggro);
 				if (self.infoFromWaifu.length > 0) {
@@ -296,12 +308,12 @@ var Controller = function() {
 			} else if (self.currentMatch.mode.charAt(0) == 'e' && self.settings.exhibitions !== undefined && !self.settings.exhibitions) {
 				self.currentMatch = null;
 				console.log("- skipping exhibition match because it is deactivated");
-			} 
-			
+			}
+
 			else {
 				self.currentMatch.init();
 			}
-			
+
 			matchesProcessed += 1;
 		}
 
@@ -313,15 +325,15 @@ var Controller = function() {
 
 };
 // Controller.prototype.receiveMessageFromTwitch = ;
-Controller.prototype.ensureTwitch = function() {
+Controller.prototype.ensureTwitch = function () {
 	chrome.runtime.sendMessage({
-		getTwitch : true
-	}, function(response) {
+		getTwitch: true
+	}, function (response) {
 		console.debug("response received in salty");
 	});
 };
-Controller.prototype.removeVideoWindow = function() {
-	var killVideo = function() {
+Controller.prototype.removeVideoWindow = function () {
+	var killVideo = function () {
 		var parent = $("#video-embed");
 		this.savedVideo = parent.clone(true);
 		parent[0].innerHTML = "";
@@ -329,8 +341,8 @@ Controller.prototype.removeVideoWindow = function() {
 	killVideo();
 };
 
-Controller.prototype.enableVideoWindow = function() {
-	var enableVideo = function() {
+Controller.prototype.enableVideoWindow = function () {
+	var enableVideo = function () {
 		if (this.savedVideo && $("#video-embed")[0].innerHTML == "") {
 			$("#video-embed").remove();
 			this.savedVideo.appendTo($("#stream"));
@@ -340,64 +352,85 @@ Controller.prototype.enableVideoWindow = function() {
 	enableVideo();
 };
 
-Controller.prototype.toggleVideoWindow = function() {
-	this.settings.video = !this.settings.video;
+Controller.prototype.toggleVideoWindow = function () {
+	this.settings.video ^= true;
 	if (!this.settings.video)
 		this.removeVideoWindow();
 	else
 		this.enableVideoWindow();
-	this.saveSettings("- settings updated, video: " + this.settings.video);
+	this.saveSettings("- settings updated, video: " + (this.settings.video ? "true" : "false"));
 };
-Controller.prototype.toggleAggro = function() {
-	this.settings.aggro = !this.settings.aggro;
-	this.saveSettings("- settings updated, aggro: " + this.settings.aggro);
+Controller.prototype.toggleAggro = function () {
+	this.settings.aggro ^= true;
+	this.saveSettings("- settings updated, aggro: " + (this.settings.aggro ? "true" : "false"));
 };
-Controller.prototype.toggleExhibitions = function() {
-	this.settings.exhibitions = !this.settings.exhibitions;
-	this.saveSettings("- settings updated, exhibition betting : " + this.settings.exhibitions);
-}
-Controller.prototype.setLimit = function(enabled, limit) {
+Controller.prototype.toggleExhibitions = function () {
+	this.settings.exhibitions ^= true;
+	this.saveSettings("- settings updated, exhibition betting: " + (this.settings.exhibitions ? "true" : "false"));
+};
+Controller.prototype.toggleAllInTournament = function () {
+	this.settings.allInTourney ^= true;
+	this.saveSettings("- settings updated, go all in at tournaments: " + (this.settings.allInTourney ? "true" : "false"));
+};
+Controller.prototype.setLimit = function (enabled, limit) {
+	if (limit == this.settings.limit && enabled == this.settings.limit_enabled) {
+		//nothing to do
+		return;
+	}
+
 	if (limit) {
 		this.settings.limit = parseInt(limit);
 	}
 	this.settings.limit_enabled = enabled;
 	this.saveSettings("- settings updated, limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
 }
-Controller.prototype.changeStrategy = function(sn, data) {
-	var t="";
-	switch(sn) {
-	case "cs_o":
-		this.settings.nextStrategy = "o";
-		t="Monk";
-		break;
-	case "cs_rc":
-		this.settings.nextStrategy = "rc";
-		t="Cowboy";
-		break;
-	case "cs_cs":
-		this.settings.nextStrategy = "cs";
-		var chromosome = new Chromosome().loadFromJSON(data);
-		this.bestChromosome = chromosome;
-		t="Scientist";
-		break;
-	case "cs_cs_warning":
-		console.log("- WARNING: cannot change mode to Scientist without initializing chromosome pool;\n  please click 'Reset Pool'");
+Controller.prototype.setTourneyLimit = function (enabled, limit) {
+	if (limit == this.settings.tourneyLimit && enabled == this.settings.tourneyLimit_enabled) {
+		//nothing to do
 		return;
-	case "cs_ipu":
-		this.settings.nextStrategy = "ipu";
-		t="Lunatic";
-		break;
+	}
+
+	if (limit) {
+		this.settings.tourneyLimit = parseInt(limit);
+	}
+	this.settings.tourneyLimit_enabled = enabled;
+	this.saveSettings("- settings updated, tourney limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
+}
+Controller.prototype.changeStrategy = function (sn, data) {
+	var t = "";
+	switch (sn) {
+		case "cs_o":
+			this.settings.nextStrategy = "o";
+			t = "Monk";
+			break;
+		case "cs_rc":
+			this.settings.nextStrategy = "rc";
+			t = "Cowboy";
+			break;
+		case "cs_cs":
+			this.settings.nextStrategy = "cs";
+			var chromosome = new Chromosome().loadFromJSON(data);
+			this.bestChromosome = chromosome;
+			t = "Scientist";
+			break;
+		case "cs_cs_warning":
+			console.log("- WARNING: cannot change mode to Scientist without initializing chromosome pool;\n  please click 'Reset Pool'");
+			return;
+		case "cs_ipu":
+			this.settings.nextStrategy = "ipu";
+			t = "Lunatic";
+			break;
 	}
 	console.log("- changing strategy to " + t);
 	this.saveSettings("- settings saved");
 };
-Controller.prototype.receiveBestChromosome = function(data) {
+Controller.prototype.receiveBestChromosome = function (data) {
 	this.bestChromosome = new Chromosome().loadFromJSON(data);
 };
-Controller.prototype.saveSettings = function(msg) {
+Controller.prototype.saveSettings = function (msg) {
 	chrome.storage.local.set({
-		'settings_v1' : this.settings
-	}, function() {
+		'settings_v1': this.settings
+	}, function () {
 		console.log(msg);
 	});
 };
@@ -408,20 +441,23 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 	window.location.href == "https://www.saltybet.com/" || window.location.href == "https://mugen.saltybet.com/") {
 	ctrl = new Controller();
 	ctrl.ensureTwitch();
-	chrome.storage.local.get(["settings_v1"], function(results) {
+	chrome.storage.local.get(["settings_v1"], function (results) {
 		var self = ctrl;
 		if (results.settings_v1) {
 			self.settings = results.settings_v1;
 			if (!self.settings.video)
 				self.removeVideoWindow();
-			if(self.settings.aggro)
-				console.log("aggro state: "+self.settings.aggro);
+			if (self.settings.aggro)
+				console.log("aggro state: " + self.settings.aggro);
 			if (!self.settings.level) {
 				self.settings.level = 0;
 				self.saveSettings("- settings upgraded");
 			}
 			if (self.settings.exhibitions === undefined) {
 				self.settings.exhibitions = true;
+			}
+			if (self.settings.allInTourney === undefined) {
+				self.settings.allInTourney = true;
 			}
 		} else {
 			self.settings = new Settings();
@@ -431,10 +467,10 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 		console.log("- settings applied");
 
 	});
-	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+	chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 		var self = ctrl;
 		// console.log("-\nmessage from Waifu:\t" + message);
-		if ( typeof message === "string") {
+		if (typeof message === "string") {
 			var winMessageIndicator = " wins";
 			var newMatchIndicator = "Bets are OPEN for ";
 			var betsLockedIndicator = "Bets are locked";
@@ -465,10 +501,10 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					matches[4] = "e";
 
 				self.infoFromWaifu.push({
-					"c1" : matches[1],
-					"c2" : matches[2],
-					"tier" : matches[3],
-					"mode" : matches[4]
+					"c1": matches[1],
+					"c2": matches[2],
+					"tier": matches[3],
+					"mode": matches[4]
 				});
 				while (self.infoFromWaifu.length > 2) {
 					self.infoFromWaifu.splice(0, 1);
@@ -478,7 +514,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 			} else if (message.indexOf(betsLockedIndicator) > -1) {
 				//reset timer
 				self.ticksSinceMatchBegan = 0;
-				setTimeout(function() {
+				setTimeout(function () {
 					//save the odds
 					try {
 						var oddsBox = $("#lastbet")[0];
@@ -486,7 +522,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 						var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
 						var c2Odds = oddsBox.childNodes[oddsBox.childNodes.length - 1].innerHTML;
 						self.odds = "" + c1Odds + ":" + c2Odds;
-					} catch(e) {
+					} catch (e) {
 						self.odds = null;
 					}
 					//save the betting totals
@@ -500,7 +536,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 						} else {
 							throw "totals error";
 						}
-					} catch(e) {
+					} catch (e) {
 						self.lastMatchCumulativeBetTotal = null;
 					}
 
@@ -520,7 +556,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 							self.illumFavor = 2;
 						else
 							self.illumFavor = (illumSizeC1 > illumSizeC2) ? 0 : 1;
-					} catch(e) {
+					} catch (e) {
 						self.crowdFavor = 2;
 						self.illumFavor = 2;
 					}
@@ -538,7 +574,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 							var e = $(crowdC2[j]).find("strong")[0];
 							self.bettorsC2.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
-					} catch(e) {
+					} catch (e) {
 						self.bettorsC1 = [];
 						self.bettorsC2 = [];
 					}
