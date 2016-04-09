@@ -302,15 +302,14 @@ var Controller = function () {
 			} else if (self.currentMatch.names[0] == self.currentMatch.names[1]) {
 				self.currentMatch = null;
 				console.log("- skipping mirror match");
-			} else if (self.currentMatch.names[0].indexOf(",") > -1 || self.currentMatch.names[1].indexOf(",") > -1) {
-				self.currentMatch = null;
-				console.log("- skipping match, comma in name, too lazy to deal with escape characters");
 			} else if (self.currentMatch.mode.charAt(0) == 'e' && self.settings.exhibitions !== undefined && !self.settings.exhibitions) {
 				self.currentMatch = null;
 				console.log("- skipping exhibition match because it is deactivated");
 			}
 
 			else {
+				self.currentMatch.names[0].replace(",", "_");
+				self.currentMatch.names[1].replace(",", "_");
 				self.currentMatch.init();
 			}
 
@@ -329,7 +328,7 @@ Controller.prototype.ensureTwitch = function () {
 	chrome.runtime.sendMessage({
 		getTwitch: true
 	}, function (response) {
-		console.debug("response received in salty");
+		//console.debug("response received in salty");
 	});
 };
 Controller.prototype.removeVideoWindow = function () {

@@ -61,7 +61,7 @@ var addListener = function () {
 				chrome.runtime.sendMessage({
 					message: Waifu4uLines[j]
 				}, function (response) {
-					console.debug("response received in twitch content");
+					//console.debug("response received in twitch content");
 				});
 				console.log("-\nnew message from Waifu:\n" + Waifu4uLines[j]);
 			}
