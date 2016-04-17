@@ -299,14 +299,13 @@ var Controller = function () {
 			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
 				self.currentMatch = null;
 				console.log("- skipping team match");
-			} else if (self.currentMatch.names[0] == self.currentMatch.names[1]) {
-				self.currentMatch = null;
-				console.log("- skipping mirror match");
 			} else if (self.currentMatch.mode.charAt(0) == 'e' && self.settings.exhibitions !== undefined && !self.settings.exhibitions) {
 				self.currentMatch = null;
 				console.log("- skipping exhibition match because it is deactivated");
+			} else if (self.currentMatch.names[0] == self.currentMatch.names[1]) {
+				self.currentMatch = null;
+				console.log("- skipping mirror match");
 			}
-
 			else {
 				self.currentMatch.names[0].replace(",", "_");
 				self.currentMatch.names[1].replace(",", "_");
@@ -487,10 +486,9 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					var regexLoose = /(?:Bets are OPEN for )(.*)(?: vs )(.*)!(.*)/g;
 					matches = regexLoose.exec(message);
 					matches.push(matches[3]);
-					if (matches[3] == "") {
-						//no tier detected, set to U
-						matches[3] = "U";
-					}
+
+					//set tier to U
+					matches[3] = "U";
 				}
 				if (matches[4].indexOf("matchmaking") > -1)
 					matches[4] = "m";
@@ -498,6 +496,10 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					matches[4] = "t";
 				else if (matches[4].indexOf("exhibition") > -1)
 					matches[4] = "e";
+
+				//replace commas in character names with underscores
+				matches[1].replace(",", "_");
+				matches[2].replace(",", "_");
 
 				self.infoFromWaifu.push({
 					"c1": matches[1],
