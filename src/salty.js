@@ -288,11 +288,6 @@ var Controller = function () {
 
 				//set aggro:
 				self.currentMatch.setAggro(self.settings.aggro);
-				if (self.infoFromWaifu.length > 0) {
-					//copy tier from infoFromWaifu
-					self.currentMatch.tier = self.infoFromWaifu[self.infoFromWaifu.length - 1].tier;
-				}
-
 			}
 
 			//skip team matches, mirror matches
