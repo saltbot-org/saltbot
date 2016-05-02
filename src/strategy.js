@@ -26,7 +26,7 @@ Strategy.prototype.getBailout = function (tournament) {
 	}
 	var level = 1;
 	var rank = $("#rank")[0];
-	if (rank != null) {
+	if (rank != null && rank.childNodes.length != 0) {
 		var re = /rank([0-9]{1,2})\.png/g;
 		var match = re.exec(rank.childNodes[0].src);
 		level = parseInt(match[1]);
