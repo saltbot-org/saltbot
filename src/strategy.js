@@ -24,7 +24,7 @@ Strategy.prototype.getBailout = function (tournament) {
 	} catch (e) { // this is how it is for non-illums:
 		isIlluminati = nameSpan && nameSpan.classList && nameSpan.classList.contains("goldtext");
 	}
-	var level = 1;
+	var level = 0;
 	var rank = $("#rank")[0];
 	if (rank != null && rank.childNodes.length != 0) {
 		var re = /rank([0-9]{1,2})\.png/g;
