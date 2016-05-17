@@ -36,7 +36,8 @@ var btnClicked = function (clicktype, data) {
 			type: clicktype,
 			text: data
 		}, function (response) {
-			console.log(response.farewell);
+			if (response && response.farewell)
+				console.log(response.farewell);
 		});
 	});
 };
