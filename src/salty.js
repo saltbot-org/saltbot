@@ -302,8 +302,8 @@ var Controller = function () {
 				console.log("- skipping mirror match");
 			}
 			else {
-				self.currentMatch.names[0].replace(",", "_");
-				self.currentMatch.names[1].replace(",", "_");
+				self.currentMatch.names[0].replace(/,/g, "_");
+				self.currentMatch.names[1].replace(/,/g, "_");
 				self.currentMatch.init();
 			}
 
@@ -493,8 +493,8 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					matches[4] = "e";
 
 				//replace commas in character names with underscores
-				matches[1].replace(",", "_");
-				matches[2].replace(",", "_");
+				matches[1].replace(/,/g, "_");
+				matches[2].replace(/,/g, "_");
 
 				self.infoFromWaifu.push({
 					"c1": matches[1],
