@@ -184,6 +184,11 @@ Simulator.prototype.evalMutations = function (mode) {
 		if (results.matches_v1)
 			matches = results.matches_v1;
 		
+		if (matches.length == 0) {
+			console.log('No matches have been recorded yet.');
+			return;
+		}
+		
 		var data = [];
 		var correct = [];
 		var totalBettedOn = [];
