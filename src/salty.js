@@ -136,25 +136,23 @@ var Controller = function () {
 					var s = self;
 					chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1", "bettors_v1"], function (results) {
 						var self = s;
-						var matches_v1 = null;
-						var characters_v1 = null;
-						var bettors_v1 = null;
+						var matches_v1 = [];
+						var characters_v1 = [];
+						var bettors_v1 = [];
 						// self.best_chromosome=results.best_chromosome;
 
 						//store new match record
-						if (results.hasOwnProperty("matches_v1")) {
+						if (results.matches_v1) {
 							results.matches_v1.push(mr);
 							matches_v1 = results.matches_v1;
 						} else {
-							matches_v1 = [];
 							matches_v1.push(mr);
 						}
 
 						//character records:
-						if (results.hasOwnProperty("characters_v1"))
+						if (results.characters_v1)
 							characters_v1 = results.characters_v1;
-						else
-							characters_v1 = [];
+
 						//find if characters are already in local storage
 						var c1_index = -1;
 						var c2_index = -1;
@@ -175,10 +173,8 @@ var Controller = function () {
 							characters_v1.push(c2);
 
 						//bettor records
-						if (results.hasOwnProperty("bettors_v1"))
+						if (results.bettors_v1)
 							bettors_v1 = results.bettors_v1;
-						else
-							bettors_v1 = [];
 						var updater = new Updater();
 						var namesOfBettorsWhoAlreadyHaveRecords = [];
 						for (var l in bettors_v1)

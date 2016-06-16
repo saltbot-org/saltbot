@@ -179,7 +179,11 @@ Simulator.prototype.applyPenalties = function (c) {
 Simulator.prototype.evalMutations = function (mode) {
 	var self = this;
 	chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1"], function (results) {
-		var matches = results.matches_v1;
+		var matches = [];
+		
+		if (results.matches_v1)
+			matches = results.matches_v1;
+		
 		var data = [];
 		var correct = [];
 		var totalBettedOn = [];
@@ -489,8 +493,8 @@ var roundsOfEvolution = 0;
 
 document.addEventListener('DOMContentLoaded', function () {
 	chrome.storage.local.get('settings_v1', function (result) {
-		if (result) {
-			$("#tl")[0].checked = result.settings_v1.limit_enabled;
+		if (result.settings_v1) {
+			$("#tl")[0].checked = result.settings_v1.limit_enabled || false;
 			$("#limit")[0].value = result.settings_v1.limit || 10000;
 			console.log($("#tl")[0]);
 			console.log($("#limit")[0].value);

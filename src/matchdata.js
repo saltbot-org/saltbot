@@ -20,24 +20,28 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
 });
 
 chrome.storage.local.get("matches_v1", function (result) {
-	var matches = result.matches_v1;
-	var matchesMirrored = $.extend(true, [], matches);
-	matchesMirrored.forEach(function (element, index, array) {
-		//switch characters around
-		var temp = element.c1;
-		element.c1 = element.c2;
-		element.c2 = temp;
+	var matches = [];
+	
+	if (result.matches_v1) {
+		var matches = result.matches_v1;
+		var matchesMirrored = $.extend(true, [], matches);
+		matchesMirrored.forEach(function (element, index, array) {
+			//switch characters around
+			var temp = element.c1;
+			element.c1 = element.c2;
+			element.c2 = temp;
 
-		//invert winner, crowd favor and illum favor
-		element.w = 1 - element.w;
-		element.cf = element.cf < 2 ? 1 - element.cf : 2;
-		element.if = element.if < 2 ? 1 - element.if : 2;
+			//invert winner, crowd favor and illum favor
+			element.w = 1 - element.w;
+			element.cf = element.cf < 2 ? 1 - element.cf : 2;
+			element.if = element.if < 2 ? 1 - element.if : 2;
 
-		//invert the odds
-		element.o = element.o.split(":").reverse().join(":");
-	});
+			//invert the odds
+			element.o = element.o.split(":").reverse().join(":");
+		});
 
-	matches = matches.concat(matchesMirrored);
+		matches = matches.concat(matchesMirrored);
+	}
 
 	$('#matches').DataTable({
 		data: matches,
