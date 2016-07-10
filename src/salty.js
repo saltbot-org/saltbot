@@ -283,7 +283,14 @@ var Controller = function () {
 					self.currentMatch.mode = "U";
 
 				//set aggro:
-				self.currentMatch.setAggro(self.settings.aggro);
+				console.log("current talimit " + self.settings.talimit_enabled + " current balance / talimit " + getbalance() + " / " + self.settings.talimit);
+					self.currentMatch.setAggro(true);
+				}
+				else
+				{
+					self.currentMatch.setAggro(false);
+				}
+				
 			}
 
 			//skip team matches, mirror matches
@@ -349,9 +356,21 @@ Controller.prototype.toggleVideoWindow = function () {
 		this.enableVideoWindow();
 	this.saveSettings("- settings updated, video: " + (this.settings.video ? "true" : "false"));
 };
-Controller.prototype.toggleAggro = function () {
-	this.settings.aggro ^= true;
-	this.saveSettings("- settings updated, aggro: " + (this.settings.aggro ? "true" : "false"));
+Controller.prototype.setAggro = function (taenabled, talimit) {
+	if (talimit == this.settings.talimit && taenabled == this.settings.talimit_enabled) {
+		//nothing to do
+		return;
+	}
+
+	if (talimit) {
+		this.settings.talimit = parseInt(talimit);
+	}
+	this.settings.talimit_enabled = taenabled;
+	this.saveSettings("- settings updated, talimit " + (taenabled ? "enabled" : "disabled") + " limit : " + talimit);
+	
+	
+	//this.settings.aggro ^= true;
+	//this.saveSettings("- settings updated, aggro: " + (this.settings.aggro ? "true" : "false"));
 };
 Controller.prototype.toggleExhibitions = function () {
 	this.settings.exhibitions ^= true;
