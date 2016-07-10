@@ -367,10 +367,7 @@ Controller.prototype.setAggro = function (taenabled, talimit) {
 	}
 	this.settings.talimit_enabled = taenabled;
 	this.saveSettings("- settings updated, talimit " + (taenabled ? "enabled" : "disabled") + " limit : " + talimit);
-	
-	
-	//this.settings.aggro ^= true;
-	//this.saveSettings("- settings updated, aggro: " + (this.settings.aggro ? "true" : "false"));
+
 };
 Controller.prototype.toggleExhibitions = function () {
 	this.settings.exhibitions ^= true;
