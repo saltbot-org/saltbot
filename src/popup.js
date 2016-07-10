@@ -7,7 +7,6 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-	console.log("starting up");
 	$("#upload_c").on("click", function (e) {
 		e.stopPropagation();
 	});
@@ -24,12 +23,10 @@ $(document).ready(function () {
 });
 
 var elementChanged = function (changetype, data) {
-	console.log("element changed");
 	btnClicked(changetype, data);
 }
 
 var btnClicked = function (clicktype, data) {
-	console.log("element clicked");
 	data = data || null;
 	chrome.tabs.query({
 		active: true,

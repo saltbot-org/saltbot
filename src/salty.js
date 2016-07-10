@@ -283,7 +283,7 @@ var Controller = function () {
 					self.currentMatch.mode = "U";
 
 				//set aggro:
-				console.log("current talimit " + self.settings.talimit_enabled + " current balance / talimit " + getbalance() + " / " + self.settings.talimit);
+				if (self.settings.talimit_enabled == true && self.currentMatch.getBalance() <= self.settings.talimit){
 					self.currentMatch.setAggro(true);
 				}
 				else
