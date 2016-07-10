@@ -44,8 +44,7 @@ var addListener = function () {
 				var line = chatLines[i];
 				var from = $(line).find(".from")[0].innerHTML;
 
-				if (from == "Waifu4u") {
-
+				if (from.toUpperCase() == "WAIFU4U") {
 					var message = $(line).find(".message")[0].innerHTML;
 					if (oldWaifuMessages.indexOf(message) == -1) {
 						oldWaifuMessages.push(message);
