@@ -17,6 +17,8 @@ var Settings = function () {
 	this.allInTourney = true;
 	this.tourneyLimit = 100000;
 	this.tourneyLimit_enabled = false;
+	this.talimit_enabled = false;
+	this.talimit = 10000;
 };
 
 var StatusScanner = function () {
