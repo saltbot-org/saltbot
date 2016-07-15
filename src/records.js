@@ -328,8 +328,11 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 			case "tv":
 				ctrl.toggleVideoWindow();
 				break;
-			case "ta":
-				ctrl.toggleAggro();
+			case "talimit_enable":
+				ctrl.setAggro(true, request.text);
+				break;
+			case "talimit_disable":
+				ctrl.setAggro(false, request.text);
 				break;
 			case "te":
 				ctrl.toggleExhibitions();

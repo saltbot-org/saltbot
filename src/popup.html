@@ -63,6 +63,10 @@
 		.subheading {
 			margin-bottom: 5px;
 			clear: both;
+
+		}
+		input[type="number"] {
+		   width:100px;
 		}
 	</style>
 	<script type="text/javascript" src="records.js"></script>
@@ -125,12 +129,20 @@
 <div id="tv" class="click smalltx">
 	Toggle Video
 </div>
-<div id="ta" class="click smalltx">
-	Toggle Aggro
-</div>
-<div class="subheading">
-	<input id="tl" type="checkbox"/> Stop at <input id="limit" type="number" min="1000" value="10000"/>
-</div>
+<h2 class="subheading">Betting Controls</h2>
+<table>
+	<tr>
+		<td><input id="ta" type="checkbox"/></td>
+		<td> Agressive betting up to </td>
+		<td><input id="talimit" type="number" min="1000" value="10000"/></td>
+	</tr>
+
+	<tr>
+		<td><input id="tl" type="checkbox"/></td>
+		<td> Stop betting at </td>
+		<td><input id="limit" type="number" min="1000" value="10000"/></td>
+	</tr>
+</table>
 </body>
 </html>
 

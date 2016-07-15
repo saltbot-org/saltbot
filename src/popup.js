@@ -51,8 +51,9 @@ var ecClick = function () {
 var tvClick = function () {
 	btnClicked("tv");
 };
-var taClick = function () {
-	btnClicked("ta");
+var taChange = function () {
+	var talimit = $("#talimit")[0].value;
+	elementChanged("talimit_" + (($("#ta")[0].checked) ? "enable" : "disable"), talimit);
 };
 var limitChange = function () {
 	var limit = $("#limit")[0].value;
@@ -63,7 +64,7 @@ var limitChange = function () {
 	if (limit < 1000) {
 		return;
 	}
-
+	
 	elementChanged("limit_" + (($("#tl")[0].checked) ? "enable" : "disable"), limit);
 }
 
@@ -501,6 +502,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (result.settings_v1) {
 			$("#tl")[0].checked = result.settings_v1.limit_enabled || false;
 			$("#limit")[0].value = result.settings_v1.limit || 10000;
+			$("#ta")[0].checked = result.settings_v1.talimit_enabled || false;
+			$("#talimit")[0].value = result.settings_v1.talimit || 10000;
+			
 			console.log($("#tl")[0]);
 			console.log($("#limit")[0].value);
 		}
@@ -518,12 +522,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		simulator.initializePool();
 	});
 	$("#tv")[0].addEventListener("click", tvClick);
-	$("#ta")[0].addEventListener("click", taClick);
+	$("#ta")[0].addEventListener("change", taChange);
+	$("#talimit").bind('keyup input', taChange);
 	$("#cs_o")[0].addEventListener("click", changeStrategyClickO);
 	$("#cs_cs")[0].addEventListener("click", changeStrategyClickCS);
 	$("#cs_rc")[0].addEventListener("click", changeStrategyClickRC);
 	$("#cs_ipu")[0].addEventListener("click", changeStrategyClickIPU);
-
 	$("#tl")[0].addEventListener("change", limitChange);
 	$("#limit").bind('keyup input', limitChange);
 
