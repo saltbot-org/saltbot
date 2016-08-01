@@ -499,6 +499,9 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 					//set tier to U
 					matches[3] = "U";
 				}
+				if (matches[3] == "NEW") {
+					matches[3] = "U";
+				}
 				if (matches[4].indexOf("matchmaking") > -1)
 					matches[4] = "m";
 				else if (matches[4].indexOf("tournament") > -1)
