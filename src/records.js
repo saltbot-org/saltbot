@@ -1,3 +1,5 @@
+var dirtyRecords = true;
+
 var Bettor = function (name) {
 	this.name = name;
 	this.wins = 0;
@@ -254,6 +256,7 @@ var ir = function (f) {
 		'characters_v1': characterRecords
 	}, function () {
 		console.log("-\nrecords imported:\n" + nmr + " match records\n" + ncr + " character records");
+		dirtyRecords = true;
 	});
 };
 
