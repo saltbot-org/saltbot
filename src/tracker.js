@@ -21,6 +21,7 @@ var Match = function (strat) {
 	this.time = 0;
 	this.crowdFavor = 2;
 	this.illumFavor = 2;
+	this.multiplier = 1;
 };
 Match.prototype.update = function (infoFromWaifu, odds, timeInfo, crowdFavor, illumFavor) {
 	for (var i = 0; i < infoFromWaifu.length; i++) {
@@ -91,12 +92,20 @@ Match.prototype.betAmount = function (tournament) {
 
 	strategy.adjustLevel(balance);
 	amountToBet = strategy.getBetAmount(balance, tournament, debug);
-	if (this.strategy.aggro) {
-		amountToBet *= 10;
+	if (!tournament) {
+		console.log("- Multiplying initial bet amount " + amountToBet + " with " + this.multiplier);
+		amountToBet = Math.floor(amountToBet * this.multiplier);
 		if (amountToBet > balance)
 			amountToBet = balance;
-		console.log("AGGRO multiplier active, increasing bet to " + amountToBet);
+
+		if (this.strategy.aggro) {
+			amountToBet *= 10;
+			if (amountToBet > balance)
+				amountToBet = balance;
+			console.log("- AGGRO multiplier active, increasing bet to " + amountToBet);
+		}
 	}
+
 	if (amountToBet == 0) {
 		//bet at least 1
 		amountToBet = 1;
@@ -108,10 +117,11 @@ Match.prototype.init = function () {
 	var s = this;
 
 	//Attempt to get character objects from storage, if they don't exist create them
-	chrome.storage.local.get(["matches_v1", "characters_v1"], function (result) {
+	chrome.storage.local.get(["matches_v1", "characters_v1", "settings_v1"], function (result) {
 		var self = s;
 		var baseSeconds = 2000;
 		var recs = result.characters_v1;
+		self.multiplier = result.settings_v1.multiplier;
 
 		//self.fillCharacters(result);//get character record objects or make new ones
 		if (recs)

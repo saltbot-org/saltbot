@@ -19,6 +19,7 @@ var Settings = function () {
 	this.tourneyLimit_enabled = false;
 	this.talimit_enabled = false;
 	this.talimit = 10000;
+	this.multiplier = 1.0;
 };
 
 var StatusScanner = function () {
@@ -398,6 +399,10 @@ Controller.prototype.toggleAllInTournament = function () {
 	this.settings.allInTourney ^= true;
 	this.saveSettings("- settings updated, go all in at tournaments: " + (this.settings.allInTourney ? "true" : "false"));
 };
+Controller.prototype.setMultiplier = function (value) {
+	this.settings.multiplier = value;
+	this.saveSettings("- settings updated, multiplier: " + value);
+};
 Controller.prototype.setLimit = function (enabled, limit) {
 	if (limit == this.settings.limit && enabled == this.settings.limit_enabled) {
 		//nothing to do
@@ -473,11 +478,10 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 			self.settings = results.settings_v1;
 			if (!self.settings.video)
 				self.removeVideoWindow();
-			if (self.settings.aggro)
+			if (self.settings.aggro !== undefined)
 				console.log("aggro state: " + self.settings.aggro);
-			if (!self.settings.level) {
+			if (self.settings.level === undefined) {
 				self.settings.level = 0;
-				self.saveSettings("- settings upgraded");
 			}
 			if (self.settings.exhibitions === undefined) {
 				self.settings.exhibitions = true;
@@ -485,6 +489,10 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 			if (self.settings.allInTourney === undefined) {
 				self.settings.allInTourney = true;
 			}
+			if (self.settings.multiplier === undefined) {
+				self.settings.multiplier = 1.0;
+			}
+			self.saveSettings("- settings upgraded");
 		} else {
 			self.settings = new Settings();
 			self.settings.nextStrategy = "o";

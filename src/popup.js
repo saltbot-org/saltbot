@@ -68,6 +68,11 @@ var limitChange = function () {
 	elementChanged("limit_" + (($("#tl")[0].checked) ? "enable" : "disable"), limit);
 }
 
+var multiplierChange = function() {
+	var multiplierValue = $("#multiplierSlider")[0].value;
+	elementChanged("multiplier", multiplierValue);
+}
+
 var changeStrategyClickO = function () {
 	btnClicked("cs_o");
 };
@@ -504,6 +509,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			$("#limit")[0].value = result.settings_v1.limit || 10000;
 			$("#ta")[0].checked = result.settings_v1.talimit_enabled || false;
 			$("#talimit")[0].value = result.settings_v1.talimit || 10000;
+			$("#multiplierField")[0].value = result.settings_v1.multiplier || 1;
+			$("#multiplierSlider")[0].value = result.settings_v1.multiplier || 1;
 			
 			console.log($("#tl")[0]);
 			console.log($("#limit")[0].value);
@@ -530,6 +537,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	$("#cs_ipu")[0].addEventListener("click", changeStrategyClickIPU);
 	$("#tl")[0].addEventListener("change", limitChange);
 	$("#limit").bind('keyup input', limitChange);
+	$("#multiplierSlider").bind("change", multiplierChange);
+	$("#multiplierSlider").bind("input", function() {
+		var multiplierValue = $("#multiplierSlider")[0].value;
+		$("#multiplierField")[0].value = multiplierValue;
+	})
 
 	chrome.alarms.create("chromosome update", {
 		delayInMinutes: 0.1,

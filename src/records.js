@@ -373,6 +373,9 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 			case "tourney_limit_disable":
 				ctrl.setTourneyLimit(false, request.text);
 				break;
+			case "multiplier":
+				ctrl.setMultiplier(request.text);
+				break;
 			default:
 				sendResponse({farewell: ("Request type " + request.type + " cannot be handled.")});
 				break;
