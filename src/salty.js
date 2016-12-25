@@ -354,14 +354,14 @@ Controller.prototype.removeVideoWindow = function () {
 	var killVideo = function () {
 		var parent = $("#video-embed");
 		this.savedVideo = parent.clone(true);
-		parent[0].innerHTML = "";
+		parent.empty();
 	};
 	killVideo();
 };
 
 Controller.prototype.enableVideoWindow = function () {
 	var enableVideo = function () {
-		if (this.savedVideo && $("#video-embed")[0].innerHTML == "") {
+		if (this.savedVideo && $("#video-embed")[0].childNodes.length == 0) {
 			$("#video-embed").remove();
 			this.savedVideo.appendTo($("#stream"));
 			this.savedVideo = null;
@@ -624,3 +624,7 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 	});
 	setInterval(ctrl.ensureTwitch, 60000);
 }
+
+window.addEventListener("beforeunload", function (e) {
+	ctrl.enableVideoWindow();
+});

@@ -539,7 +539,7 @@ ConfidenceScore.prototype.execute = function (info) {
 	}
 
 	// make sure something gets bet
-	if (this.confidence < 0)
+	if (this.confidence <= 0)
 		this.confidence = .01;
 
 	return this.prediction;
