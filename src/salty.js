@@ -316,7 +316,8 @@ var Controller = function () {
 			}
 
 			//skip team matches, mirror matches
-			if (self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1) {
+			if ((self.currentMatch.mode == "U" || self.currentMatch.mode == "e") &&
+				(self.currentMatch.names[0].toLowerCase().indexOf("team") > -1 || self.currentMatch.names[1].toLowerCase().indexOf("team") > -1)) {
 				self.currentMatch = null;
 				console.log("- skipping team match");
 			} else if (self.currentMatch.mode.charAt(0) == 'e' && self.settings.exhibitions !== undefined && !self.settings.exhibitions) {
@@ -467,7 +468,7 @@ Controller.prototype.saveSettings = function (msg) {
 };
 
 
-ctrl = null;
+var ctrl = null;
 if (window.location.href == "http://www.saltybet.com/" || window.location.href == "http://mugen.saltybet.com/" ||
 	window.location.href == "https://www.saltybet.com/" || window.location.href == "https://mugen.saltybet.com/") {
 	ctrl = new Controller();
@@ -625,6 +626,6 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 	setInterval(ctrl.ensureTwitch, 60000);
 }
 
-window.addEventListener("beforeunload", function (e) {
+window.addEventListener("beforeunload", function () {
 	ctrl.enableVideoWindow();
 });

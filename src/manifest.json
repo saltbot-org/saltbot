@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "SaltBot",
 	"description": "This extension automates betting on SaltyBet.com.",
-	"version": "2.4.2",
+	"version": "2.4.3",
 	"permissions": [
 		"storage",
 		"unlimitedStorage",
