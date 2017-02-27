@@ -269,17 +269,13 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 1.0;
-		var mutationChance = 0.2;
+		var mutationScale = 0.9;	// range 0..<1 (a danger if offspring becomes < 0).
+		var mutationChance = 0.21;	// range 0..1
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
-			// 20% chance of mutation
-			//var radiation = Math.random() + Math.random();
-			//radiation *= radiation;
 			var radiation =  (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
 			if (Math.random() < mutationChance && offspring[i] != null)
-				//offspring[i] *= radiation;
 				offspring[i] += change;
 		}
 	}

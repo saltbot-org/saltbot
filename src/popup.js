@@ -465,9 +465,11 @@ Simulator.prototype.evalMutations = function (mode) {
 	});
 };
 Simulator.prototype.initializePool = function () {
+	var populationSize = 100;
+	var shortPopulationSize = 20;
 	var pool = [new Chromosome(), new Chromosome()];
-	while (pool.length < 100) {
-		if (pool.length < 20) {
+	while (pool.length < populationSize) {
+		if (pool.length < shortPopulationSize) {
 			var offspring = pool[0].mate(pool[1]);
 			var foundDuplicate = false;
 			for (var i in pool) {
@@ -488,8 +490,8 @@ Simulator.prototype.initializePool = function () {
 	for (var i = 0; i < pool.length; i++) {
 		if (i % 5 == 0) {
 			console.log(pool[i].toDisplayString());
-			newPool.push(pool[i]);
 		}
+		newPool.push(pool[i]);
 	}
 	chrome.storage.local.set({
 		'chromosomes_v1': newPool
