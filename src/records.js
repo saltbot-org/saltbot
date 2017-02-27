@@ -119,7 +119,7 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 				charObj.illumFavor.shift();
 			}
 		}
-	}
+	};
 
 	// this.tiers will correspond with the odds
 	if (mObj.o != null && mObj.o != "U") {
