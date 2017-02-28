@@ -1,6 +1,4 @@
 var Strategy = function (sn) {
-	this.btn10 = $("#interval1")[0];
-	this.btn50 = $("#interval5")[0];
 	this.btnP1 = $("#player1")[0];
 	this.btnP2 = $("#player2")[0];
 	this.p1name = this.btnP1.getAttribute("value").replace(/,/g, '_');
@@ -15,6 +13,7 @@ var Strategy = function (sn) {
 		[500000, 1000000, 100],
 		[1000000, 5000000, 250],
 		[5000000, 20000000, 500]];
+	this.lowBet = false;
 };
 Strategy.prototype.getBailout = function (tournament) {
 	var nameSpan = $("h2")[0].children[2];
@@ -205,127 +204,60 @@ RatioConfidence.prototype.execute = function (info) {
 
 var Chromosome = function () {
 	// confidence weights
-	this.oddsWeight = 1			/82	;
-	this.timeWeight = 0.5		/82	;
-	this.winPercentageWeight = 1/82	;
-	this.crowdFavorWeight = 1	/82	;
-	this.illumFavorWeight = 1	/82	;
-	// tier scoring            
-	this.wX = 5					/82	;
-	this.wS = 4					/82	;
-	this.wA = 3					/82	;
-	this.wB = 2					/82	;
-	this.wP = 1					/82	;
-	this.wU = 0.5				/82	;
-	this.lX = 1					/82	;
-	this.lS = 2					/82	;
-	this.lA = 3					/82	;
-	this.lB = 4					/82	;
-	this.lP = 5					/82	;
-	this.lU = 0.5				/82	;
+	this.oddsWeight = 1;
+	this.timeWeight = 1;
+	this.winPercentageWeight = 1;
+	this.crowdFavorWeight = 1;
+	this.illumFavorWeight = 1;
+	// tier scoring
+	this.wX = 1;
+	this.wS = 1;
+	this.wA = 1;
+	this.wB = 1;
+	this.wP = 1;
+	this.wU = 1;
+	this.lX = 1;
+	this.lS = 1;
+	this.lA = 1;
+	this.lB = 1;
+	this.lP = 1;
+	this.lU = 1;
 	// odds weights
-	this.oX = 5					/82	;
-	this.oS = 4					/82	;
-	this.oA = 3					/82	;
-	this.oB = 2					/82	;
-	this.oP = 1					/82	;
-	this.oU = 0.5				/82	;
+	this.oX = 1;
+	this.oS = 1;
+	this.oA = 1;
+	this.oB = 1;
+	this.oP = 1;
+	this.oU = 1;
 	// times weights
-	this.wtX = 5				/82	;
-	this.wtS = 4				/82	;
-	this.wtA = 3				/82	;
-	this.wtB = 2				/82	;
-	this.wtP = 1				/82	;
-	this.wtU = 0.5				/82	;
-	this.ltX = 1				/82	;
-	this.ltS = 2				/82	;
-	this.ltA = 3				/82	;
-	this.ltB = 4				/82	;
-	this.ltP = 5				/82	;
-	this.ltU = 0.5				/82	;
+	this.wtX =	1;
+	this.wtS =	1;
+	this.wtA =	1;
+	this.wtB =	1;
+	this.wtP =	1;
+	this.wtU =	1;
+	this.ltX =	1;
+	this.ltS =	1;
+	this.ltA =	1;
+	this.ltB =	1;
+	this.ltP =	1;
+	this.ltU =	1;
 	return this;
 };
 
-Chromosome.prototype.normalize = function( chrom){
+Chromosome.prototype.normalize = function(){
 	var sum = 0;
-	sum += chrom.oddsWeight;
-	sum += chrom.timeWeight;
-	sum += chrom.winPercentageWeight;
-	sum += chrom.crowdFavorWeight;
-	sum += chrom.illumFavorWeight;
-	// tier scoring
-	sum += chrom.wX;
-	sum += chrom.wS;
-	sum += chrom.wA;
-	sum += chrom.wB;
-	sum += chrom.wP;
-	sum += chrom.wU;
-	sum += chrom.lX;
-	sum += chrom.lS;
-	sum += chrom.lA;
-	sum += chrom.lB;
-	sum += chrom.lP;
-	sum += chrom.lU;
-	// odds weights
-	sum += chrom.oX;
-	sum += chrom.oS;
-	sum += chrom.oA;
-	sum += chrom.oB;
-	sum += chrom.oP;
-	sum += chrom.oU;
-	// times weights
-	sum += chrom.wtX;
-	sum += chrom.wtS;
-	sum += chrom.wtA;
-	sum += chrom.wtB;
-	sum += chrom.wtP;
-	sum += chrom.wtU;
-	sum += chrom.ltX;
-	sum += chrom.ltS;
-	sum += chrom.ltA;
-	sum += chrom.ltB;
-	sum += chrom.ltP;
-	sum += chrom.ltU;
+	for(var el in this) {
+		if(this.hasOwnProperty(el)) {
+			sum += parseFloat(this[el]);
+		}
+	}
 	
-	chrom.oddsWeight		/= sum	;
-	chrom.timeWeight		/= sum	;
-	chrom.winPercentageWeight	/= sum	;
-	chrom.crowdFavorWeight	/= sum	;
-	chrom.illumFavorWeight	/= sum	;
-	// tier scoring
-	chrom.wX /=	sum;
-	chrom.wS /=	sum;
-	chrom.wA /=	sum;
-	chrom.wB /=	sum;
-	chrom.wP /=	sum;
-	chrom.wU /=	sum;
-	chrom.lX /=	sum;
-	chrom.lS /=	sum;
-	chrom.lA /=	sum;
-	chrom.lB /=	sum;
-	chrom.lP /=	sum;
-	chrom.lU /=	sum;
-	// odds weights
-	chrom.oX /=	sum;
-	chrom.oS /=	sum;
-	chrom.oA /=	sum;
-	chrom.oB /=	sum;
-	chrom.oP /=	sum;
-	chrom.oU /=	sum;
-	// times weights
-	chrom.wtX /= sum;
-	chrom.wtS /= sum;
-	chrom.wtA /= sum;
-	chrom.wtB /= sum;
-	chrom.wtP /= sum;
-	chrom.wtU /= sum;
-	chrom.ltX /= sum;
-	chrom.ltS /= sum;
-	chrom.ltA /= sum;
-	chrom.ltB /= sum;
-	chrom.ltP /= sum;
-    chrom.ltU /= sum;
-	
+	for (var el2 in this) {
+		if (this.hasOwnProperty(el2)) {
+			this[el2] /= (sum);
+		}
+	}
 }
 
 Chromosome.prototype.loadFromJSON = function (json) {
@@ -362,7 +294,7 @@ Chromosome.prototype.mate = function (other) {
 				offspring[i] += change;
 		}
 	}
-	offspring.normalize(offspring);
+	offspring.normalize();
 	return offspring;
 };
 Chromosome.prototype.equals = function (other) {
@@ -446,7 +378,6 @@ var ConfidenceScore = function (chromosome, level, lastMatchCumulativeBetTotal) 
 	Strategy.call(this, "cs");
 	this.abstain = false;
 	this.confidence = null;
-	this.possibleConfidence = 0;
 	this.chromosome = chromosome;
 	this.level = level;
 	this.lastMatchCumulativeBetTotal = lastMatchCumulativeBetTotal;
@@ -461,7 +392,6 @@ ConfidenceScore.prototype.getBetAmount = function (balance, tournament, debug) {
 ConfidenceScore.prototype.execute = function (info) {
 	var c1 = info.character1;
 	var c2 = info.character2;
-	var matches = info.matches;
 	//
 	var oddsWeight = this.chromosome.oddsWeight;
 	var timeWeight = this.chromosome.timeWeight;
@@ -602,13 +532,12 @@ ConfidenceScore.prototype.execute = function (info) {
 
 	var winnerPoints = (this.prediction == c1.name) ? c1Score : c2Score;
 	var totalAvailablePoints = c1Score + c2Score;
-	this.confidence = parseFloat((winnerPoints / totalWeight));
+	this.confidence = parseFloat((winnerPoints / totalAvailablePoints));
 
 	/*---------------------------------------------------------------------------------------------------*/
 	// CONFIDENCE ADJUSTMENT SECTION
 	/*---------------------------------------------------------------------------------------------------*/
 
-	// var unconfident = false;
 	var nerfAmount = 0;
 	var nerfMsg = "-- PROBLEMS:";
 	if ((c1Score == c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3) {

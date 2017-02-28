@@ -24,7 +24,7 @@ $(document).ready(function () {
 
 var elementChanged = function (changetype, data) {
 	btnClicked(changetype, data);
-}
+};
 
 var btnClicked = function (clicktype, data) {
 	data = data || null;
@@ -66,12 +66,12 @@ var limitChange = function () {
 	}
 	
 	elementChanged("limit_" + (($("#tl")[0].checked) ? "enable" : "disable"), limit);
-}
+};
 
 var multiplierChange = function() {
 	var multiplierValue = $("#multiplierSlider")[0].value;
 	elementChanged("multiplier", multiplierValue);
-}
+};
 
 var changeStrategyClickO = function () {
 	btnClicked("cs_o");
@@ -102,7 +102,7 @@ var onFileReadChromosome = function (e) {
 	console.log("File read successful.");
 	var t = e.target.result;
 	btnClicked("ic", t);
-}
+};
 var irClick = function () {
 	console.log("Attempting records import...");
 	var files = $("#upload_r")[0].files;
@@ -488,6 +488,7 @@ Simulator.prototype.initializePool = function () {
 	}
 	var newPool = [];
 	for (var i = 0; i < pool.length; i++) {
+
 		if (i % 5 == 0) {
 			console.log(pool[i].toDisplayString());
 		}
