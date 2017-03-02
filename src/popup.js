@@ -407,20 +407,24 @@ Simulator.prototype.evalMutations = function (mode) {
 				}
 				// i really only need to see the best one
 				console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+				var ratioBestToKeep = 0.1;
 				// created and push children of that half of best sorted population
 				for (var mf = 0; mf < parents.length; mf++) {
 					var parent1 = null;
 					var parent2 = null;
 					var child = null;
-					if (mf == 0) {					// breed best to worst
+					if (mf == 0) {								// breed the best to the worst
 						parent1 = parents[0];
 						parent2 = parents[parents.length - 1];
-					} else if (mf <= 4) {			// breed best with next few best
+					} else if (mf <= parents.length * ratioBestToKeep) {	// breed the best with next few best top %
 						parent1 = parents[0];
 						parent2 = parents[mf];
 					} else {
-						parent1 = parents[mf - 1];	// orderly breeding of best remaining
-						parent2 = parents[mf];
+						parent1 = parents[mf - 1];				// breeding of rest remaining
+						//parent2 = parents[mf];
+						//parent2 = parents[ (mf + Math.floor(Math.random() * (parents.length - mf)))];
+						parent2 = sortingArray[mf +  Math.floor(Math.random() * (top - mf)) ][0];
+						
 					}
 					child = parent1.mate(parent2);
 					nextGeneration.push(child);
