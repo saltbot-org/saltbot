@@ -284,7 +284,7 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 0.5;	// range 0..<1 (a danger if offspring weight becomes < 0).
+		var mutationScale = 0.75;	// range 0..<1 (a danger if offspring weight becomes < 0).
 		var mutationChance = 0.21;	// range 0..1
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
