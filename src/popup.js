@@ -380,7 +380,7 @@ Simulator.prototype.evalMutations = function (mode) {
 			var parents = [];
 			var nextGeneration = [];
 			var money = true;
-			var accuracy = false;
+			var accuracy = true;
 			var unshackle = true;
 
 			if (mode == "evolution") {
@@ -420,15 +420,14 @@ Simulator.prototype.evalMutations = function (mode) {
 						parent1 = parents[0];
 						parent2 = parents[mf];
 					} else {
-						parent1 = parents[mf - 1];				// breeding of rest remaining
+						parent1 = parents[mf];				// breeding of rest remaining
 						//parent2 = parents[mf];
 						//parent2 = parents[ (mf + Math.floor(Math.random() * (parents.length - mf)))];	// pick random after i in top
 						//parent2 = sortingArray[mf +  Math.floor(Math.random() * (top - mf))][0];	// pick random after i to all
 						//var sizeBestRatio =  parents.length * ratioBestToKeep
 						//var sizeAllAfterBestRatio = sortingArray.length - sizeBestRatio;	// when sortingArray >= parents
 						//parent2 = sortingArray[sizeBestRatio + Math.floor(Math.random() * (sizeAllAfterBestRatio)) ][0]; // pick random after best ratio
-						parent2 = sortingArray[top +  Math.floor(Math.random() * (top))][0];	// pick random after top
-						
+						parent2 = sortingArray[top + Math.floor(Math.random() * (top))][0];	// pick random after top
 					}
 					child = parent1.mate(parent2);
 					nextGeneration.push(child);
@@ -474,7 +473,7 @@ Simulator.prototype.evalMutations = function (mode) {
 	});
 };
 Simulator.prototype.initializePool = function () {
-	var populationSize = 100;
+	var populationSize = 76;
 	var shortPopulationSize = 20;
 	var pool = [new Chromosome(), new Chromosome()];
 	while (pool.length < populationSize) {
