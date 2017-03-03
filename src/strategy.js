@@ -204,44 +204,44 @@ RatioConfidence.prototype.execute = function (info) {
 
 var Chromosome = function () {
 	// confidence weights
-	this.oddsWeight = 1;
-	this.timeWeight = 1;
-	this.winPercentageWeight = 1;
-	this.crowdFavorWeight = 1;
-	this.illumFavorWeight = 1;
-	// tier scoring
-	this.wX = 1;
-	this.wS = 1;
-	this.wA = 1;
-	this.wB = 1;
-	this.wP = 1;
-	this.wU = 1;
-	this.lX = 1;
-	this.lS = 1;
-	this.lA = 1;
-	this.lB = 1;
-	this.lP = 1;
-	this.lU = 1;
+	this.oddsWeight = 1			/82	;
+	this.timeWeight = 0.5		/82	;
+	this.winPercentageWeight = 1/82	;
+	this.crowdFavorWeight = 1	/82	;
+	this.illumFavorWeight = 1	/82	;
+	// tier scoring            
+	this.wX = 5					/82	;
+	this.wS = 4					/82	;
+	this.wA = 3					/82	;
+	this.wB = 2					/82	;
+	this.wP = 1					/82	;
+	this.wU = 0.5				/82	;
+	this.lX = 1					/82	;
+	this.lS = 2					/82	;
+	this.lA = 3					/82	;
+	this.lB = 4					/82	;
+	this.lP = 5					/82	;
+	this.lU = 0.5				/82	;
 	// odds weights
-	this.oX = 1;
-	this.oS = 1;
-	this.oA = 1;
-	this.oB = 1;
-	this.oP = 1;
-	this.oU = 1;
+		this.oX = 5					/82	;
+	this.oS = 4					/82	;
+	this.oA = 3					/82	;
+	this.oB = 2					/82	;
+	this.oP = 1					/82	;
+	this.oU = 0.5				/82	;
 	// times weights
-	this.wtX =	1;
-	this.wtS =	1;
-	this.wtA =	1;
-	this.wtB =	1;
-	this.wtP =	1;
-	this.wtU =	1;
-	this.ltX =	1;
-	this.ltS =	1;
-	this.ltA =	1;
-	this.ltB =	1;
-	this.ltP =	1;
-	this.ltU =	1;
+	this.wtX = 5				/82	;
+	this.wtS = 4				/82	;
+	this.wtA = 3				/82	;
+	this.wtB = 2				/82	;
+	this.wtP = 1				/82	;
+	this.wtU = 0.5				/82	;
+	this.ltX = 1				/82	;
+	this.ltS = 2				/82	;
+	this.ltA = 3				/82	;
+	this.ltB = 4				/82	;
+	this.ltP = 5				/82	;
+	this.ltU = 0.5				/82	;
 	return this;
 };
 
@@ -537,11 +537,11 @@ ConfidenceScore.prototype.execute = function (info) {
 	/*---------------------------------------------------------------------------------------------------*/
 	// CONFIDENCE ADJUSTMENT SECTION
 	/*---------------------------------------------------------------------------------------------------*/
-
+	var nerfPoorScore = 0.5;		// 
 	var nerfAmount = 0;
 	var nerfMsg = "-- PROBLEMS:";
 	if ((c1Score == c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3) {
-		nerfAmount += .3;
+		nerfAmount += nerfPoorScore;
 		nerfMsg += "\n- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
 	}
 
