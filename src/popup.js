@@ -415,7 +415,9 @@ Simulator.prototype.evalMutations = function (mode) {
 					var parent1 = null;
 					var parent2 = null;
 					var child = null;
+					if (mf == 0) {		// breed the best to the worst parents kept.
 						parent1 = parents[0];
+						parent2 = parents[sizeTopParents - 1];
 					} else if (mf < sizeTopParents * ratioTopBestBreeding) {		// breed the best with next few best kept
 						parent1 = parents[0];
 						parent2 = parents[mf];
