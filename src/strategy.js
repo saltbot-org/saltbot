@@ -290,7 +290,7 @@ Chromosome.prototype.mate = function (other) {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
-			if (Math.random() < mutationChance && offspring[i] != null)
+			if ((Math.random() < mutationChance) && (offspring[i] != null))
 				offspring[i] += change;
 		}
 	}

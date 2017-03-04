@@ -425,11 +425,14 @@ Simulator.prototype.evalMutations = function (mode) {
 						parent1 = parents[mf];			
 						parent2 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeTopParents))][0];	// pick random after top
 					} else {		// fill remaining population by random breeding below the best kept.
+						var attemps = 2;
+						var atmp = 0;
 						do {							
 							parent1 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeNextGen - sizeTopParents))][0];
 							parent2 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeNextGen - sizeTopParents))][0];
+							atmp++;
 						} 
-						while (parent1 != parent2);
+						while ((parent1 != parent2) && (atmp < attemps));
 					}
 					child = parent1.mate(parent2);
 					nextGeneration.push(child);
