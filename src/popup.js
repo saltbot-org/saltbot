@@ -399,7 +399,7 @@ Simulator.prototype.evalMutations = function (mode) {
 				});
 
 				var sizeNextGen = sortingArray.length;
-				var ratioTopKeep = 0.34;
+				var ratioTopKeep = 0.10;
 				var ratioTopBestBreeding = 0.5;
 				var sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep half of sorted population
 				for (var o = 0; o < sizeTopParents; o++) {
@@ -478,7 +478,7 @@ Simulator.prototype.evalMutations = function (mode) {
 	});
 };
 Simulator.prototype.initializePool = function () {
-	var populationSize = 76;
+	var populationSize = 100;
 	var shortPopulationSize = 20;
 	var pool = [new Chromosome(), new Chromosome()];
 	while (pool.length < populationSize) {

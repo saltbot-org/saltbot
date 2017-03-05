@@ -284,8 +284,8 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 0.50;	// range 0..<1 (a danger if offspring weight becomes < 0).
-		var mutationChance = 0.11;	// range 0..1
+		var mutationScale = 0.20;	// range 0..<1 (a danger if offspring weight becomes < 0).
+		var mutationChance = 0.15;	// range 0..1
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
@@ -537,7 +537,7 @@ ConfidenceScore.prototype.execute = function (info) {
 	/*---------------------------------------------------------------------------------------------------*/
 	// CONFIDENCE ADJUSTMENT SECTION
 	/*---------------------------------------------------------------------------------------------------*/
-	var nerfPoorScore = 0.5;		// 
+	var nerfPoorScore = 0.66;
 	var nerfAmount = 0;
 	var nerfMsg = "-- PROBLEMS:";
 	if ((c1Score == c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3) {
