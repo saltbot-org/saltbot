@@ -284,13 +284,13 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 0.75;	// range 0..<1 (a danger if offspring weight becomes < 0).
-		var mutationChance = 0.11;	// range 0..1
+		var mutationScale = 0.20;	// range 0..<1 (a danger if offspring weight becomes < 0).
+		var mutationChance = 0.15;	// range 0..1
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
-			if (Math.random() < mutationChance && offspring[i] != null)
+			if ((Math.random() < mutationChance) && (offspring[i] != null))
 				offspring[i] += change;
 		}
 	}
@@ -537,11 +537,11 @@ ConfidenceScore.prototype.execute = function (info) {
 	/*---------------------------------------------------------------------------------------------------*/
 	// CONFIDENCE ADJUSTMENT SECTION
 	/*---------------------------------------------------------------------------------------------------*/
-
+	var nerfPoorScore = 0.66;
 	var nerfAmount = 0;
 	var nerfMsg = "-- PROBLEMS:";
 	if ((c1Score == c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3) {
-		nerfAmount += .3;
+		nerfAmount += nerfPoorScore;
 		nerfMsg += "\n- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
 	}
 
