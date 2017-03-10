@@ -208,41 +208,41 @@ var Chromosome = function () {
 	this.timeWeight = 0.5		/82	;
 	this.winPercentageWeight = 1/82	;
 	this.crowdFavorWeight = 1	/82	;
-	this.illumFavorWeight = 1	/82	;
+	this.illumFavorWeight = 1	/82	;// 4.5 // these are sums for normalization, temporary here for sanity.
 	// tier scoring            
 	this.wX = 5					/82	;
 	this.wS = 4					/82	;
 	this.wA = 3					/82	;
 	this.wB = 2					/82	;
 	this.wP = 1					/82	;
-	this.wU = 0.5				/82	;
+	this.wU = 0.5				/82	;// 15.5
 	this.lX = 1					/82	;
 	this.lS = 2					/82	;
 	this.lA = 3					/82	;
 	this.lB = 4					/82	;
 	this.lP = 5					/82	;
-	this.lU = 0.5				/82	;
+	this.lU = 0.5				/82	;// 15.5
 	// odds weights
-		this.oX = 5					/82	;
+	this.oX = 5					/82	;
 	this.oS = 4					/82	;
 	this.oA = 3					/82	;
 	this.oB = 2					/82	;
 	this.oP = 1					/82	;
-	this.oU = 0.5				/82	;
+	this.oU = 0.5				/82	;// 15.5
 	// times weights
 	this.wtX = 5				/82	;
 	this.wtS = 4				/82	;
 	this.wtA = 3				/82	;
 	this.wtB = 2				/82	;
 	this.wtP = 1				/82	;
-	this.wtU = 0.5				/82	;
+	this.wtU = 0.5				/82	;// 15.5
 	this.ltX = 1				/82	;
 	this.ltS = 2				/82	;
 	this.ltA = 3				/82	;
 	this.ltB = 4				/82	;
 	this.ltP = 5				/82	;
-	this.ltU = 0.5				/82	;
-	return this;
+	this.ltU = 0.5				/82	;// 15.5
+	return this;					 // total=82
 };
 
 Chromosome.prototype.normalize = function(){
@@ -255,7 +255,8 @@ Chromosome.prototype.normalize = function(){
 	
 	for (var el2 in this) {
 		if (this.hasOwnProperty(el2)) {
-			this[el2] /= (sum);
+			//* 0.01 because of normalizing to a sum of 100
+			this[el2] /= (sum * 0.01);
 		}
 	}
 }
