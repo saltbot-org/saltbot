@@ -255,7 +255,6 @@ Chromosome.prototype.normalize = function(){
 	
 	for (var el2 in this) {
 		if (this.hasOwnProperty(el2)) {
-			//* 0.01 because of normalizing to a sum of 100
 			this[el2] /= sum;
 		}
 	}
