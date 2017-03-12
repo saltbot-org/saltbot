@@ -382,6 +382,7 @@ Simulator.prototype.evalMutations = function (mode) {
 			var money = true;
 			var accuracy = true;
 			var unshackle = true;
+			var weightAccToMoney = 0.21;
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
@@ -395,11 +396,12 @@ Simulator.prototype.evalMutations = function (mode) {
 						return (b[1] * b[3]) - (a[1] * a[3]);
 					if (money && !accuracy)
 						return (b[2] * b[3]) - (a[2] * a[3]);
-					return (b[1] * b[2] * b[3]) - (a[1] * a[2] * a[3]);
+					var negate = 1 - weightAccToMoney;
+					return ( (weightAccToMoney * b[1]) * (negate * b[2]) * b[3]) - ((weightAccToMoney * a[1]) * (negate * a[2]) * a[3]);
 				});
 
 				var sizeNextGen = sortingArray.length;
-				var ratioTopKeep = 0.10;
+				var ratioTopKeep = 0.05;
 				var ratioTopBestBreeding = 0.5;
 				var sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep half of sorted population
 				for (var o = 0; o < sizeTopParents; o++) {
