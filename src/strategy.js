@@ -255,7 +255,6 @@ Chromosome.prototype.normalize = function(){
 	
 	for (var el2 in this) {
 		if (this.hasOwnProperty(el2)) {
-			//* 0.01 because of normalizing to a sum of 100
 			this[el2] /= sum;
 		}
 	}
@@ -285,8 +284,8 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 0.20;	// range 0..<1 (a danger if offspring weight becomes < 0).
-		var mutationChance = 0.21;	// range 0..1
+		var mutationScale = 0.35;	// range 0..<1 (a danger if offspring weight becomes < 0).
+		var mutationChance = 0.08;	// range 0..1
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
