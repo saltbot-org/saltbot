@@ -204,45 +204,45 @@ RatioConfidence.prototype.execute = function (info) {
 
 var Chromosome = function () {
 	// confidence weights
-	this.oddsWeight = 1;
-	this.timeWeight = 0.5;
-	this.winPercentageWeight = 1;
-	this.crowdFavorWeight = 1;
-	this.illumFavorWeight = 1;
+	this.oddsWeight = 1			/82	;
+	this.timeWeight = 0.5		/82	;
+	this.winPercentageWeight = 1/82	;
+	this.crowdFavorWeight = 1	/82	;
+	this.illumFavorWeight = 1	/82	;// 4.5 // these are sums for normalization, temporary here for sanity.
 	// tier scoring            
-	this.wX = 5;
-	this.wS = 4;
-	this.wA = 3;
-	this.wB = 2;
-	this.wP = 1;
-	this.wU = 0.5;
-	this.lX = 1;
-	this.lS = 2;
-	this.lA = 3;
-	this.lB = 4;
-	this.lP = 5;
-	this.lU = 0.5;
+	this.wX = 5					/82	;
+	this.wS = 4					/82	;
+	this.wA = 3					/82	;
+	this.wB = 2					/82	;
+	this.wP = 1					/82	;
+	this.wU = 0.5				/82	;// 15.5
+	this.lX = 1					/82	;
+	this.lS = 2					/82	;
+	this.lA = 3					/82	;
+	this.lB = 4					/82	;
+	this.lP = 5					/82	;
+	this.lU = 0.5				/82	;// 15.5
 	// odds weights
-	this.oX = 5;
-	this.oS = 4;
-	this.oA = 3;
-	this.oB = 2;
-	this.oP = 1;
-	this.oU = 0.5;
+	this.oX = 5					/82	;
+	this.oS = 4					/82	;
+	this.oA = 3					/82	;
+	this.oB = 2					/82	;
+	this.oP = 1					/82	;
+	this.oU = 0.5				/82	;// 15.5
 	// times weights
-	this.wtX = 5;
-	this.wtS = 4;
-	this.wtA = 3;
-	this.wtB = 2;
-	this.wtP = 1;
-	this.wtU = 0.5;
-	this.ltX = 1;
-	this.ltS = 2;
-	this.ltA = 3;
-	this.ltB = 4;
-	this.ltP = 5;
-	this.ltU = 0.5;
-	return this;
+	this.wtX = 5				/82	;
+	this.wtS = 4				/82	;
+	this.wtA = 3				/82	;
+	this.wtB = 2				/82	;
+	this.wtP = 1				/82	;
+	this.wtU = 0.5				/82	;// 15.5
+	this.ltX = 1				/82	;
+	this.ltS = 2				/82	;
+	this.ltA = 3				/82	;
+	this.ltB = 4				/82	;
+	this.ltP = 5				/82	;
+	this.ltU = 0.5				/82	;// 15.5
+	return this;					 // total=82
 };
 
 Chromosome.prototype.normalize = function(){
@@ -256,7 +256,7 @@ Chromosome.prototype.normalize = function(){
 	for (var el2 in this) {
 		if (this.hasOwnProperty(el2)) {
 			//* 0.01 because of normalizing to a sum of 100
-			this[el2] /= (sum * 0.01);
+			this[el2] /= sum;
 		}
 	}
 }
@@ -285,13 +285,13 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 0.5;	// range 0..<1 (a danger if offspring weight becomes < 0).
-		var mutationChance = 0.21;	// range 0..1
+		var mutationScale = 0.20;	// range 0..<1 (a danger if offspring weight becomes < 0).
+		var mutationChance = 0.15;	// range 0..1
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
-			if (Math.random() < mutationChance && offspring[i] != null)
+			if ((Math.random() < mutationChance) && (offspring[i] != null))
 				offspring[i] += change;
 		}
 	}
@@ -538,11 +538,11 @@ ConfidenceScore.prototype.execute = function (info) {
 	/*---------------------------------------------------------------------------------------------------*/
 	// CONFIDENCE ADJUSTMENT SECTION
 	/*---------------------------------------------------------------------------------------------------*/
-
+	var nerfPoorScore = 0.66;
 	var nerfAmount = 0;
 	var nerfMsg = "-- PROBLEMS:";
 	if ((c1Score == c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3) {
-		nerfAmount += .3;
+		nerfAmount += nerfPoorScore;
 		nerfMsg += "\n- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
 	}
 
