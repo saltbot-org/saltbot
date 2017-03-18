@@ -171,7 +171,12 @@ Simulator.prototype.getBetAmount = function (strategy, index) {
 
 	return amountToBet;
 };
+// currently unsupported with the time weights splitting.
 Simulator.prototype.applyPenalties = function (c) {
+	//###
+	Console.log("called: applyPenalties. Is undefined.")
+	return 1;
+	//###
 	// anti-domination
 	var adOdds = c.timeWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
 	var adTime = c.oddsWeight + c.winPercentageWeight + c.crowdFavorWeight + c.illumFavorWeight;
