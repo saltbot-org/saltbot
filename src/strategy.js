@@ -205,7 +205,7 @@ RatioConfidence.prototype.execute = function (info) {
 var Chromosome = function () {
 	// confidence weights
 	this.oddsWeight = 1			 	;
-	this.timeWeight = 1			 	;
+	//this.timeWeight = 1			 	;
 	this.timeAveWin = 1				;
 	this.timeAveLose = 1			;
 	this.winPercentageWeight = 1	 	;
@@ -286,7 +286,7 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 0.35;	// range 0..<1 (a danger if offspring weight becomes < 0).
+		var mutationScale = 0.21;	// range 0..<1 (a danger if offspring weight becomes < 0).
 		var mutationChance = 0.08;	// range 0..1
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
@@ -396,13 +396,13 @@ ConfidenceScore.prototype.execute = function (info) {
 	var c2 = info.character2;
 	//
 	var oddsWeight = this.chromosome.oddsWeight;
-	var timeWeight = this.chromosome.timeWeight;
+	//var timeWeight = this.chromosome.timeWeight;
 	var timeAveWin = this.chromosome.timeAveWin;
 	var timeAveLose = this.chromosome.timeAveLose;
 	var winPercentageWeight = this.chromosome.winPercentageWeight;
 	var crowdFavorWeight = this.chromosome.crowdFavorWeight;
 	var illumFavorWeight = this.chromosome.illumFavorWeight;
-	var totalWeight = oddsWeight + timeWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
+	var totalWeight = oddsWeight + timeAveWin + timeAveLose + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
 
 	// messages
 	var oddsMessage = null;
