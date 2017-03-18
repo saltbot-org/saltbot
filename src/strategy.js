@@ -248,13 +248,23 @@ var Chromosome = function () {
 };
 
 Chromosome.prototype.normalize = function(){
+	var lowest = 0;
+	for (var low in this){
+		if (low < lowest){
+			lowest = low;
+		}
+	}
+	//lowest = (lowest < 0) ? (-1 *lowest) : lowest;
+	for (var e0 in this){
+		e0 -= lowest;
+	}
+	
 	var sum = 0;
 	for(var el in this) {
 		if(this.hasOwnProperty(el)) {
 			sum += parseFloat(this[el]);
 		}
 	}
-	
 	for (var el2 in this) {
 		if (this.hasOwnProperty(el2)) {
 			this[el2] /= sum;
