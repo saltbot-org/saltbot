@@ -174,7 +174,7 @@ Simulator.prototype.getBetAmount = function (strategy, index) {
 // currently unsupported with the time weights splitting.
 Simulator.prototype.applyPenalties = function (c) {
 	//###
-	Console.log("called: applyPenalties. Is undefined.")
+	console.log("called: applyPenalties. Is undefined.")
 	return 1;
 	//###
 	// anti-domination
@@ -485,7 +485,7 @@ Simulator.prototype.evalMutations = function (mode) {
 	});
 };
 Simulator.prototype.initializePool = function () {
-	var populationSize = 200;
+	var populationSize = 100;
 	var shortPopulationSize = 20;
 	var pool = [new Chromosome(), new Chromosome()];
 	while (pool.length < populationSize) {
