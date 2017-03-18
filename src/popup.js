@@ -387,7 +387,7 @@ Simulator.prototype.evalMutations = function (mode) {
 			var money = true;
 			var accuracy = true;
 			var unshackle = true;
-			var weightAccToMoney = 0.10;
+			var weightAccToMoney = 0.25;
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {

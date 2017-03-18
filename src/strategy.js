@@ -247,18 +247,24 @@ var Chromosome = function () {
 	return this;					 // total=82
 };
 
+//
 Chromosome.prototype.normalize = function(){
+	// make weights > 0
 	var lowest = 0;
-	for (var low in this){
-		if (low < lowest){
-			lowest = low;
+	for (var e0 in this){
+		if(this.hasOwnProperty(e0)){
+			var low =  parseFloat(this[e0]);
+			if (low < lowest){
+				lowest = low;
+			}
 		}
 	}
-	//lowest = (lowest < 0) ? (-1 *lowest) : lowest;
-	for (var e0 in this){
-		e0 -= lowest;
+	for (var e01 in this){
+		if(this.hasOwnProperty(e01)){
+			this[e01] -= lowest;
+		}
 	}
-	
+	// normalize
 	var sum = 0;
 	for(var el in this) {
 		if(this.hasOwnProperty(el)) {
@@ -296,8 +302,8 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 0.21;	// range 0..<1 (a danger if offspring weight becomes < 0).
-		var mutationChance = 0.08;	// range 0..1
+		var mutationScale = 1.1;	// range (-inf, +inf)
+		var mutationChance = 0.08;	// range [0,1)
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
@@ -483,18 +489,18 @@ ConfidenceScore.prototype.execute = function (info) {
 
 	if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null) {
 		if (c1Stats.averageWinTime < c2Stats.averageWinTime)
-			c1Score += timeAveWin / 2;
+			c1Score += timeAveWin;
 		else if (c1Stats.averageWinTime > c2Stats.averageWinTime)
-			c2Score += timeAveWin / 2;
+			c2Score += timeAveWin;
 		if (this.debug) timeMessage = "avg win time (red:blue) -> (" + formatString(c1Stats.averageWinTimeRaw.toFixed(0) + " : " + c2Stats.averageWinTimeRaw.toFixed(0), messagelength) + ")";
 	}
 
 
 	if (c1Stats.averageLossTime != null && c2Stats.averageLossTime != null) {
 		if (c1Stats.averageLossTime > c2Stats.averageLossTime)
-			c1Score += timeAveLose / 2;
+			c1Score += timeAveLose;
 		else if (c1Stats.averageLossTime < c2Stats.averageLossTime)
-			c2Score += timeAveLose / 2;
+			c2Score += timeAveLose;
 		if (this.debug) {
 			var msg = "  ::  avg loss time (red:blue) -> (" + formatString(c1Stats.averageLossTimeRaw.toFixed(0) + " : " + c2Stats.averageLossTimeRaw.toFixed(0), messagelength) + ")";
 			if (timeMessage)
