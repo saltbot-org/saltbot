@@ -258,6 +258,7 @@ Chromosome.prototype.normalize = function(){
 				lowest = low;
 			}
 		}
+		lowest -= 0.0000001;
 	}
 	for (var e01 in this){
 		if(this.hasOwnProperty(e01)){
@@ -304,12 +305,18 @@ Chromosome.prototype.mate = function (other) {
 	for (var i in offspring) {
 		var mutationScale = 1.1;	// range (-inf, +inf)
 		var mutationChance = 0.08;	// range [0,1)
+		var smallVal = 0.0000001;
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
-			if ((Math.random() < mutationChance) && (offspring[i] != null))
+			if (Math.abs(change) < smallVal) change = smallVal;
+			if ((Math.random() < mutationChance) && (offspring[i] != null)){
 				offspring[i] += change;
+			}
+			if (Math.abs(offspring[i]) < smallVal) {
+				offspring[i] = smallVal;
+			}
 		}
 	}
 	offspring.normalize();
