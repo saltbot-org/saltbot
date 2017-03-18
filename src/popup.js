@@ -391,8 +391,10 @@ Simulator.prototype.evalMutations = function (mode) {
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
-					var penalty = self.applyPenalties(orders[l].chromosome);
-					if (unshackle) penalty = 1;
+					var penalty = 1;
+					if (!unshackle){
+						penalty = self.applyPenalties(orders[l].chromosome);
+					}
 					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l], penalty]);
 				}
 				//	sort the the best in order.
