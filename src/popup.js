@@ -388,6 +388,8 @@ Simulator.prototype.evalMutations = function (mode) {
 			var accuracy = true;
 			var unshackle = true;
 			var weightAccToMoney = 0.01;
+			var ratioTopKeep = 0.05;
+			var ratioOrderedTopBestBreeding = 0.1; // valid range [0, 1) 
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
@@ -407,9 +409,7 @@ Simulator.prototype.evalMutations = function (mode) {
 					return ( (weightAccToMoney * b[1]) * (negate * b[2]) * b[3]) - ((weightAccToMoney * a[1]) * (negate * a[2]) * a[3]);
 				});
 
-				var sizeNextGen = sortingArray.length;
-				var ratioTopKeep = 0.05;
-				var ratioTopBestBreeding = 0.1; // valid range [0, 1) 
+				var sizeNextGen = sortingArray.length;	
 				var sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep half of sorted population
 				for (var o = 0; o < sizeTopParents; o++) {
 					parents.push(sortingArray[o][0]);
@@ -427,12 +427,12 @@ Simulator.prototype.evalMutations = function (mode) {
 					if (mf == 0) {		// breed the best to the worst parents kept.
 						parent1 = parents[0];
 						parent2 = sortingArray[sortingArray.length-1][0];
-					} else if (mf < sizeTopParents * ratioTopBestBreeding) {		// breed the best with next few best kept
+					} else if (mf < sizeTopParents * ratioOrderedTopBestBreeding) {		// breed the best with next few best kept
 						parent1 = parents[0];
 						parent2 = parents[mf];
 					} else if (mf < sizeTopParents){			// breed best kept remaining
 						parent1 = parents[mf];			
-						parent2 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeTopParents))][0];	// pick random after top
+						parent2 = sortingArray[1+Math.floor(Math.random() * (sizeTopParents-1))][0];	// pick random after top
 					} else {		// fill remaining population by random breeding with some rules.
 						var attemps = 2;
 						var atmp = 0;
