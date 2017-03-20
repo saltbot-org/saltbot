@@ -210,41 +210,41 @@ var Chromosome = function () {
 	this.timeAveLose = 1			;
 	this.winPercentageWeight = 1	 	;
 	this.crowdFavorWeight = 1		 	;
-	this.illumFavorWeight = 1		 	;// 4.5 // these are sums for normalization, temporary here for sanity.
+	this.illumFavorWeight = 1		 	;
 	// tier scoring            
 	this.wX = 1						 	;
 	this.wS = 1				 	;
 	this.wA = 1				 	;
 	this.wB = 1				 	;
 	this.wP = 1				 	;
-	this.wU = 1				 	;// 15.5
+	this.wU = 1				 	;
 	this.lX = 1				 	;
 	this.lS = 1				 	;
 	this.lA = 1				 	;
 	this.lB = 1				 	;
 	this.lP = 1				 	;
-	this.lU = 1				 	;// 15.5
+	this.lU = 1				 	;
 	// odds weights
 	this.oX = 1				 	;
 	this.oS = 1				 	;
 	this.oA = 1				 	;
 	this.oB = 1				 	;
 	this.oP = 1				 	;
-	this.oU = 1				 	;// 15.5
+	this.oU = 1				 	;
 	// times weights
 	this.wtX = 1				 	;
 	this.wtS = 1				 	;
 	this.wtA = 1				 	;
 	this.wtB = 1				 	;
 	this.wtP = 1				 	;
-	this.wtU = 1				 	;// 15.5
+	this.wtU = 1				 	;
 	this.ltX = 1				 	;
 	this.ltS = 1				 	;
 	this.ltA = 1				 	;
 	this.ltB = 1				 	;
 	this.ltP = 1				 	;
-	this.ltU = 1				 	;// 15.5
-	return this;					 // total=82
+	this.ltU = 1				 	;
+	return this;					 
 };
 
 //
@@ -303,8 +303,8 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 0.1;	// range (-inf, +inf)
-		var mutationChance = 0.16;	// range [0,1)
+		var mutationScale = 0.2;	// range (-inf, +inf)
+		var mutationChance = 0.16;	// range [0,1]
 		var smallVal = 0.0000001;
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
