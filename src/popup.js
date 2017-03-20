@@ -387,9 +387,9 @@ Simulator.prototype.evalMutations = function (mode) {
 			var money = true;
 			var accuracy = true;
 			var unshackle = true;
-			var weightAccToMoney = 0.01;
-			var ratioTopKeep = 0.05;
-			var ratioOrderedTopBestBreeding = 0.1; // valid range [0, 1) 
+			var weightAccToMoney = 0.1;
+			var ratioTopKeep = 0.20;				// valid range [0, 0.5] critical value, this retains + duplicates creations for next gen.
+			var ratioOrderedTopBestBreeding = 0.1;	// valid range [0, 1) , controls ordered breeding of best parents, else randomly.
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
@@ -410,7 +410,7 @@ Simulator.prototype.evalMutations = function (mode) {
 				});
 
 				var sizeNextGen = sortingArray.length;	
-				var sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep half of sorted population
+				var sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep part of sorted population
 				for (var o = 0; o < sizeTopParents; o++) {
 					parents.push(sortingArray[o][0]);
 					//ranking guarantees that we send the best one
@@ -424,16 +424,16 @@ Simulator.prototype.evalMutations = function (mode) {
 					var parent1 = null;
 					var parent2 = null;
 					var child = null;
-					if (mf == 0) {		// breed the best to the worst parents kept.
+					if (mf == 0) {													// breed the best to the worst parents kept.
 						parent1 = parents[0];
 						parent2 = sortingArray[sortingArray.length-1][0];
 					} else if (mf < sizeTopParents * ratioOrderedTopBestBreeding) {		// breed the best with next few best kept
 						parent1 = parents[0];
 						parent2 = parents[mf];
-					} else if (mf < sizeTopParents){			// breed best kept remaining
+					} else if (mf < sizeTopParents){							// breed best kept remaining randomly. (even self)
 						parent1 = parents[mf];			
 						parent2 = sortingArray[1+Math.floor(Math.random() * (sizeTopParents-1))][0];	// pick random after top
-					} else {		// fill remaining population by random breeding with some rules.
+					} else {				// fill remaining population by random breeding the poor chromosomes with some rules.
 						var attemps = 2;
 						var atmp = 0;
 						do {							
@@ -487,7 +487,7 @@ Simulator.prototype.evalMutations = function (mode) {
 	});
 };
 Simulator.prototype.initializePool = function () {
-	var populationSize = 100;
+	var populationSize = 50;
 	var shortPopulationSize = 20;
 	var pool = [new Chromosome(), new Chromosome()];
 	while (pool.length < populationSize) {
