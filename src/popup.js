@@ -427,6 +427,9 @@ Simulator.prototype.evalMutations = function (mode) {
 					if (mf == 0) {													// breed the best to the worst.
 						parent1 = sortingArray[0][0];
 						parent2 = sortingArray[sortingArray.length-1][0];
+					} else if (mf==1){
+						parent1 = sortingArray[0][0];		//self
+						parent2 = sortingArray[0][0];
 					} else if (mf < sizeTopParents * ratioOrderedTopBestBreeding) {		// breed the best with next few best.
 						parent1 = sortingArray[0][0];
 						parent2 = sortingArray[mf][0];
