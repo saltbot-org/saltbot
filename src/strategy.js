@@ -204,55 +204,74 @@ RatioConfidence.prototype.execute = function (info) {
 
 var Chromosome = function () {
 	// confidence weights
-	this.oddsWeight = 1			/82	;
-	this.timeWeight = 1			/82	;
-	this.winPercentageWeight = 1	/82	;
-	this.crowdFavorWeight = 1		/82	;
-	this.illumFavorWeight = 1		/82	;// 4.5 // these are sums for normalization, temporary here for sanity.
+	this.oddsWeight = 1			 	;
+	//this.timeWeight = 1			 	;
+	this.timeAveWin = 1				;
+	this.timeAveLose = 1			;
+	this.winPercentageWeight = 1	 	;
+	this.crowdFavorWeight = 1		 	;
+	this.illumFavorWeight = 1		 	;
 	// tier scoring            
-	this.wX = 1						/82	;
-	this.wS = 1				/82	;
-	this.wA = 1				/82	;
-	this.wB = 1				/82	;
-	this.wP = 1				/82	;
-	this.wU = 1				/82	;// 15.5
-	this.lX = 1				/82	;
-	this.lS = 1				/82	;
-	this.lA = 1				/82	;
-	this.lB = 1				/82	;
-	this.lP = 1				/82	;
-	this.lU = 1				/82	;// 15.5
+	this.wX = 1						 	;
+	this.wS = 1				 	;
+	this.wA = 1				 	;
+	this.wB = 1				 	;
+	this.wP = 1				 	;
+	this.wU = 1				 	;
+	this.lX = 1				 	;
+	this.lS = 1				 	;
+	this.lA = 1				 	;
+	this.lB = 1				 	;
+	this.lP = 1				 	;
+	this.lU = 1				 	;
 	// odds weights
-	this.oX = 1				/82	;
-	this.oS = 1				/82	;
-	this.oA = 1				/82	;
-	this.oB = 1				/82	;
-	this.oP = 1				/82	;
-	this.oU = 1				/82	;// 15.5
+	this.oX = 1				 	;
+	this.oS = 1				 	;
+	this.oA = 1				 	;
+	this.oB = 1				 	;
+	this.oP = 1				 	;
+	this.oU = 1				 	;
 	// times weights
-	this.wtX = 1				/82	;
-	this.wtS = 1				/82	;
-	this.wtA = 1				/82	;
-	this.wtB = 1				/82	;
-	this.wtP = 1				/82	;
-	this.wtU = 1				/82	;// 15.5
-	this.ltX = 1				/82	;
-	this.ltS = 1				/82	;
-	this.ltA = 1				/82	;
-	this.ltB = 1				/82	;
-	this.ltP = 1				/82	;
-	this.ltU = 1				/82	;// 15.5
-	return this;					 // total=82
+	this.wtX = 1				 	;
+	this.wtS = 1				 	;
+	this.wtA = 1				 	;
+	this.wtB = 1				 	;
+	this.wtP = 1				 	;
+	this.wtU = 1				 	;
+	this.ltX = 1				 	;
+	this.ltS = 1				 	;
+	this.ltA = 1				 	;
+	this.ltB = 1				 	;
+	this.ltP = 1				 	;
+	this.ltU = 1				 	;
+	return this;					 
 };
 
+//
 Chromosome.prototype.normalize = function(){
+	// make weights > 0
+	var lowest = 0;
+	for (var e0 in this){
+		if(this.hasOwnProperty(e0)){
+			var low =  parseFloat(this[e0]);
+			if (low < lowest){
+				lowest = low;
+			}
+		}
+		lowest -= 0.0000001;
+	}
+	for (var e01 in this){
+		if(this.hasOwnProperty(e01)){
+			this[e01] -= lowest;
+		}
+	}
+	// normalize
 	var sum = 0;
 	for(var el in this) {
 		if(this.hasOwnProperty(el)) {
 			sum += parseFloat(this[el]);
 		}
 	}
-	
 	for (var el2 in this) {
 		if (this.hasOwnProperty(el2)) {
 			this[el2] /= sum;
@@ -284,14 +303,20 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 0.35;	// range 0..<1 (a danger if offspring weight becomes < 0).
-		var mutationChance = 0.08;	// range 0..1
+		var mutationScale = 0.3;	// range (-inf, +inf)
+		var mutationChance = 0.08;	// range [0,1]
+		var smallVal = 0.0000001;
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
-			if ((Math.random() < mutationChance) && (offspring[i] != null))
+			if (Math.abs(change) < smallVal) change = smallVal;
+			if ((Math.random() < mutationChance) && (offspring[i] != null)){
 				offspring[i] += change;
+			}
+			if (Math.abs(offspring[i]) < smallVal) {
+				offspring[i] = smallVal;
+			}
 		}
 	}
 	offspring.normalize();
@@ -394,11 +419,12 @@ ConfidenceScore.prototype.execute = function (info) {
 	var c2 = info.character2;
 	//
 	var oddsWeight = this.chromosome.oddsWeight;
-	var timeWeight = this.chromosome.timeWeight;
+	var timeAveWin = this.chromosome.timeAveWin;
+	var timeAveLose = this.chromosome.timeAveLose;
 	var winPercentageWeight = this.chromosome.winPercentageWeight;
 	var crowdFavorWeight = this.chromosome.crowdFavorWeight;
 	var illumFavorWeight = this.chromosome.illumFavorWeight;
-	var totalWeight = oddsWeight + timeWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
+	var totalWeight = oddsWeight + timeAveWin + timeAveLose + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
 
 	// messages
 	var oddsMessage = null;
@@ -469,18 +495,18 @@ ConfidenceScore.prototype.execute = function (info) {
 
 	if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null) {
 		if (c1Stats.averageWinTime < c2Stats.averageWinTime)
-			c1Score += timeWeight / 2;
+			c1Score += timeAveWin;
 		else if (c1Stats.averageWinTime > c2Stats.averageWinTime)
-			c2Score += timeWeight / 2;
+			c2Score += timeAveWin;
 		if (this.debug) timeMessage = "avg win time (red:blue) -> (" + formatString(c1Stats.averageWinTimeRaw.toFixed(0) + " : " + c2Stats.averageWinTimeRaw.toFixed(0), messagelength) + ")";
 	}
 
 
 	if (c1Stats.averageLossTime != null && c2Stats.averageLossTime != null) {
 		if (c1Stats.averageLossTime > c2Stats.averageLossTime)
-			c1Score += timeWeight / 2;
+			c1Score += timeAveLose;
 		else if (c1Stats.averageLossTime < c2Stats.averageLossTime)
-			c2Score += timeWeight / 2;
+			c2Score += timeAveLose;
 		if (this.debug) {
 			var msg = "  ::  avg loss time (red:blue) -> (" + formatString(c1Stats.averageLossTimeRaw.toFixed(0) + " : " + c2Stats.averageLossTimeRaw.toFixed(0), messagelength) + ")";
 			if (timeMessage)
