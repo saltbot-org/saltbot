@@ -388,8 +388,9 @@ Simulator.prototype.evalMutations = function (mode) {
 			var accuracy = true;
 			var unshackle = true;
 			var weightAccToMoney = 0.90;
-			var ratioTopKeep = 0.45;				// valid range [0, 0.499..) critical value, control what is retained.
-			var ratioOrderedTopBestBreeding = 0.10;	// valid range [0, 1), subset of ratioTopKeep, controls ordered breeding of best parents, else randomly.
+			var ratioTopKeep = 0.05;				// from the sorted listed of last gen, the best retained.
+			var ratioTopKeptBreeding = 0.50;		// exclusive to ratioTopKeep, controls amount the best will breed together.
+			var ratioOrderedTopBestBreeding = 0.5;	// valid range [0, 1), a subset of best breeding, ratio of ordered breeding vs. randomly.
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
@@ -411,29 +412,27 @@ Simulator.prototype.evalMutations = function (mode) {
 
 				var sizeNextGen = sortingArray.length;	
 				var sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep part of sorted population
-//				for (var o = 0; o < sizeTopParents; o++) {
-//					parents.push(sortingArray[o][0]);
-//					//ranking guarantees that we send the best one
-//					sortingArray[o][0].rank = o + 1;
-//					nextGeneration.push(sortingArray[o][0]);
-//				}
+				var sizeTopParentsBreed = Math.floor(sizeNextGen * ratioTopKeptBreeding);
+				for (var o = 0; o < sizeTopParents; o++) {
+					parents.push(sortingArray[o][0]);
+					//ranking guarantees that we send the best one
+					sortingArray[o][0].rank = o + 1;
+					nextGeneration.push(sortingArray[o][0]);
+				}
 				// i really only need to see the best one
 				console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 				// created and push children of that half of best sorted population
-				for (var mf = 0; mf < sizeNextGen/*-sizeTopParents*/ ; mf++) {
+				for (var mf = 0; mf < sizeNextGen-sizeTopParents ; mf++) {
 					var parent1 = null;
 					var parent2 = null;
 					var child = null;
 					if (mf == 0) {													// breed the best to the worst.
 						parent1 = sortingArray[0][0];
 						parent2 = sortingArray[sortingArray.length-1][0];
-					} else if (mf==1){
-						parent1 = sortingArray[0][0];		//self
-						parent2 = sortingArray[0][0];
-					} else if (mf < sizeTopParents * ratioOrderedTopBestBreeding) {		// breed the best with next few best.
+					} else if (mf < sizeTopParentsBreed * ratioOrderedTopBestBreeding) {	// breed the best with next few best.
 						parent1 = sortingArray[0][0];
 						parent2 = sortingArray[mf][0];
-					} else if (mf < sizeTopParents){							// breed best remaining randomly. (even self).
+					} else if (mf < sizeTopParentsBreed ){							// breed best remaining randomly. (even self).
 						parent1 = sortingArray[mf][0];			
 						parent2 = sortingArray[1+Math.floor(Math.random() * (sizeTopParents-1))][0];
 					} else {				// fill remaining population by random breeding the elements with some rules.
