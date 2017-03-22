@@ -258,8 +258,8 @@ Chromosome.prototype.normalize = function(){
 				lowest = low;
 			}
 		}
-		lowest -= 0.0000001;
 	}
+	lowest -= 0.000001;	// extra sum for near zero prevention.
 	for (var e01 in this){
 		if(this.hasOwnProperty(e01)){
 			this[e01] -= lowest;
@@ -305,7 +305,7 @@ Chromosome.prototype.mate = function (other) {
 	for (var i in offspring) {
 		var mutationScale = 0.5;	// range (-inf, +inf)
 		var mutationChance = 0.16;	// range [0,1]
-		var smallVal = 0.0000001;
+		var smallVal = 0.000001;
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;

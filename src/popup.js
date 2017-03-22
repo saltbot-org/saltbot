@@ -387,10 +387,10 @@ Simulator.prototype.evalMutations = function (mode) {
 			var money = true;
 			var accuracy = true;
 			var unshackle = true;
-			var weightAccToMoney = 0.90;
-			var ratioTopKeep = 0.05;				// from the sorted listed of last gen, the best retained.
-			var ratioTopKeptBreeding = 0.50;		// exclusive to ratioTopKeep, controls amount the best will breed together.
-			var ratioOrderedTopBestBreeding = 0.5;	// valid range [0, 1), a subset of best breeding, ratio of ordered breeding vs. randomly.
+			var weightAccToMoney = 1;
+			var ratioTopKeep = 0.05;				// from the sorted listed of last gen, the best retained and reused.
+			var ratioTopKeptBreeding = 0.75;		// exclusive to ratioTopKeep, controls amount breed, filling next gen from best sorted.
+			var ratioOrderedTopBestBreeding = 0.0;	// valid range [0, 1), a subset of best breeding, ratio of controlled breeding onto best vs. randomly.
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
@@ -428,18 +428,18 @@ Simulator.prototype.evalMutations = function (mode) {
 					var child = null;
 					if (mf == 0) {													// breed the best to the worst.
 						parent1 = sortingArray[0][0];
-						parent2 = sortingArray[sortingArray.length-1][0];
+						parent2 = sortingArray[parents.length-1][0];
 					} else if (mf < sizeTopParentsBreed * ratioOrderedTopBestBreeding) {	// breed the best with next few best.
 						parent1 = sortingArray[0][0];
 						parent2 = sortingArray[mf][0];
 					} else if (mf < sizeTopParentsBreed ){							// breed best remaining randomly. (even self).
 						parent1 = sortingArray[mf][0];			
-						parent2 = sortingArray[1+Math.floor(Math.random() * (sizeTopParents-1))][0];
+						parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParents))][0];
 					} else {				// fill remaining population by random breeding the elements with some rules.
 						var attemps = 2;
 						var atmp = 0;
 						do {							
-							parent1 = sortingArray[Math.floor(Math.random() * (sizeNextGen))][0];
+							parent1 = sortingArray[Math.floor(Math.random() * (sizeTopParents))][0];
 							parent2 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeNextGen - sizeTopParents))][0];
 							atmp++;
 						} 
