@@ -362,8 +362,9 @@ Controller.prototype.removeVideoWindow = function () {
 
 Controller.prototype.enableVideoWindow = function () {
 	var enableVideo = function () {
-		if (this.savedVideo && $("#video-embed")[0].childNodes.length == 0) {
-			$("#video-embed").remove();
+		var embeddedVideo = $("#video-embed");
+		if (this.savedVideo && embeddedVideo[0].childNodes.length == 0) {
+			embeddedVideo.remove();
 			this.savedVideo.appendTo($("#stream"));
 			this.savedVideo = null;
 		}
@@ -415,7 +416,8 @@ Controller.prototype.setLimit = function (enabled, limit) {
 	}
 	this.settings.limit_enabled = enabled;
 	this.saveSettings("- settings updated, limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
-}
+};
+
 Controller.prototype.setTourneyLimit = function (enabled, limit) {
 	if (limit == this.settings.tourneyLimit && enabled == this.settings.tourneyLimit_enabled) {
 		//nothing to do
@@ -427,7 +429,8 @@ Controller.prototype.setTourneyLimit = function (enabled, limit) {
 	}
 	this.settings.tourneyLimit_enabled = enabled;
 	this.saveSettings("- settings updated, tourney limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
-}
+};
+
 Controller.prototype.changeStrategy = function (sn, data) {
 	var t = "";
 	switch (sn) {

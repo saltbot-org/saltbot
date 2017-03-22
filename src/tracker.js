@@ -6,7 +6,7 @@ var detectTournament = function() {
 	var tournament = footer != null && (footer.innerHTML.indexOf(tournamentModeIndicator) > -1 || footer.innerHTML.indexOf(tournamentModeIndicator2) > -1 ||
 		footer.innerHTML.indexOf(tournamentModeIndicator3) > -1);
 	return tournament;
-}
+};
 
 var Match = function (strat) {
 	this.names = [strat.p1name, strat.p2name];
@@ -82,7 +82,8 @@ Match.prototype.getBalance = function () {
 	var balanceBox = $("#balance")[0];
 	var balance = parseInt(balanceBox.innerHTML.replace(/,/g, ""));
 	return balance;
-}
+};
+
 Match.prototype.betAmount = function (tournament) {
 	var balance = this.getBalance();
 	var wagerBox = $("#wager")[0];
