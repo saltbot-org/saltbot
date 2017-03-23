@@ -75,11 +75,11 @@ var prClick = function () {
 };
 
 var teChange = function () {
-	btnClicked("te");
+	elementChanged("te", $("#te")[0].checked);
 };
 
 var aitChange = function () {
-	btnClicked("ait")
+	elementChanged("ait", $("#ait")[0].checked);
 };
 
 var tLimitChange = function (ev) {
@@ -95,12 +95,17 @@ var tLimitChange = function (ev) {
 	elementChanged("tourney_limit_" + (($("#ctl")[0].checked) ? "enable" : "disable"), tLimit);
 };
 
+var keepAliveChange = function () {
+	elementChanged("keepAlive", $("#toggleKeepAlive")[0].checked);
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 	chrome.storage.local.get(["settings_v1"], function (results) {
 		$("#te").prop('checked', results.settings_v1.exhibitions);
 		$("#ait").prop('checked', results.settings_v1.allInTourney);
 		$("#ctl").prop('checked', results.settings_v1.tourneyLimit_enabled);
 		$("#tourney-limit")[0].value = results.settings_v1.tourneyLimit;
+		$("#toggleKeepAlive").prop('checked', results.settings_v1.keepAlive)
 	});
 
 	$("#bdr")[0].addEventListener("click", drClick);
@@ -108,5 +113,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	$("#te")[0].addEventListener("change", teChange);
 	$("#ait")[0].addEventListener("change", aitChange);
 	$("#ctl")[0].addEventListener("change", tLimitChange);
+	$("#toggleKeepAlive")[0].addEventListener("change", keepAliveChange);
 	$("#tourney-limit").bind('keyup input', tLimitChange);
 });
