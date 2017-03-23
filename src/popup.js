@@ -443,7 +443,7 @@ Simulator.prototype.evalMutations = function (mode) {
 							parent2 = sortingArray[mf][0];
 						} else if (mf < sizeTopParentsBreed ){						// breed best remaining randomly. (even self).
 							parent1 = sortingArray[mf][0];			
-							parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParents))][0];
+							parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
 						} else {				// fill remaining population by random breeding the elements with some rules.			
 								parent1 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
 								parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
