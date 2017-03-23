@@ -2,7 +2,7 @@
 
 sleep 5
 
-chromium-browser http://www.saltybet.com/authenticate?signin=1 & disown
+chromium-browser http://www.saltybet.com/authenticate?signin=1
 
 sleep 5
 

@@ -27,8 +27,8 @@ while True:
             print ("You are logged in, nothing to do")
             print ("counter =" + str(counter))
             if counter >= 6: counter = 0
-else:
-pyautogui.keyDown('alt')
-pyautogui.press('f4')
-pyautogui.keyUp('alt')
-rc = subprocess.call("saltbot.sh")
+            else:
+                pyautogui.keyDown('alt')
+                pyautogui.press('f4')
+                pyautogui.keyUp('alt')
+#rc = subprocess.call("saltbot.sh")
