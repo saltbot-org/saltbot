@@ -387,7 +387,6 @@ Simulator.prototype.evalMutations = function (mode) {
 			var money = true;
 			var accuracy = true;
 			var unshackle = true;
-			var weightAccToMoney = 0.001;			// valid range (0,1), enabled when accuracy & unshackle are.
 			var ratioTopKeep = 0.00;				// from the sorted listed of last gen, the best retained and reused.
 			var ratioTopKeptBreeding = 0.5;		// exclusive to ratioTopKeep, controls amount breed, filling next gen from best sorted.
 			var ratioOrderedTopBestBreeding = 0.0;	// valid range [0, 1), a subset of ratioTopKeptBreeding, ratio of controlled breeding onto the best vs. randomly.
