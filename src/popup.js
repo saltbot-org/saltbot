@@ -385,9 +385,8 @@ Simulator.prototype.evalMutations = function (mode) {
 			var parents = [];
 			var nextGeneration = [];
 			var money = true;
-			var accuracy = false;
+			var accuracy = true;
 			var unshackle = true;
-			var weightAccToMoney = 0.5;			// valid range (0,1), enabled when accuracy & unshackle are.
 			var ratioTopKeep = 0.00;				// from the sorted listed of last gen, the best retained and reused.
 			var ratioTopKeptBreeding = 0.5;		// exclusive to ratioTopKeep, controls amount breed, filling next gen from best sorted.
 			var ratioOrderedTopBestBreeding = 0.0;	// valid range [0, 1), a subset of ratioTopKeptBreeding, ratio of controlled breeding onto the best vs. randomly.
@@ -443,7 +442,7 @@ Simulator.prototype.evalMutations = function (mode) {
 							parent2 = sortingArray[mf][0];
 						} else if (mf < sizeTopParentsBreed ){						// breed best remaining randomly. (even self).
 							parent1 = sortingArray[mf][0];			
-							parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParents))][0];
+							parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
 						} else {				// fill remaining population by random breeding the elements with some rules.			
 								parent1 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
 								parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
