@@ -306,7 +306,7 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	for (var i in offspring) {
-		var mutationScale = 2;	// range (-inf, +inf)
+		var mutationScale = 0.25;	// range (-inf, +inf)
 		var mutationChance = 0.08;	// range [0,1]
 		var smallVal = 0.000001;
 		if (typeof offspring[i] != "function") {
