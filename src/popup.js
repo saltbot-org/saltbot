@@ -385,12 +385,12 @@ Simulator.prototype.evalMutations = function (mode) {
 			var parents = [];
 			var nextGeneration = [];
 			var money = true;
-			var accuracy = true;
+			var accuracy = false;
 			var unshackle = true;
-			var weightAccToMoney = 1;
-			var ratioTopKeep = 0.05;				// from the sorted listed of last gen, the best retained and reused.
-			var ratioTopKeptBreeding = 0.75;		// exclusive to ratioTopKeep, controls amount breed, filling next gen from best sorted.
-			var ratioOrderedTopBestBreeding = 0.0;	// valid range [0, 1), a subset of best breeding, ratio of controlled breeding onto best vs. randomly.
+			var weightAccToMoney = 0.5;			// valid range (0,1), enabled when accuracy & unshackle are.
+			var ratioTopKeep = 0.00;				// from the sorted listed of last gen, the best retained and reused.
+			var ratioTopKeptBreeding = 0.5;		// exclusive to ratioTopKeep, controls amount breed, filling next gen from best sorted.
+			var ratioOrderedTopBestBreeding = 0.0;	// valid range [0, 1), a subset of ratioTopKeptBreeding, ratio of controlled breeding onto the best vs. randomly.
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
@@ -421,30 +421,35 @@ Simulator.prototype.evalMutations = function (mode) {
 				}
 				// i really only need to see the best one
 				console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+				// print scores of pool
+				var poolScoreLog = "\n pool scores: \n";
+				for (var i=0; i<sortingArray.length; i++){
+					poolScoreLog += sortingArray[i][1].toFixed(4) + "%:$" + parseInt(sortingArray[i][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") +"\n";
+				}
+				console.log(poolScoreLog);
 				// created and push children of that half of best sorted population
 				for (var mf = 0; mf < sizeNextGen-sizeTopParents ; mf++) {
-					var parent1 = null;
-					var parent2 = null;
-					var child = null;
-					if (mf == 0) {													// breed the best to the worst.
-						parent1 = sortingArray[0][0];
-						parent2 = sortingArray[parents.length-1][0];
-					} else if (mf < sizeTopParentsBreed * ratioOrderedTopBestBreeding) {	// breed the best with next few best.
-						parent1 = sortingArray[0][0];
-						parent2 = sortingArray[mf][0];
-					} else if (mf < sizeTopParentsBreed ){							// breed best remaining randomly. (even self).
-						parent1 = sortingArray[mf][0];			
-						parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParents))][0];
-					} else {				// fill remaining population by random breeding the elements with some rules.
-						var attemps = 2;
-						var atmp = 0;
-						do {							
-							parent1 = sortingArray[Math.floor(Math.random() * (sizeTopParents))][0];
-							parent2 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeNextGen - sizeTopParents))][0];
-							atmp++;
-						} 
-						while ((parent1 != parent2) && (atmp < attemps));
-					}
+					var attemps = 2;
+					var atmp = 0;			
+					do {
+						var parent1 = null;
+						var parent2 = null;
+						var child = null;
+						if (mf == 0) {													// breed the best to the worst.
+							parent1 = sortingArray[0][0];
+							parent2 = sortingArray[sizeTopParentsBreed-1][0];
+						} else if (mf < sizeTopParentsBreed * ratioOrderedTopBestBreeding) {	// breed the best with next few best.
+							parent1 = sortingArray[0][0];
+							parent2 = sortingArray[mf][0];
+						} else if (mf < sizeTopParentsBreed ){						// breed best remaining randomly. (even self).
+							parent1 = sortingArray[mf][0];			
+							parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParents))][0];
+						} else {				// fill remaining population by random breeding the elements with some rules.			
+								parent1 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
+								parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
+						}
+						atmp++;
+					} while ((parent1 == parent2) && (atmp < attemps));
 					child = parent1.mate(parent2);
 					nextGeneration.push(child);
 				}
@@ -489,7 +494,7 @@ Simulator.prototype.evalMutations = function (mode) {
 	});
 };
 Simulator.prototype.initializePool = function () {
-	var populationSize = 100;
+	var populationSize = 64;
 	var shortPopulationSize = 20;
 	var pool = [new Chromosome(), new Chromosome()];
 	while (pool.length < populationSize) {
