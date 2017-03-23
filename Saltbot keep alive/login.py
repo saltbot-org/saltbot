@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# Welcome to CLRenew, a simple python script that automates mouse clicks to
-# renew craigslist postings credit to https://github.com/yuqianli for base code
+
 import pyautogui
 import os
 import subprocess
