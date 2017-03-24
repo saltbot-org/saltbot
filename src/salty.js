@@ -393,12 +393,12 @@ Controller.prototype.setAggro = function (taenabled, talimit) {
 	this.saveSettings("- settings updated, talimit " + (taenabled ? "enabled" : "disabled") + " limit : " + talimit);
 
 };
-Controller.prototype.toggleExhibitions = function () {
-	this.settings.exhibitions ^= true;
+Controller.prototype.setExhibitions = function (value) {
+	this.settings.exhibitions = value;
 	this.saveSettings("- settings updated, exhibition betting: " + (this.settings.exhibitions ? "true" : "false"));
 };
-Controller.prototype.toggleAllInTournament = function () {
-	this.settings.allInTourney ^= true;
+Controller.prototype.setAllInTournament = function (value) {
+	this.settings.allInTourney = value;
 	this.saveSettings("- settings updated, go all in at tournaments: " + (this.settings.allInTourney ? "true" : "false"));
 };
 Controller.prototype.setMultiplier = function (value) {
@@ -470,6 +470,11 @@ Controller.prototype.saveSettings = function (msg) {
 	});
 };
 
+Controller.prototype.setKeepAlive = function (value) {
+	this.settings.keepAlive = value;
+	this.saveSettings("- settings updated, always keep saltybet tab alive: " + (this.settings.keepAlive ? "true" : "false"));
+}
+
 
 var ctrl = null;
 if (window.location.href == "http://www.saltybet.com/" || window.location.href == "http://mugen.saltybet.com/" ||
@@ -495,6 +500,9 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 			}
 			if (self.settings.multiplier === undefined) {
 				self.settings.multiplier = 1.0;
+			}
+			if (self.settings.keepAlive === undefined) {
+				self.settings.keepAlive = false;
 			}
 			self.saveSettings("- settings upgraded");
 		} else {
