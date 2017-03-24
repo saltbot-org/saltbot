@@ -37,15 +37,40 @@ chrome.runtime.onInstalled.addListener(function () {
 
 chrome.extension.onMessage.addListener(function (details, sender, sendResponse) {
 	if (details.message !== undefined) {
+		var queryResult = null;
+		
 		//Receive message from Waifu, pass it on to salty tab
 		chrome.tabs.query({
 			title: "Salty Bet",
 			url: "*://*.saltybet.com/"
 		}, function (result) {
-			// result is an array of tab.Tabs
-			for (var i = 0; i < result.length; i++) {
-				chrome.tabs.sendMessage(result[i].id, details.message);
-			}
+			queryResult = result;
+
+			chrome.storage.local.get(["settings_v1"], function (storedObjects) {
+				if (result.length == 0 && storedObjects["settings_v1"].keepAlive) {
+					chrome.tabs.create({
+						url: "http://www.saltybet.com"
+					});
+				}
+				else {
+					for (var i = 0; i < queryResult.length; i++) {
+						chrome.tabs.sendMessage(queryResult[i].id, details.message, function (response) {
+							if (storedObjects["settings_v1"].keepAlive && chrome.runtime.lastError !== undefined) {
+								//an error happened while sending the message to the tab, create a new tab
+								chrome.tabs.remove(queryResult[i].id, function () {
+								});
+
+								chrome.tabs.create({
+									url: "http://www.saltybet.com"
+								});
+							}
+						});
+					}
+				}
+
+
+			});
+
 		});
 	}
 	if (details.getTwitch !== undefined) {
@@ -99,10 +124,12 @@ var sendUpdatedChromosome = function () {
 				title: "Salty Bet",
 				url: "*://*.saltybet.com/"
 			}, function (result) {
-				chrome.tabs.sendMessage(result[0].id, {
-					type: "suc",
-					text: data
-				});
+				if (result.length > 0) {
+					chrome.tabs.sendMessage(result[0].id, {
+						type: "suc",
+						text: data
+					});
+				}
 			});
 		}
 	});

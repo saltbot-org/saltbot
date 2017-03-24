@@ -338,10 +338,10 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 				ctrl.setAggro(false, request.text);
 				break;
 			case "te":
-				ctrl.toggleExhibitions();
+				ctrl.setExhibitions(request.text);
 				break;
 			case "ait":
-				ctrl.toggleAllInTournament();
+				ctrl.setAllInTournament(request.text);
 				break;
 			case "cs_o":
 				ctrl.changeStrategy(request.type);
@@ -349,17 +349,13 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 			case "suc":
 				ctrl.receiveBestChromosome(request.text);
 				break;
+			case "cs_ipu":
 			case "cs_rc":
 				ctrl.changeStrategy(request.type);
 				break;
 			case "cs_cs":
-				ctrl.changeStrategy(request.type, request.text);
-				break;
 			case "cs_cs_warning":
 				ctrl.changeStrategy(request.type, request.text);
-				break;
-			case "cs_ipu":
-				ctrl.changeStrategy(request.type);
 				break;
 			case "limit_enable":
 				ctrl.setLimit(true, request.text);
@@ -375,6 +371,9 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 				break;
 			case "multiplier":
 				ctrl.setMultiplier(request.text);
+				break;
+			case "keepAlive":
+				ctrl.setKeepAlive(request.text);
 				break;
 			default:
 				sendResponse({farewell: ("Request type " + request.type + " cannot be handled.")});
