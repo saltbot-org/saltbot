@@ -35,10 +35,22 @@ chrome.runtime.onInstalled.addListener(function () {
 	reimportMatches();
 });
 
+//variable used so the tabs aren't closed and reopened multiple times
+var restartedSaltyBet = false;
+
+function resetRestarted(){
+	//set restarted to true and then to false in 5 seconds
+	//this is done to ensure that multiple messages in a short amount of time do not create multiple tabs
+	restartedSaltyBet = true;
+	setTimeout(function(){
+		restartedSaltyBet = false;
+	}, 5000);
+}
+
 chrome.extension.onMessage.addListener(function (details, sender, sendResponse) {
 	if (details.message !== undefined) {
 		var queryResult = null;
-		
+
 		//Receive message from Waifu, pass it on to salty tab
 		chrome.tabs.query({
 			title: "Salty Bet",
@@ -47,22 +59,34 @@ chrome.extension.onMessage.addListener(function (details, sender, sendResponse) 
 			queryResult = result;
 
 			chrome.storage.local.get(["settings_v1"], function (storedObjects) {
-				if (result.length == 0 && storedObjects["settings_v1"].keepAlive) {
+				if (result.length == 0 && storedObjects["settings_v1"].keepAlive && !restartedSaltyBet) {
 					chrome.tabs.create({
 						url: "http://www.saltybet.com"
 					});
+					resetRestarted();
 				}
 				else {
 					for (var i = 0; i < queryResult.length; i++) {
 						chrome.tabs.sendMessage(queryResult[i].id, details.message, function (response) {
-							if (storedObjects["settings_v1"].keepAlive && chrome.runtime.lastError !== undefined) {
+							if (storedObjects["settings_v1"].keepAlive && !restartedSaltyBet &&
+								chrome.runtime.lastError !== undefined &&
+								chrome.runtime.lastError.message == "Could not establish connection. Receiving end does not exist.") {
 								//an error happened while sending the message to the tab, create a new tab
-								chrome.tabs.remove(queryResult[i].id, function () {
-								});
+
+								chrome.runtime.lastError = undefined;
+
+								//close saltybet tabs
+								//can't use queryResult[i] because sendMessage is asynchronous
+								for (var j = 0; j < queryResult.length; ++j) {
+									chrome.tabs.remove(queryResult[j].id, function () {
+									});
+								}
 
 								chrome.tabs.create({
 									url: "http://www.saltybet.com"
 								});
+
+								resetRestarted();
 							}
 						});
 					}
