@@ -22,5 +22,5 @@ To keep your version up to date simple:
 
 # Contributors & Members
 
-[Click here](https://github.com/synkarius/saltbot/network/members)
+[**Click here for the current list of Contributors & Members**](https://github.com/synkarius/saltbot/network/members)
 
