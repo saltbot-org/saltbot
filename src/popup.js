@@ -387,11 +387,13 @@ Simulator.prototype.evalMutations = function (mode) {
 			var money = true;
 			var accuracy = true;
 			var unshackle = true;
-			var weightAccToMoney = 1 - 1/100000000;			// valid range (0,1), enabled if accuracy & money are.
-			var ratioTopKeep = 0.00;			// valid range [0,1), from the sorted listed of last gen, the best retained and reused. No recommended as it prevents "jitter" in finding solutions.
-			var ratioTopKeptBreeding = 0.5;		// valid range (0,1], fills after ratioTopKeep. Controls breeding and dropping, too much and everything will get to breed, to little and it breed a small selection.
-			var ratioOrderedTopBestBreeding = 0.0;	// valid range [0, 1), a subset of ratioTopKeptBreeding, ratio of controlled breeding onto the best vs. randomly. When you want the best to be experimented.
-			var ratioEvenTopBestBreeding = 0.0;		// valid range [0, 1), a subset of ratioTopKeptBreeding done after ratioOrderedTopBestBreeding,  evenly allows the best a chance to breed.
+			var weightAccToMoney = 1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
+			
+			// these ratios controls how critters are breed using the sorted array of critters after the heuristic method. Think of percents as from top best to worst.
+			var ratioTopKeep = 0;				// valid range [0,1], from the sorted listed of last gen, the best retained and reused. Not recommended as it prevents "jitter" in finding solutions.
+			var ratioTopKeptBreeding = 0.5;		// valid range (0,1), Critical value; fills pool after ratioTopKeep. Controls how many critters are kept/dropped.
+			var ratioOrderedTopBestBreeding = Math.ceil(4/64);;	// valid range [0, 1), treat it exclusive to ratioEvenTopBestBreeding. Ratio of controlled breeding onto the best.
+			var ratioEvenTopBestBreeding = 0.0;		// valid range [0, 1), treat it exclusive to ratioOrderedTopBestBreeding. Evenly allows the the top list a chance to breed.
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
@@ -441,10 +443,10 @@ Simulator.prototype.evalMutations = function (mode) {
 						if (mf == 0) {													// breed the best to worst.
 							parent1 = sortingArray[0][0];
 							parent2 = sortingArray[sizeTopParentsBreed-1][0];
-						} else if (mf < sizeTopParentsBreed * ratioOrderedTopBestBreeding) {	// breed orderly with best
+						} else if (mf < sizeTopParentsBreed * (ratioOrderedTopBestBreeding)) {	// breed orderly with best
 							parent1 = sortingArray[0][0];
 							parent2 = sortingArray[mf][0];
-						} else if (mf < sizeTopParentsBreed * (ratioOrderedTopBestBreeding + ratioEvenTopBestBreeding)){		// breed all the best with a random.
+						} else if (mf < sizeTopParentsBreed * (ratioEvenTopBestBreeding)){		// breed all the best with a random.
 							parent1 = sortingArray[mf][0];			
 							parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
 						} else {					// fill remaining population by random breeding the best with chaos. 
