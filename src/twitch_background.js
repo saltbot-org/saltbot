@@ -38,7 +38,7 @@ chrome.runtime.onInstalled.addListener(function () {
 //variable used so the tabs aren't closed and reopened multiple times
 var restartedSaltyBet = false;
 
-function resetRestarted(){
+function setRestarted(){
 	//set restarted to true and then to false in 5 seconds
 	//this is done to ensure that multiple messages in a short amount of time do not create multiple tabs
 	restartedSaltyBet = true;
@@ -63,7 +63,7 @@ chrome.extension.onMessage.addListener(function (details, sender, sendResponse) 
 					chrome.tabs.create({
 						url: "http://www.saltybet.com"
 					});
-					resetRestarted();
+					setRestarted();
 				}
 				else {
 					for (var i = 0; i < queryResult.length; i++) {
@@ -86,7 +86,7 @@ chrome.extension.onMessage.addListener(function (details, sender, sendResponse) 
 									url: "http://www.saltybet.com"
 								});
 
-								resetRestarted();
+								setRestarted();
 							}
 						});
 					}
