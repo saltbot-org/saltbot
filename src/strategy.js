@@ -202,49 +202,48 @@ RatioConfidence.prototype.execute = function (info) {
 	}
 };
 
-var Chromosome = function () {
+var Chromosome = function() {
 	// confidence weights
-	this.oddsWeight = 1			 	;
-	//this.timeWeight = 1			 	;
-	this.timeAveWin = 1				;
-	this.timeAveLose = 1			;
-	this.winPercentageWeight = 1	 	;
-	this.crowdFavorWeight = 1		 	;
-	this.illumFavorWeight = 1		 	;
+	this.oddsWeight = 1;
+	this.timeAveWin = 1;	//this.timeWeight  =  1;
+	this.timeAveLose = 1;
+	this.winPercentageWeight = 1;
+	this.crowdFavorWeight = 1;
+	this.illumFavorWeight = 1;
 	// tier scoring            
-	this.wX = 1						 	;
-	this.wS = 1				 	;
-	this.wA = 1				 	;
-	this.wB = 1				 	;
-	this.wP = 1				 	;
-	this.wU = 1				 	;
-	this.lX = 1				 	;
-	this.lS = 1				 	;
-	this.lA = 1				 	;
-	this.lB = 1				 	;
-	this.lP = 1				 	;
-	this.lU = 1				 	;
+	this.wX = 1;
+	this.wS = 1;
+	this.wA = 1;
+	this.wB = 1;
+	this.wP = 1;
+	this.wU = 1;
+	this.lX = 1;
+	this.lS = 1;
+	this.lA = 1;
+	this.lB = 1;
+	this.lP = 1;
+	this.lU = 1;
 	// odds weights
-	this.oX = 1				 	;
-	this.oS = 1				 	;
-	this.oA = 1				 	;
-	this.oB = 1				 	;
-	this.oP = 1				 	;
-	this.oU = 1				 	;
+	this.oX = 1;
+	this.oS = 1;
+	this.oA = 1;
+	this.oB = 1;
+	this.oP = 1;
+	this.oU = 1;
 	// times weights
-	this.wtX = 1				 	;
-	this.wtS = 1				 	;
-	this.wtA = 1				 	;
-	this.wtB = 1				 	;
-	this.wtP = 1				 	;
-	this.wtU = 1				 	;
-	this.ltX = 1				 	;
-	this.ltS = 1				 	;
-	this.ltA = 1				 	;
-	this.ltB = 1				 	;
-	this.ltP = 1				 	;
-	this.ltU = 1				 	;
-	return this;					 
+	this.wtX = 1;
+	this.wtS = 1;
+	this.wtA = 1;
+	this.wtB = 1;
+	this.wtP = 1;
+	this.wtU = 1;
+	this.ltX = 1;
+	this.ltS = 1;
+	this.ltA = 1;
+	this.ltB = 1;
+	this.ltP = 1;
+	this.ltU = 1;
+	return this;
 };
 
 //
@@ -261,13 +260,13 @@ Chromosome.prototype.normalize = function(){
 	}
 	if (lowest<0){
 		lowest -= 0.000001;	// extra sum for near zero prevention.
-		//console.log("normalize: found <0 weight(after correction): " +lowest +"\n");
 	}
 	for (var e01 in this){
 		if(this.hasOwnProperty(e01)){
 			this[e01] -= lowest;
 		}
 	}
+	
 	// normalize
 	var sum = 0;
 	for(var el in this) {
@@ -305,10 +304,10 @@ Chromosome.prototype.toDisplayString = function () {
 };
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
+	var mutationScale = 0.25;	// range (-inf, +inf)
+	var mutationChance = 0.08;	// range [0,1]
+	var smallVal = 0.000001;
 	for (var i in offspring) {
-		var mutationScale = 0.25;	// range (-inf, +inf)
-		var mutationChance = 0.08;	// range [0,1]
-		var smallVal = 0.000001;
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
