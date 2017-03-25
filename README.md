@@ -9,7 +9,7 @@ A betting bot for SaltyBet.
 
 To install the git version of this extension:
 * Clone the repo:
-`git clone https://github.com/synkarius/saltbot.git~
+`git clone https://github.com/synkarius/saltbot.git`
 * Open chrome extension settings and enable developer mode
 * Click "load unpacked extension"
 * Navigate to the '/src/' folder and load it
