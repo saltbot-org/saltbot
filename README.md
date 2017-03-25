@@ -17,8 +17,12 @@ To install the git version of this extension:
 # Updating
 
 To keep your version up to date simple:
-* Re clone the git periodically
+* Re-clone the git periodically
 * Open Chrome Extension settings and click "reload" on Saltbot
+
+# Screenshot
+
+![Alt text](https://u.teknik.io/HpM8r.png)
 
 # Contributors & Members
 
