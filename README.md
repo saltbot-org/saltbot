@@ -1,9 +1,9 @@
 # SaltBot
 A betting bot for SaltyBet. 
 
-* Read about it [here](http://explosionduck.com/wp/story-of-a-betting-bot/) and learn how to use it [here](http://explosionduck.com/wp/so-you-want-to-use-saltbot/). 
-* Download sample data(match record and chromosome) above or click  [here](https://github.com/calexil/saltbot/blob/master/86k%20Records%20%2B%20Chromosome%20Mar%202017.zip)(updated Mar.25,2017). 
-* Download the app from the Chrome Store [here](https://chrome.google.com/webstore/detail/saltbot/bholoegapebhflljekancpcnajigaiih).
+* Read about it [**here**](http://explosionduck.com/wp/story-of-a-betting-bot/) and learn how to use it [here](http://explosionduck.com/wp/so-you-want-to-use-saltbot/). 
+* Download sample data(match record and chromosome) above or click  [**here**](https://github.com/calexil/saltbot/blob/master/86k%20Records%20%2B%20Chromosome%20Mar%202017.zip)(updated Mar.25,2017). 
+* Download the app from the Chrome Store [**here**](https://chrome.google.com/webstore/detail/saltbot/bholoegapebhflljekancpcnajigaiih).
 
 # Installing latest version(Chrome/Chromium)
 
@@ -22,25 +22,5 @@ To keep your version up to date simple:
 
 # Contributors & Members
 
+[Click here](https://github.com/synkarius/saltbot/network/members)
 
-
-@synkarius 
-@ACIIL 
-@Ampheric 
-@AoiHaru 
-@calexil 
-@CritikalFreeze 
-@db-kai 
-@dirtyjobs 
-@ehissey 
-@HotPotSoup 
-@Jrad7 
-@KingMikeGames 
-@kurzimov 
-@OldDragon2A 
-@reconman 
-@retsu3 
-@Yousef- 
-@zgf2022 
-@Zyrixion 
-@bannable 
