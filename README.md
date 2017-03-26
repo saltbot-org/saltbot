@@ -24,6 +24,10 @@ To keep your version up to date simply:
 
 ![Alt text](https://u.teknik.io/HpM8r.png)
 
+# Subreddit
+
+We have a subreddit for saltbot now at [/r/saltbot](https://www.reddit.com/r/saltbot/). Use this for extensive discussions of saltbot's features.
+
 # Contributors & Members
 
 [**Click here for the current list of Contributors & Members**](https://github.com/synkarius/saltbot/network/members)
