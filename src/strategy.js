@@ -81,13 +81,13 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 	var bailout = this.getBailout(tournament);
 
 	if (tournament) {
-		var allIn = ctrl.settings.allInTourney ||
+		var allIn = ctrl.settings.allInTourney;/* ||
 			balance <= 2 * bailout ||
 			this.confidence > 0.9 ||
-			(1 - this.confidence) * balance <= bailout;
+			(1 - this.confidence) * balance <= bailout;*/
 		amountToBet = (!allIn) ? Math.round(balance * (this.confidence || 0.5)) : balance;
 		var bailoutMessage = 0;
-		if (amountToBet < bailout) {
+		if (balance <= bailout) {
 			bailoutMessage = amountToBet;
 			amountToBet = bailout;
 		}
@@ -586,6 +586,7 @@ ConfidenceScore.prototype.execute = function (info) {
 	if (this.confidence <= 0)
 		this.confidence = .01;
 
+	if (this.debug) console.log("::Predicting: " + this.prediction +"\n::at confidence: "+this.confidence+"\n");
 	return this.prediction;
 };
 
