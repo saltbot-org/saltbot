@@ -20,8 +20,6 @@ $(document).ready(function () {
 	$("#bir").on("click", function (e) {
 		$('#upload_r').trigger('click');
 	});
-	
-	chrome.local
 });
 
 var elementChanged = function (changetype, data) {
