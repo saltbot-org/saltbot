@@ -74,8 +74,9 @@ Strategy.prototype.getWinner = function (ss) {
 	return ss.getWinner();
 };
 Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
-	var rangeConfidanceScale = [0.5, 1];
-	var rangeTourneyScale = [0.1, 1];
+	var allowConfRescale = true;
+	var rangeConfidanceScale = [0.60, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
+	var rangeTourneyScale = [0.1, 0.5];			// range of tourney scale.
 	if (!this.confidence)
 		this.confidence = 1;
 
@@ -87,10 +88,15 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 			balance <= 2 * bailout ||
 			this.confidence > 0.9 ||
 			(1 - this.confidence) * balance <= bailout;*/
-		var rescaledConf = ( (this.confidence || 0.5)  - rangeConfidanceScale[0] ) * 
+		
+		var conf = (this.confidence || 0.5);
+		var confPrint = conf;
+		if (allowConfRescale) {
+			conf = ( conf - rangeConfidanceScale[0] ) * 
 							( rangeTourneyScale[1] - rangeTourneyScale[0] ) / 
 							( rangeConfidanceScale[1] - rangeConfidanceScale[0] ) + rangeTourneyScale[0];
-		amountToBet = (!allIn) ? Math.round(balance * (rescaledConf)) : balance;
+		}
+		amountToBet = (!allIn) ? Math.round(balance * (conf)) : balance;
 	
 		var bailoutMessage = 0;
 		if (balance <= bailout) {
@@ -105,7 +111,7 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 			else if (bailoutMessage != 0)
 				console.log("- amount is less than bailout (" + bailoutMessage + "), betting bailout: " + amountToBet);
 			else if (this.confidence)
-				console.log("- betting: " + balance + " x  cf(" + (rescaledConf * 100).toFixed(2) + "%) = " + amountToBet);
+				console.log("- betting: " + balance + " x (cf("+(confPrint* 100).toFixed(2)+")=" + (conf * 100).toFixed(2) + "%) = " + amountToBet);
 			else
 				console.log("- betting: " + balance + " x  50%) = " + amountToBet);
 		}
