@@ -75,6 +75,7 @@ var multiplierChange = function() {
 
 var changeStrategyClickO = function () {
 	btnClicked("cs_o");
+	setButtonActive("#cs_o");
 };
 var changeStrategyClickCS = function () {
 	chrome.storage.local.get(["chromosomes_v1"], function (results) {
@@ -84,15 +85,26 @@ var changeStrategyClickCS = function () {
 		} else {
 			var data = JSON.stringify(results.chromosomes_v1[0]);
 			btnClicked("cs_cs", data);
+			setButtonActive("#cs_cs");
 		}
 	});
 };
 var changeStrategyClickRC = function () {
 	btnClicked("cs_rc");
+	setButtonActive("#cs_rc");
 };
 var changeStrategyClickIPU = function () {
 	btnClicked("cs_ipu");
+	setButtonActive("#cs_ipu");
 };
+var setButtonActive = function(identifier) {
+	$("#cs_o").removeClass("active");
+	$("#cs_rc").removeClass("active");
+	$("#cs_cs").removeClass("active");
+	$("#cs_ipu").removeClass("active");
+	
+	$(identifier).addClass("active");
+}
 var onFileReadRecord = function (e) {
 	console.log("File read successful.");
 	var t = e.target.result;
@@ -548,6 +560,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			$("#talimit")[0].value = result.settings_v1.talimit || 10000;
 			$("#multiplierField")[0].value = result.settings_v1.multiplier || 1;
 			$("#multiplierSlider")[0].value = result.settings_v1.multiplier || 1;
+			
+			setButtonActive("#cs_" + result.settings_v1.nextStrategy);
 			
 			console.log($("#tl")[0]);
 			console.log($("#limit")[0].value);
