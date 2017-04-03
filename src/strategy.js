@@ -316,7 +316,7 @@ Chromosome.prototype.toDisplayString = function () {
 };
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
-	var mutationScale = 0.25;	// range (-inf, +inf)
+	var mutationScale = 0.10;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
 	var mutationChance = 0.08;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
