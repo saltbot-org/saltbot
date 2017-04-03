@@ -260,6 +260,7 @@ var Chromosome = function() {
 
 //
 Chromosome.prototype.normalize = function(){
+	
 	// make weights > 0
 	var lowest = 0;
 	for (var e0 in this){
@@ -278,6 +279,22 @@ Chromosome.prototype.normalize = function(){
 			this[e01] -= lowest;
 		}
 	}
+	// nerf very highest. A constant dampening.
+	var highest = 0;
+	var highIndex = null;
+	for (var e0 in this){
+		if(this.hasOwnProperty(e0)){
+			var high =  parseFloat(this[e0]);
+			if (high > highest){
+				highest = high;
+				highIndex = e0;
+			}
+		}
+	}
+	if (this.hasOwnProperty(highIndex)){
+			this[highIndex] *= 0.99;
+	}
+	
 	
 	// normalize
 	var sum = 0;
