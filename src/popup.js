@@ -383,7 +383,7 @@ Simulator.prototype.evalMutations = function (mode) {
 				nudSum += nonupsetDenominators[zzz];
 			}
 
-			console.log("avg denom: " + (dSum / denominators.length).toFixed(0) + ", avg upset: " + (udSum / upsetDenominators.length).toFixed(0) + ", avg nonupset: " + (nudSum / nonupsetDenominators.length).toFixed(0) +
+			console.log("avg denom: " + (dSum / denominators.length).toFixed(1) + ", avg upset: " + (udSum / upsetDenominators.length).toFixed(1) + ", avg nonupset: " + (nudSum / nonupsetDenominators.length).toFixed(1) +
 				", \nupsets called correctly: " + (upsetsBetOn / upsetDenominators.length * 100).toFixed(2) + "%, (" + upsetsBetOn + "/" + upsetDenominators.length + ")" +
 				", \nnonupsets called correctly: " + (nonUpsetsBetOn / nonupsetDenominators.length * 100).toFixed(2) + "%, (" + nonUpsetsBetOn + "/" + nonupsetDenominators.length + ")" +
 				", \nminimized losses: " + (minimizedLosses / matches.length * 100).toFixed(2) + "%, (" + minimizedLosses + "/" + matches.length + "), avg loss minimization amount: "
@@ -536,7 +536,7 @@ Simulator.prototype.initializePool = function () {
 	var newPool = [];
 	for (var i = 0; i < pool.length; i++) {
 
-		if (i % 5 == 0) {
+		if (i % 1 == 0) {
 			console.log(":: "+i+"\n"+pool[i].toDisplayString());
 		}
 		newPool.push(pool[i]);

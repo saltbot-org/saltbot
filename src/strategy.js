@@ -109,7 +109,7 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 			if (allIn)
 				console.log("- ALL IN: " + balance);
 			else if (bailoutMessage != 0)
-				console.log("- amount is less than bailout (" + bailoutMessage + "), betting bailout: " + amountToBet);
+				console.log("- balance is less than bailout (" + bailoutMessage + "), betting bailout: " + amountToBet);
 			else if (this.confidence)
 				console.log("- betting: " + balance + " x (cf("+(confPrint* 100).toFixed(2)+")=" + (conf * 100).toFixed(2) + "%) = " + amountToBet);
 			else
