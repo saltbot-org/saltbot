@@ -75,7 +75,7 @@ Strategy.prototype.getWinner = function (ss) {
 };
 Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 	var allowConfRescale = true;
-	var rangeConfidanceScale = [0.60, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
+	var rangeConfidanceScale = [0.52, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
 	var rangeTourneyScale = [0.1, 0.5];			// range of tourney scale.
 	if (!this.confidence)
 		this.confidence = 1;
@@ -95,6 +95,8 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 			conf = ( conf - rangeConfidanceScale[0] ) * 
 							( rangeTourneyScale[1] - rangeTourneyScale[0] ) / 
 							( rangeConfidanceScale[1] - rangeConfidanceScale[0] ) + rangeTourneyScale[0];
+							
+			conf = Math.max(rangeTourneyScale[0], conf);
 		}
 		amountToBet = (!allIn) ? Math.round(balance * (conf)) : balance;
 	
@@ -109,7 +111,7 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 			if (allIn)
 				console.log("- ALL IN: " + balance);
 			else if (bailoutMessage != 0)
-				console.log("- amount is less than bailout (" + bailoutMessage + "), betting bailout: " + amountToBet);
+				console.log("- balance is less than bailout (" + bailoutMessage + "), betting bailout: " + amountToBet);
 			else if (this.confidence)
 				console.log("- betting: " + balance + " x (cf("+(confPrint* 100).toFixed(2)+")=" + (conf * 100).toFixed(2) + "%) = " + amountToBet);
 			else
@@ -260,6 +262,7 @@ var Chromosome = function() {
 
 //
 Chromosome.prototype.normalize = function(){
+	
 	// make weights > 0
 	var lowest = 0;
 	for (var e0 in this){
@@ -278,6 +281,22 @@ Chromosome.prototype.normalize = function(){
 			this[e01] -= lowest;
 		}
 	}
+	// nerf very highest. A constant dampening.
+	var highest = 0;
+	var highIndex = null;
+	for (var e0 in this){
+		if(this.hasOwnProperty(e0)){
+			var high =  parseFloat(this[e0]);
+			if (high > highest){
+				highest = high;
+				highIndex = e0;
+			}
+		}
+	}
+	if (this.hasOwnProperty(highIndex)){
+			this[highIndex] *= 0.99;
+	}
+	
 	
 	// normalize
 	var sum = 0;
@@ -316,12 +335,13 @@ Chromosome.prototype.toDisplayString = function () {
 };
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
+	var parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
 	var mutationScale = 0.10;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
 	var mutationChance = 0.08;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
 		if (typeof offspring[i] != "function") {
-			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
+			offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
 			if (Math.abs(change) < smallVal) {

@@ -383,7 +383,7 @@ Simulator.prototype.evalMutations = function (mode) {
 				nudSum += nonupsetDenominators[zzz];
 			}
 
-			console.log("avg denom: " + (dSum / denominators.length).toFixed(0) + ", avg upset: " + (udSum / upsetDenominators.length).toFixed(0) + ", avg nonupset: " + (nudSum / nonupsetDenominators.length).toFixed(0) +
+			console.log("avg denom: " + (dSum / denominators.length).toFixed(1) + ", avg upset: " + (udSum / upsetDenominators.length).toFixed(1) + ", avg nonupset: " + (nudSum / nonupsetDenominators.length).toFixed(1) +
 				", \nupsets called correctly: " + (upsetsBetOn / upsetDenominators.length * 100).toFixed(2) + "%, (" + upsetsBetOn + "/" + upsetDenominators.length + ")" +
 				", \nnonupsets called correctly: " + (nonUpsetsBetOn / nonupsetDenominators.length * 100).toFixed(2) + "%, (" + nonUpsetsBetOn + "/" + nonupsetDenominators.length + ")" +
 				", \nminimized losses: " + (minimizedLosses / matches.length * 100).toFixed(2) + "%, (" + minimizedLosses + "/" + matches.length + "), avg loss minimization amount: "
@@ -404,8 +404,8 @@ Simulator.prototype.evalMutations = function (mode) {
 			// these ratios controls how critters are breed using the sorted array of critters after the heuristic method. Think of percents as from top best to worst.
 			var ratioTopKeep = 0;				// valid range [0,1], from the sorted listed of last gen, the best retained and reused. Not recommended as it prevents "jitter" in finding solutions.
 			var ratioTopKeptBreeding = 0.5;		// valid range (0,1), Critical value; fills pool after ratioTopKeep. Controls how many critters are kept/dropped.
-			var ratioOrderedTopBestBreeding = Math.ceil(4/64);;	// valid range [0, 1), treat it exclusive to ratioEvenTopBestBreeding. Ratio of controlled breeding onto the best.
-			var ratioEvenTopBestBreeding = 0.0;		// valid range [0, 1), treat it exclusive to ratioOrderedTopBestBreeding. Evenly allows the the top list a chance to breed.
+			var ratioOrderedTopBestBreeding = 0;	// valid range [0, 1), treat it exclusive to ratioEvenTopBestBreeding. Ratio of controlled breeding onto the best.
+			var ratioEvenTopBestBreeding = Math.ceil(4/64);		// valid range [0, 1), treat it exclusive to ratioOrderedTopBestBreeding. Evenly allows the the top list a chance to breed.
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {
@@ -536,7 +536,7 @@ Simulator.prototype.initializePool = function () {
 	var newPool = [];
 	for (var i = 0; i < pool.length; i++) {
 
-		if (i % 5 == 0) {
+		if (i % 1 == 0) {
 			console.log(":: "+i+"\n"+pool[i].toDisplayString());
 		}
 		newPool.push(pool[i]);
