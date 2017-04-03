@@ -404,8 +404,8 @@ Simulator.prototype.evalMutations = function (mode) {
 			// these ratios controls how critters are breed using the sorted array of critters after the heuristic method. Think of percents as from top best to worst.
 			var ratioTopKeep = 0;				// valid range [0,1], from the sorted listed of last gen, the best retained and reused. Not recommended as it prevents "jitter" in finding solutions.
 			var ratioTopKeptBreeding = 0.5;		// valid range (0,1), Critical value; fills pool after ratioTopKeep. Controls how many critters are kept/dropped.
-			var ratioOrderedTopBestBreeding = Math.ceil(4/64);;	// valid range [0, 1), treat it exclusive to ratioEvenTopBestBreeding. Ratio of controlled breeding onto the best.
-			var ratioEvenTopBestBreeding = 0.0;		// valid range [0, 1), treat it exclusive to ratioOrderedTopBestBreeding. Evenly allows the the top list a chance to breed.
+			var ratioOrderedTopBestBreeding = 0;	// valid range [0, 1), treat it exclusive to ratioEvenTopBestBreeding. Ratio of controlled breeding onto the best.
+			var ratioEvenTopBestBreeding = Math.ceil(4/64);		// valid range [0, 1), treat it exclusive to ratioOrderedTopBestBreeding. Evenly allows the the top list a chance to breed.
 
 			if (mode == "evolution") {
 				for (var l = 0; l < orders.length; l++) {

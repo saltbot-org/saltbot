@@ -335,12 +335,13 @@ Chromosome.prototype.toDisplayString = function () {
 };
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
+	var parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
 	var mutationScale = 0.10;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
 	var mutationChance = 0.08;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
 		if (typeof offspring[i] != "function") {
-			offspring[i] = (Math.random() > 0.5) ? this[i] : other[i];
+			offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
 			if (Math.abs(change) < smallVal) {
