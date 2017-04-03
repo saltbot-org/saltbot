@@ -511,8 +511,8 @@ Simulator.prototype.evalMutations = function (mode) {
 	});
 };
 Simulator.prototype.initializePool = function () {
-	var populationSize = 64;
-	var shortPopulationSize = 20;
+	var populationSize = 32;	// too small, it cannot expanded solve space; two large, not only runtime increases, weights differences between best/worst become dominate.
+	var shortPopulationSize = 16;
 	var pool = [new Chromosome(), new Chromosome()];
 	while (pool.length < populationSize) {
 		if (pool.length < shortPopulationSize) {
