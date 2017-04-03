@@ -155,7 +155,7 @@ var Order = function (typeStr, chromosome) {
 var Simulator = function () {
 	this.data = [];
 	this.money = [];
-	this.minimum = 400;
+	this.minimum = 100;		// absolute lowest bailout
 };
 Simulator.prototype.updateMoney = function (index, odds, selection, amount, correct) {
 	var oddsArr = odds.split(":");
@@ -358,8 +358,8 @@ Simulator.prototype.evalMutations = function (mode) {
 					strategy.adjustLevel(moneyBefore);
 					var betAmount = self.getBetAmount(strategy, k);
 					// the 20,000 limit is to compensate for the fact that I haven't been recording the money of the matches -- that amount wouldn't swing the odds
-					if (betAmount > 20000)
-						betAmount = 20000;
+					/*if (betAmount > 20000)	// edit, would preserving some aspect of the rolling magnitude be better?
+						betAmount = 20000;*/
 					self.updateMoney(k, matches[i].o, prediction == matches[i].c1 ? 0 : 1, betAmount, predictionWasCorrect);
 					if (k == 0 && false)
 						console.log("m " + i + ": " + moneyBefore + " o: " + matches[i].o + " b: " + betAmount + " -> " + self.money[k]);
