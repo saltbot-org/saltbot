@@ -526,8 +526,9 @@ Simulator.prototype.initializePool = function () {
 			if (!foundDuplicate)
 				pool.push(offspring);
 		} else {
-			var chromosome1 = pool[Math.floor(Math.random() * pool.length)];
-			var chromosome2 = pool[Math.floor(Math.random() * pool.length)];
+			// offset random, as starting new chromosomes are not normalized.
+			var chromosome1 = pool[2+Math.floor(Math.random() * (pool.length-2))];
+			var chromosome2 = pool[2+Math.floor(Math.random() * (pool.length-2))];
 			pool.push(chromosome1.mate(chromosome2));
 		}
 
@@ -536,7 +537,7 @@ Simulator.prototype.initializePool = function () {
 	for (var i = 0; i < pool.length; i++) {
 
 		if (i % 5 == 0) {
-			console.log(pool[i].toDisplayString());
+			console.log(":: "+i+"\n"+pool[i].toDisplayString());
 		}
 		newPool.push(pool[i]);
 	}
