@@ -20,6 +20,12 @@ To keep your version up to date simply:
 * Re-clone the git periodically
 * Open Chrome Extension settings and click "reload" on Saltbot
 
+# Bug Reports
+
+Please be sure to [**Read the bug reporting guide**](https://github.com/synkarius/saltbot/blob/master/bugreports.md) before you [**submit a bug report!**](https://github.com/synkarius/saltbot/issues/new)
+
+The more info you provide, the better we can diagnose the issue and remedy it. 
+
 # Screenshot
 
 ![Alt text](https://u.teknik.io/HpM8r.png)
