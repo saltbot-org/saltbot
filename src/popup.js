@@ -452,10 +452,10 @@ Simulator.prototype.evalMutations = function (mode) {
 						var parent1 = null;
 						var parent2 = null;
 						var child = null;
-						if (mf == 0) {													// breed the best to worst.
+						/*if (mf == 0) {													// breed the best to worst.
 							parent1 = sortingArray[0][0];
 							parent2 = sortingArray[sizeTopParentsBreed-1][0];
-						} else if (mf < sizeTopParentsBreed * (ratioOrderedTopBestBreeding)) {	// breed orderly with best
+						} else*/ if (mf < sizeTopParentsBreed * (ratioOrderedTopBestBreeding)) {	// breed orderly with best
 							parent1 = sortingArray[0][0];
 							parent2 = sortingArray[mf][0];
 						} else if (mf < sizeTopParentsBreed * (ratioEvenTopBestBreeding)){		// breed all the best with a random.
