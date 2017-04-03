@@ -536,7 +536,7 @@ Simulator.prototype.initializePool = function () {
 	var newPool = [];
 	for (var i = 0; i < pool.length; i++) {
 
-		if (i % 1 == 0) {
+		if (i % 5 == 0) {
 			console.log(":: "+i+"\n"+pool[i].toDisplayString());
 		}
 		newPool.push(pool[i]);
