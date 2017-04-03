@@ -75,7 +75,7 @@ Strategy.prototype.getWinner = function (ss) {
 };
 Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 	var allowConfRescale = true;
-	var rangeConfidanceScale = [0.60, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
+	var rangeConfidanceScale = [0.52, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
 	var rangeTourneyScale = [0.1, 0.5];			// range of tourney scale.
 	if (!this.confidence)
 		this.confidence = 1;
@@ -95,6 +95,8 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 			conf = ( conf - rangeConfidanceScale[0] ) * 
 							( rangeTourneyScale[1] - rangeTourneyScale[0] ) / 
 							( rangeConfidanceScale[1] - rangeConfidanceScale[0] ) + rangeTourneyScale[0];
+							
+			conf = Math.max(rangeTourneyScale[0], conf);
 		}
 		amountToBet = (!allIn) ? Math.round(balance * (conf)) : balance;
 	
