@@ -74,9 +74,11 @@ Strategy.prototype.getWinner = function (ss) {
 	return ss.getWinner();
 };
 Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
+	var simBettingLimitScale = 0.1;
+	var lowBettingScale = 0.01;
 	var allowConfRescale = true;
 	var rangeConfidanceScale = [0.52, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
-	var rangeTourneyScale = [0.1, 0.5];			// range of tourney scale.
+	var rangeTourneyScale = [0.1, 0.34];			// range of tourney scale.
 	if (!this.confidence)
 		this.confidence = 1;
 
@@ -118,17 +120,17 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 				console.log("- betting: " + balance + " x  50%) = " + amountToBet);
 		}
 	} else if (!(this.lowBet && this instanceof RatioConfidence)) {
-		amountToBet = Math.round(balance * .1 * this.confidence);
-		if (amountToBet > balance * .1)
-			amountToBet = Math.round(balance * .1);
+		amountToBet = Math.round(balance * simBettingLimitScale * this.confidence);
+		if (amountToBet > balance * simBettingLimitScale)
+			amountToBet = Math.round(balance * simBettingLimitScale);
 		if (amountToBet < bailout) {
 			if (debug)
 				console.log("- amount is less than bailout (" + amountToBet + "), betting bailout: " + bailout);
 			amountToBet = bailout;
 		} else if (debug)
-			console.log("- betting: " + balance + " x .10 =(" + (balance * .1) + ") x cf(" + (this.confidence * 100).toFixed(2) + "%) = " + amountToBet);
+			console.log("- betting: " + balance + " x .10 =(" + (balance * simBettingLimitScale) + ") x cf(" + (this.confidence * 100).toFixed(2) + "%) = " + amountToBet);
 	} else {
-		var p05 = Math.ceil(balance * .01);
+		var p05 = Math.ceil(balance * lowBettingScale);
 		var cb = Math.ceil(balance * this.confidence);
 		amountToBet = (p05 < cb) ? p05 : cb;
 		if (amountToBet < bailout)
@@ -222,8 +224,8 @@ var Chromosome = function() {
 	this.timeAveWin = 1;	//this.timeWeight  =  1;
 	this.timeAveLose = 1;
 	this.winPercentageWeight = 1;
-	this.crowdFavorWeight = 1;
-	this.illumFavorWeight = 1;
+	this.crowdFavorWeight = 0;
+	this.illumFavorWeight = 0;
 	// tier scoring            
 	this.wX = 1;
 	this.wS = 1;
@@ -294,7 +296,7 @@ Chromosome.prototype.normalize = function(){
 		}
 	}
 	if (this.hasOwnProperty(highIndex)){
-			this[highIndex] *= 0.99;
+			this[highIndex] *= 0.90;
 	}
 	
 	
@@ -336,7 +338,7 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	var parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
-	var mutationScale = 0.10;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
+	var mutationScale = 0.20;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
 	var mutationChance = 0.08;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
