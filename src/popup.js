@@ -283,10 +283,12 @@ Simulator.prototype.evalMutations = function (mode) {
 		var nonUpsetsBetOn = 0;
 		var minimizedLosses = 0;
 		var lossMinimizationAmount = 0;
-
+		var possibleMaxGain = self.minimum * Math.pow((1.10*0.99), 200/*matches.length*/); // if all matches bet perfectly & 1:1 odds. (and goes to infi).
+		console.log("::New loop. Perfect money gain measure: $" +possibleMaxGain+"\n");
 		// process matches
+		
 		for (var i = 0; i < matches.length; i++) {
-
+			
 			var info = {
 				"character1": updater.getCharacter(matches[i].c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
 				"character2": updater.getCharacter(matches[i].c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
@@ -397,9 +399,9 @@ Simulator.prototype.evalMutations = function (mode) {
 			var parents = [];
 			var nextGeneration = [];
 			var money = true;
-			var accuracy = true;
+			var accuracy = false;
 			var unshackle = true;
-			var weightAccToMoney = 1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
+			var weightAccToMoney = 0.5;//1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
 			
 			// these ratios controls how critters are breed using the sorted array of critters after the heuristic method. Think of percents as from top best to worst.
 			var ratioTopKeep = 0;				// valid range [0,1], from the sorted listed of last gen, the best retained and reused. Not recommended as it prevents "jitter" in finding solutions.
@@ -413,7 +415,7 @@ Simulator.prototype.evalMutations = function (mode) {
 					if (!unshackle){
 						penalty = self.applyPenalties(orders[l].chromosome);
 					}
-					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l], penalty]);
+					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l] / 100, self.money[l] / possibleMaxGain, penalty]);
 				}
 				//	sort the the best in order.
 				sortingArray.sort(function (a, b) {
@@ -436,11 +438,11 @@ Simulator.prototype.evalMutations = function (mode) {
 				}
 				
 				// i really only need to see the best one
-				console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+				console.log(sortingArray[0][0].toDisplayString() + " -> " + (sortingArray[0][1]*100).toFixed(4) + "%,  $(%)" + ((sortingArray[0][2]*100)).toFixed(4)/*toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")*/);
 				// print scores of pool.
 				var poolScoreLog = "\n pool scores: \n";
 				for (var i=0; i<sortingArray.length; i++){
-					poolScoreLog += sortingArray[i][1].toFixed(4) + "%:$" + parseInt(sortingArray[i][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") +"\n";
+					poolScoreLog += (sortingArray[i][1]*100).toFixed(4) + "%:$(%)" + (sortingArray[0][2]*100).toFixed(4)/*.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")*/ +"\n";
 				}
 				console.log(poolScoreLog);
 				
@@ -484,7 +486,7 @@ Simulator.prototype.evalMutations = function (mode) {
 				}, function () {
 					roundsOfEvolution += 1;
 					console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "%m -> " + bestPercent.toFixed(1) + "%c, $" + bestMoney.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "   -----------------\n\n");
-					$("#msgbox")[0].value = "g(" + roundsOfEvolution + "), best: " + bestPercent.toFixed(1) + "%, $" + bestMoney.toFixed(0);
+					$("#msgbox")[0].value = "g(" + roundsOfEvolution + "), best: " + (bestPercent*100).toFixed(1) + "%, $(%)" + (bestMoney*100).toFixed(1);
 					setTimeout(function () {
 						simulator.evalMutations("evolution");
 					}, 5000);
