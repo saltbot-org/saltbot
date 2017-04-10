@@ -352,7 +352,7 @@ Simulator.prototype.evalMutations = function (mode) {
 								minimizedLosses += 1;
 							}
 							// how chicken we are.
-							if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains)) {
+							if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains) && (strategy.confidence>0.5)) {
 								gainMissedAmount += 1 - strategy.confidence;
 								missedGains += 1;
 							}
