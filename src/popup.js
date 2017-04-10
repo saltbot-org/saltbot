@@ -281,8 +281,12 @@ Simulator.prototype.evalMutations = function (mode) {
 		var denominators = [];
 		var upsetsBetOn = 0;
 		var nonUpsetsBetOn = 0;
+		var ratioMinizLoses = 0.9;
 		var minimizedLosses = 0;
 		var lossMinimizationAmount = 0;
+		var ratioMissedGains = 0.6;
+		var missedGains = 0;
+		var gainMissedAmount = 0;
 		var possibleMaxGain = self.minimum * Math.pow((1.10*0.99), 200/*matches.length*/); // if all matches bet perfectly & 1:1 odds. (and goes to infi).
 		console.log("::New loop. Perfect money gain measure: $" +possibleMaxGain+"\n");
 		// process matches
@@ -321,7 +325,7 @@ Simulator.prototype.evalMutations = function (mode) {
 					correct[k] += (predictionWasCorrect) ? 1 : 0;
 
 					totalBettedOn[k] += 1;
-					totalPercentCorrect[k] = correct[k] / totalBettedOn[k] * 100;
+					totalPercentCorrect[k] = correct[k] / totalBettedOn[k];
 					data[k].push([totalBettedOn[k], totalPercentCorrect[k]]);
 
 					if (mode == "mass")
@@ -342,10 +346,15 @@ Simulator.prototype.evalMutations = function (mode) {
 								if (predictionWasCorrect)
 									nonUpsetsBetOn += 1;
 							}
-
-							if (!predictionWasCorrect && strategy.confidence && strategy.confidence < 0.9) {
+							// how smart we are.
+							if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses)) {
 								lossMinimizationAmount += 1 - strategy.confidence;
 								minimizedLosses += 1;
+							}
+							// how chicken we are.
+							if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains)) {
+								gainMissedAmount += 1 - strategy.confidence;
+								missedGains += 1;
 							}
 
 
@@ -388,8 +397,10 @@ Simulator.prototype.evalMutations = function (mode) {
 			console.log("avg denom: " + (dSum / denominators.length).toFixed(1) + ", avg upset: " + (udSum / upsetDenominators.length).toFixed(1) + ", avg nonupset: " + (nudSum / nonupsetDenominators.length).toFixed(1) +
 				", \nupsets called correctly: " + (upsetsBetOn / upsetDenominators.length * 100).toFixed(2) + "%, (" + upsetsBetOn + "/" + upsetDenominators.length + ")" +
 				", \nnonupsets called correctly: " + (nonUpsetsBetOn / nonupsetDenominators.length * 100).toFixed(2) + "%, (" + nonUpsetsBetOn + "/" + nonupsetDenominators.length + ")" +
-				", \nminimized losses: " + (minimizedLosses / matches.length * 100).toFixed(2) + "%, (" + minimizedLosses + "/" + matches.length + "), avg loss minimization amount: "
-				+ (lossMinimizationAmount / minimizedLosses * 100).toFixed(2) + "%");
+				", \nminimized losses(<"+(ratioMinizLoses*100).toFixed(2)+"% conf.): " + (minimizedLosses / matches.length * 100).toFixed(2) + "%, (" + minimizedLosses + "/" + matches.length + "), avg loss minimization amount: "
+				+ (lossMinimizationAmount / minimizedLosses * 100).toFixed(2) + "%"
+				+ "\nMissed Gains(<"+(ratioMissedGains*100).toFixed(2) +"% conf.): " +(missedGains / matches.length * 100).toFixed(2)+"%, ave gainMissedAmount: " 
+				+ (gainMissedAmount / missedGains * 100).toFixed(2)+"%");
 
 		}
 
@@ -399,7 +410,7 @@ Simulator.prototype.evalMutations = function (mode) {
 			var parents = [];
 			var nextGeneration = [];
 			var money = true;
-			var accuracy = false;
+			var accuracy = true;
 			var unshackle = true;
 			var weightAccToMoney = 0.5;//1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
 			
@@ -415,7 +426,7 @@ Simulator.prototype.evalMutations = function (mode) {
 					if (!unshackle){
 						penalty = self.applyPenalties(orders[l].chromosome);
 					}
-					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l] / 100, self.money[l] / possibleMaxGain, penalty]);
+					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l] / possibleMaxGain, penalty]);
 				}
 				//	sort the the best in order.
 				sortingArray.sort(function (a, b) {
@@ -442,7 +453,7 @@ Simulator.prototype.evalMutations = function (mode) {
 				// print scores of pool.
 				var poolScoreLog = "\n pool scores: \n";
 				for (var i=0; i<sortingArray.length; i++){
-					poolScoreLog += (sortingArray[i][1]*100).toFixed(4) + "%:$(%)" + (sortingArray[0][2]*100).toFixed(4)/*.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")*/ +"\n";
+					poolScoreLog += (sortingArray[i][1]*100).toFixed(4) + "%:$(%)" + (sortingArray[i][2]*100).toFixed(4)/*.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")*/ +"\n";
 				}
 				console.log(poolScoreLog);
 				
@@ -513,7 +524,7 @@ Simulator.prototype.evalMutations = function (mode) {
 	});
 };
 Simulator.prototype.initializePool = function () {
-	var populationSize = 32;	// too small, it cannot expanded solve space; two large, not only runtime increases, weights differences between best/worst become dominate.
+	var populationSize = 64;	// too small, it cannot expanded solve space; two large, not only runtime increases, weights differences between best/worst become dominate.
 	var shortPopulationSize = 16;
 	var pool = [new Chromosome(), new Chromosome()];
 	while (pool.length < populationSize) {

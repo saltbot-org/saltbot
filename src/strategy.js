@@ -78,7 +78,7 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 	var lowBettingScale = 0.01;
 	var allowConfRescale = true;
 	var rangeConfidanceScale = [0.52, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
-	var rangeTourneyScale = [0.1, 0.34];			// range of tourney scale.
+	var rangeTourneyScale = [0.1, 0.45];			// range of tourney scale.
 	if (!this.confidence)
 		this.confidence = 1;
 
@@ -296,7 +296,7 @@ Chromosome.prototype.normalize = function(){
 		}
 	}
 	if (this.hasOwnProperty(highIndex)){
-			this[highIndex] *= 0.90;
+			this[highIndex] *= 0.8;
 	}
 	
 	
