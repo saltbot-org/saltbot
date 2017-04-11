@@ -224,8 +224,8 @@ var Chromosome = function() {
 	this.timeAveWin = 1;	//this.timeWeight  =  1;
 	this.timeAveLose = 1;
 	this.winPercentageWeight = 1;
-	this.crowdFavorWeight = 0;
-	this.illumFavorWeight = 0;
+	this.crowdFavorWeight = 1;
+	this.illumFavorWeight = 1;
 	// tier scoring            
 	this.wX = 1;
 	this.wS = 1;
@@ -427,12 +427,12 @@ var CSStats = function (cObj, chromosome) {
 		for (var l = 0; l < cObj.crowdFavor.length; l++) {
 			cfSum += cObj.crowdFavor[l];
 		}
-		this.cfPercent = cfSum / cObj.cf.length;
+        this.cfPercent = cfSum / cObj.crowdFavor.length;
 	}
 	if (cObj.illumFavor.length > 0) {
 		var ifSum = 0;
 		for (var m = 0; m < cObj.illumFavor.length; m++) {
-			cfSum += cObj.illumFavor[m];
+			ifSum += cObj.illumFavor[m];
 		}
 		this.ifPercent = ifSum / cObj.illumFavor.length;
 	}
