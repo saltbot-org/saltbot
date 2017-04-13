@@ -79,7 +79,7 @@ Updater.prototype.updateBettorsFromMatch = function (mObj, bc1, bc2) {
 	}
 };
 Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
-    var rememberRecordsLast = 45;  // changing this requires re-importing matches.
+    var rememberRecordsLast = 30;  // changing this requires re-importing matches.
 	// wins, losses, and times
 	if (mObj.w == 0) {
 		c1Obj.wins.push(mObj.t);

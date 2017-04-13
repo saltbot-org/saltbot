@@ -74,9 +74,11 @@ Strategy.prototype.getWinner = function (ss) {
 	return ss.getWinner();
 };
 Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
+	var simBettingLimitScale = 0.1;
+	var lowBettingScale = 0.01;
 	var allowConfRescale = true;
-	var rangeConfidanceScale = [0.60, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
-	var rangeTourneyScale = [0.1, 0.5];			// range of tourney scale.
+	var rangeConfidanceScale = [0.52, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
+	var rangeTourneyScale = [0.1, 0.45];			// range of tourney scale.
 	if (!this.confidence)
 		this.confidence = 1;
 
@@ -95,6 +97,7 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 			conf = ( conf - rangeConfidanceScale[0] ) * 
 							( rangeTourneyScale[1] - rangeTourneyScale[0] ) / 
 							( rangeConfidanceScale[1] - rangeConfidanceScale[0] ) + rangeTourneyScale[0];
+			conf = Math.max(rangeTourneyScale[0], conf);
 		}
 		amountToBet = (!allIn) ? Math.round(balance * (conf)) : balance;
 	
@@ -260,7 +263,7 @@ var Chromosome = function() {
 
 //
 Chromosome.prototype.normalize = function(){
-    var ratioDampen = 0.97;
+    var ratioDampen = 0.90;
     var lowValueControl = 0.000001;
 	// make weights > 0
 	var lowest = 0;
@@ -272,9 +275,9 @@ Chromosome.prototype.normalize = function(){
 			}
 		}
 	}
-	//if (lowest<0){
+	if (lowest<0){
         lowest -= lowValueControl;	// extra sum for near zero prevention.
-	//}
+	}
 	for (var e01 in this){
 		if(this.hasOwnProperty(e01)){
 			this[e01] -= lowest;
@@ -285,7 +288,7 @@ Chromosome.prototype.normalize = function(){
 	var highIndex = null;
 	for (var e0 in this){
 		if(this.hasOwnProperty(e0)){
-            var high = Number(this[e0]);
+			var high =  parseFloat(this[e0]);
 			if (high > highest){
 				highest = high;
 				highIndex = e0;
@@ -336,8 +339,8 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	var parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
-	var mutationScale = 0.25;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
-	var mutationChance = 0.08;	// range [0,1]
+	var mutationScale = 0.20;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
+	var mutationChance = 0.09;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
 		var mutationScale = 0.20;	// range 0..<1 (a danger if offspring weight becomes < 0).
@@ -505,6 +508,40 @@ ConfidenceScore.prototype.execute = function (info) {
 	 } else {
 	    c1Score += 0.5*winPercentageWeight;
 	    c2Score += 0.5*winPercentageWeight;
+	var c2Stats = new CSStats(c2, this.chromosome);
+
+	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
+		var lesserOdds = (c1Stats.averageOdds < c2Stats.averageOdds) ? c1Stats.averageOdds : c2Stats.averageOdds;
+		this.oddsConfidence = [(c1Stats.averageOdds / lesserOdds), (c2Stats.averageOdds / lesserOdds)];
+		if (this.debug) oddsMessage = "predicted odds -> (" + formatString("" + (this.oddsConfidence[0]).toFixed(2) + " : " + (this.oddsConfidence[1]).toFixed(2), messagelength) + ")"
+	} else {
+		this.oddsConfidence = null;
+	}
+
+    var padValue = 0.0001;
+    var c1WT = c1Stats.wins + c1Stats.losses + padValue;
+    var c2WT = c2Stats.wins + c2Stats.losses + padValue;
+    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue) / c1WT : 0;
+    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue) / c2WT : 0;
+    //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
+
+	var wpTotal = c1Stats.wins + c2Stats.wins;
+	var c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
+	var c2WPDisplay = wpTotal > 0 ? c2Stats.wins / wpTotal : 0;
+	if (this.debug) winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> (" + (c1WPDisplay * 100).toFixed(0) + " : " + (c2WPDisplay * 100).toFixed(0) + ")" +
+		"  ::  unweighted (red W:L)(blue W:L) -> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")" +
+		"  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
+		"(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
+
+	/*if (c1WP > c2WP) {
+	 c1Score += winPercentageWeight;
+	 }
+	 else if (c2WP > c1WP) {
+	 c2Score += winPercentageWeight;
+	 }
+	 else {
+	 c1Score += 0.5*winPercentageWeight;
+	 c2Score += 0.5*winPercentageWeight;
 	 }*/
     // weight in win percent
     var WPSum = c1WP + c2WP;

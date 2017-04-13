@@ -347,12 +347,12 @@ Simulator.prototype.evalMutations = function (mode) {
 									nonUpsetsBetOn += 1;
 							}
 							// how smart we are.
-                            if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses) /*&& (strategy.confidence > 0.5)*/) {
+                            if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses) && (strategy.confidence > 0.5)) {
 								lossMinimizationAmount += 1 - strategy.confidence;
 								minimizedLosses += 1;
 							}
 							// how chicken we are.
-							if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains) /*&& (strategy.confidence>0.5)*/) {
+							if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains) && (strategy.confidence>0.5)) {
 								gainMissedAmount += 1 - strategy.confidence;
 								missedGains += 1;
 							}
@@ -412,7 +412,7 @@ Simulator.prototype.evalMutations = function (mode) {
 			var money = true;
 			var accuracy = true;
 			var unshackle = true;
-			var weightAccToMoney = 0.25;//1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
+			var weightAccToMoney = 0.5;//1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
 			
 			// these ratios controls how critters are breed using the sorted array of critters after the heuristic method. Think of percents as from top best to worst.
 			var ratioTopKeep = 0;				// valid range [0,1], from the sorted listed of last gen, the best retained and reused. Not recommended as it prevents "jitter" in finding solutions.
@@ -450,31 +450,37 @@ Simulator.prototype.evalMutations = function (mode) {
 				}
 				
 				// i really only need to see the best one
-				console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+				console.log(sortingArray[0][0].toDisplayString() + " -> " + (sortingArray[0][1]*100).toFixed(4) + "%,  $(%)" + ((sortingArray[0][2]*100)).toFixed(4)/*toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")*/);
+				// print scores of pool.
+				var poolScoreLog = "\n pool scores: \n";
+				for (var i=0; i<sortingArray.length; i++){
+					poolScoreLog += (sortingArray[i][1]*100).toFixed(4) + "%:$(%)" + (sortingArray[i][2]*100).toFixed(4)/*.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")*/ +"\n";
+				}
+				console.log(poolScoreLog);
+				
 				// created and push children of that half of best sorted population
 				for (var mf = 0; mf < sizeNextGen-sizeTopParents ; mf++) {
-					var parent1 = null;
-					var parent2 = null;
-					var child = null;
-					if (mf == 0) {		// breed the best to the worst parents kept.
-						parent1 = parents[0];
-						parent2 = parents[sizeTopParents - 1];
-					} else if (mf < sizeTopParents * ratioTopBestBreeding) {		// breed the best with next few best kept
-						parent1 = parents[0];
-						parent2 = parents[mf];
-					} else if (mf < sizeTopParents){			// breed best kept remaining
-						parent1 = parents[mf];			
-						parent2 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeTopParents))][0];	// pick random after top
-					} else {		// fill remaining population by random breeding below the best kept.
-						var attemps = 2;
-						var atmp = 0;
-						do {							
-							parent1 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeNextGen - sizeTopParents))][0];
-							parent2 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeNextGen - sizeTopParents))][0];
-							atmp++;
-						} 
-						while ((parent1 != parent2) && (atmp < attemps));
-					}
+					var attemps = 2;
+					var atmp = 0;			
+					do {
+						var parent1 = null;
+						var parent2 = null;
+						var child = null;
+						/*if (mf == 0) {													// breed the best to worst.
+							parent1 = sortingArray[0][0];
+							parent2 = sortingArray[sizeTopParentsBreed-1][0];
+						} else*/ if (mf < sizeTopParentsBreed * (ratioOrderedTopBestBreeding)) {	// breed orderly with best
+							parent1 = sortingArray[0][0];
+							parent2 = sortingArray[mf][0];
+						} else if (mf < sizeTopParentsBreed * (ratioEvenTopBestBreeding)){		// breed all the best with a random.
+							parent1 = sortingArray[mf][0];			
+							parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
+						} else {					// fill remaining population by random breeding the best with chaos. 
+							parent1 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
+							parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
+						}
+						atmp++;
+					} while ((parent1 == parent2) && (atmp < attemps));
 					child = parent1.mate(parent2);
 					nextGeneration.push(child);
 				}
@@ -521,7 +527,7 @@ Simulator.prototype.evalMutations = function (mode) {
 	});
 };
 Simulator.prototype.initializePool = function () {
-	var populationSize = 32;	// too small, it cannot expanded solve space; two large, not only runtime increases, weights differences between best/worst become dominate.
+	var populationSize = 64;	// too small, it cannot expanded solve space; two large, not only runtime increases, weights differences between best/worst become dominate.
 	var shortPopulationSize = 16;
 	var pool = [new Chromosome(), new Chromosome()];
 	while (pool.length < populationSize) {
@@ -546,8 +552,8 @@ Simulator.prototype.initializePool = function () {
 	var newPool = [];
 	for (var i = 0; i < pool.length; i++) {
 
-		if (i % 5 == 0) {
-			console.log(pool[i].toDisplayString());
+		if (i % 1 == 0) {
+			console.log(":: "+i+"\n"+pool[i].toDisplayString());
 		}
 		newPool.push(pool[i]);
 	}
