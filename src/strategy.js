@@ -264,7 +264,8 @@ var Chromosome = function() {
 
 //
 Chromosome.prototype.normalize = function(){
-	
+    var ratioDampen = 0.90;
+    var lowValueControl = 0.000001;
 	// make weights > 0
 	var lowest = 0;
 	for (var e0 in this){
@@ -276,7 +277,7 @@ Chromosome.prototype.normalize = function(){
 		}
 	}
 	if (lowest<0){
-		lowest -= 0.000001;	// extra sum for near zero prevention.
+        lowest -= lowValueControl;	// extra sum for near zero prevention.
 	}
 	for (var e01 in this){
 		if(this.hasOwnProperty(e01)){
@@ -296,7 +297,7 @@ Chromosome.prototype.normalize = function(){
 		}
 	}
 	if (this.hasOwnProperty(highIndex)){
-			this[highIndex] *= 0.8;
+        this[highIndex] *= ratioDampen;
 	}
 	
 	
@@ -339,7 +340,7 @@ Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	var parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
 	var mutationScale = 0.20;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
-	var mutationChance = 0.08;	// range [0,1]
+	var mutationChance = 0.09;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
 		if (typeof offspring[i] != "function") {
@@ -360,6 +361,7 @@ Chromosome.prototype.mate = function (other) {
 	offspring.normalize();
 	return offspring;
 };
+// note, test equals for floats...
 Chromosome.prototype.equals = function (other) {
 	var anyDifference = false;
 	for (var i in other) {
@@ -369,6 +371,7 @@ Chromosome.prototype.equals = function (other) {
 	}
 	return !anyDifference;
 };
+// scores character stats by chromosome. Does not score everything, Eg) differances of both characters stats are scored later.
 var CSStats = function (cObj, chromosome) {
 	var oddsSum = 0;
 	var oddsCount = 0;
@@ -452,6 +455,7 @@ ConfidenceScore.prototype.getBetAmount = function (balance, tournament, debug) {
 		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
 	return this.__super__.prototype.flatBet.call(this, balance, debug);
 };
+// find confidence by comparing current match's characters stats.
 ConfidenceScore.prototype.execute = function (info) {
 	var c1 = info.character1;
 	var c2 = info.character2;
@@ -491,10 +495,12 @@ ConfidenceScore.prototype.execute = function (info) {
 		this.oddsConfidence = null;
 	}
 
-	var c1WT = c1Stats.wins + c1Stats.losses;
-	var c2WT = c2Stats.wins + c2Stats.losses;
-	var c1WP = (c1WT != 0) ? c1Stats.wins / c1WT : 0;
-	var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
+    var padValue = 0.0001;
+    var c1WT = c1Stats.wins + c1Stats.losses + padValue;
+    var c2WT = c2Stats.wins + c2Stats.losses + padValue;
+    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue) / c1WT : 0;
+    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue) / c2WT : 0;
+    //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
 
 	var wpTotal = c1Stats.wins + c2Stats.wins;
 	var c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
