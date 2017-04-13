@@ -347,7 +347,7 @@ Simulator.prototype.evalMutations = function (mode) {
 									nonUpsetsBetOn += 1;
 							}
 							// how smart we are.
-							if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses)) {
+                            if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses) && (strategy.confidence > 0.5)) {
 								lossMinimizationAmount += 1 - strategy.confidence;
 								minimizedLosses += 1;
 							}
@@ -496,7 +496,9 @@ Simulator.prototype.evalMutations = function (mode) {
 					'best_chromosome': sortingArray[0][0]
 				}, function () {
 					roundsOfEvolution += 1;
-					console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS " + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "%m -> " + bestPercent.toFixed(1) + "%c, $" + bestMoney.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "   -----------------\n\n");
+                    console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS "
+                        + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "%m -> "
+                        + bestPercent.toFixed(1) + "%c, $" + bestMoney.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "   -----------------\n\n");
 					$("#msgbox")[0].value = "g(" + roundsOfEvolution + "), best: " + (bestPercent*100).toFixed(1) + "%, $(%)" + (bestMoney*100).toFixed(1);
 					setTimeout(function () {
 						simulator.evalMutations("evolution");

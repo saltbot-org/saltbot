@@ -264,7 +264,8 @@ var Chromosome = function() {
 
 //
 Chromosome.prototype.normalize = function(){
-	
+    var ratioDampen = 0.90;
+    var lowValueControl = 0.000001;
 	// make weights > 0
 	var lowest = 0;
 	for (var e0 in this){
@@ -276,7 +277,7 @@ Chromosome.prototype.normalize = function(){
 		}
 	}
 	if (lowest<0){
-		lowest -= 0.000001;	// extra sum for near zero prevention.
+        lowest -= lowValueControl;	// extra sum for near zero prevention.
 	}
 	for (var e01 in this){
 		if(this.hasOwnProperty(e01)){
@@ -296,7 +297,7 @@ Chromosome.prototype.normalize = function(){
 		}
 	}
 	if (this.hasOwnProperty(highIndex)){
-			this[highIndex] *= 0.8;
+        this[highIndex] *= ratioDampen;
 	}
 	
 	
@@ -360,6 +361,7 @@ Chromosome.prototype.mate = function (other) {
 	offspring.normalize();
 	return offspring;
 };
+// note, test equals for floats...
 Chromosome.prototype.equals = function (other) {
 	var anyDifference = false;
 	for (var i in other) {
@@ -369,6 +371,7 @@ Chromosome.prototype.equals = function (other) {
 	}
 	return !anyDifference;
 };
+// scores character stats by chromosome. Does not score everything, Eg) differances of both characters stats are scored later.
 var CSStats = function (cObj, chromosome) {
 	var oddsSum = 0;
 	var oddsCount = 0;
@@ -452,6 +455,7 @@ ConfidenceScore.prototype.getBetAmount = function (balance, tournament, debug) {
 		return this.__super__.prototype.getBetAmount.call(this, balance, tournament, debug);
 	return this.__super__.prototype.flatBet.call(this, balance, debug);
 };
+// find confidence by comparing current match's characters stats.
 ConfidenceScore.prototype.execute = function (info) {
 	var c1 = info.character1;
 	var c2 = info.character2;
