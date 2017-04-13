@@ -498,8 +498,8 @@ ConfidenceScore.prototype.execute = function (info) {
     var padValue = 0.0001;
     var c1WT = c1Stats.wins + c1Stats.losses + padValue;
     var c2WT = c2Stats.wins + c2Stats.losses + padValue;
-    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? c1Stats.wins / c1WT : 0;
-    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? c2Stats.wins / c2WT : 0;
+    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue) / c1WT : 0;
+    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue) / c2WT : 0;
     //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
 
 	var wpTotal = c1Stats.wins + c2Stats.wins;
