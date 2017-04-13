@@ -497,9 +497,9 @@ Simulator.prototype.evalMutations = function (mode) {
 				}, function () {
 					roundsOfEvolution += 1;
                     console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS "
-                        + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(0) + "%m -> "
-                        + bestPercent.toFixed(1) + "%c, $" + bestMoney.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "   -----------------\n\n");
-					$("#msgbox")[0].value = "g(" + roundsOfEvolution + "), best: " + (bestPercent*100).toFixed(1) + "%, $(%)" + (bestMoney*100).toFixed(1);
+                        + totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(2) + "%m -> "
+                        + (bestPercent*100).toFixed(4) + "%c, $(%)" + (bestMoney*100).toFixed(4)/*.replace(/\B(?=(\d{3})+(?!\d))/g, ",")*/ + "   -----------------\n\n");
+					$("#msgbox")[0].value = "g(" + roundsOfEvolution + "), best: " + (bestPercent*100).toFixed(1) + "%,$(%)" + (bestMoney*100).toFixed(1);
 					setTimeout(function () {
 						simulator.evalMutations("evolution");
 					}, 5000);
@@ -511,7 +511,7 @@ Simulator.prototype.evalMutations = function (mode) {
 					if (orders[l].type == "ipu")
 						ipuSum += self.money[l];
 					else
-						console.log(orders[l].type + ": " + totalPercentCorrect[l] + "%, $" + self.money[l]);
+						console.log(orders[l].type + ": " + totalPercentCorrect[l]*100 + "%, $" + self.money[l]);
 				}
 				console.log("average IPU money: " + (ipuSum / (self.money.length - 1)));
 			}
