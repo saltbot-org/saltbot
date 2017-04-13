@@ -340,7 +340,7 @@ Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	var parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
 	var mutationScale = 0.20;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
-	var mutationChance = 0.08;	// range [0,1]
+	var mutationChance = 0.09;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
 		if (typeof offspring[i] != "function") {
@@ -495,10 +495,12 @@ ConfidenceScore.prototype.execute = function (info) {
 		this.oddsConfidence = null;
 	}
 
-	var c1WT = c1Stats.wins + c1Stats.losses;
-	var c2WT = c2Stats.wins + c2Stats.losses;
-	var c1WP = (c1WT != 0) ? c1Stats.wins / c1WT : 0;
-	var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
+    var padValue = 0.0001;
+    var c1WT = c1Stats.wins + c1Stats.losses + padValue;
+    var c2WT = c2Stats.wins + c2Stats.losses + padValue;
+    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? c1Stats.wins / c1WT : 0;
+    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? c2Stats.wins / c2WT : 0;
+    //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
 
 	var wpTotal = c1Stats.wins + c2Stats.wins;
 	var c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
