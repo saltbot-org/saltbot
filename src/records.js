@@ -79,6 +79,7 @@ Updater.prototype.updateBettorsFromMatch = function (mObj, bc1, bc2) {
 	}
 };
 Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
+    var rememberRecordsLast = 30;  // changing this requires re-importing matches.
 	// wins, losses, and times
 	if (mObj.w == 0) {
 		c1Obj.wins.push(mObj.t);
@@ -134,7 +135,7 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 	c1Obj.tiers.push(mObj.t);
 	c2Obj.tiers.push(mObj.t);
 	// expert favor is seemingly worthless but what the hell
-	if (mObj.if != null && mObj.if.length > 0) {
+    if (mObj.if != null || mObj.cf != null ) {
 		if (mObj.cf == 0) {
 			c1Obj.crowdFavor.push(1);
 			c2Obj.crowdFavor.push(0);
@@ -151,8 +152,8 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 		}
 	}
 
-	limitRecordsTo(c1Obj, 15);
-	limitRecordsTo(c2Obj, 15);
+    limitRecordsTo(c1Obj, rememberRecordsLast);
+    limitRecordsTo(c2Obj, rememberRecordsLast);
 
 };
 
