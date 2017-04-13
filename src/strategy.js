@@ -97,7 +97,6 @@ Strategy.prototype.getBetAmount = function (balance, tournament, debug) {
 			conf = ( conf - rangeConfidanceScale[0] ) * 
 							( rangeTourneyScale[1] - rangeTourneyScale[0] ) / 
 							( rangeConfidanceScale[1] - rangeConfidanceScale[0] ) + rangeTourneyScale[0];
-							
 			conf = Math.max(rangeTourneyScale[0], conf);
 		}
 		amountToBet = (!allIn) ? Math.round(balance * (conf)) : balance;
