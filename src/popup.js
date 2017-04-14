@@ -347,12 +347,12 @@ Simulator.prototype.evalMutations = function (mode) {
 									nonUpsetsBetOn += 1;
 							}
 							// how smart we are.
-                            if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses) && (strategy.confidence > 0.5)) {
+                            if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses) /*&& (strategy.confidence > 0.5)*/) {
 								lossMinimizationAmount += 1 - strategy.confidence;
 								minimizedLosses += 1;
 							}
 							// how chicken we are.
-							if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains) && (strategy.confidence>0.5)) {
+							if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains) /*&& (strategy.confidence>0.5)*/) {
 								gainMissedAmount += 1 - strategy.confidence;
 								missedGains += 1;
 							}
@@ -410,7 +410,7 @@ Simulator.prototype.evalMutations = function (mode) {
 			var parents = [];
 			var nextGeneration = [];
 			var money = true;
-			var accuracy = true;
+			var accuracy = false;
 			var unshackle = true;
 			var weightAccToMoney = 0.5;//1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
 			
@@ -526,7 +526,7 @@ Simulator.prototype.evalMutations = function (mode) {
 	});
 };
 Simulator.prototype.initializePool = function () {
-	var populationSize = 64;	// too small, it cannot expanded solve space; two large, not only runtime increases, weights differences between best/worst become dominate.
+	var populationSize = 32;	// too small, it cannot expanded solve space; two large, not only runtime increases, weights differences between best/worst become dominate.
 	var shortPopulationSize = 16;
 	var pool = [new Chromosome(), new Chromosome()];
 	while (pool.length < populationSize) {
