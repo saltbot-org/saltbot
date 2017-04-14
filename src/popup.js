@@ -347,12 +347,12 @@ Simulator.prototype.evalMutations = function (mode) {
 									nonUpsetsBetOn += 1;
 							}
 							// how smart we are.
-                            if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses) && (strategy.confidence > 0.5)) {
+                            if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses) /*&& (strategy.confidence > 0.5)*/) {
 								lossMinimizationAmount += 1 - strategy.confidence;
 								minimizedLosses += 1;
 							}
 							// how chicken we are.
-							if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains) && (strategy.confidence>0.5)) {
+							if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains) /*&& (strategy.confidence>0.5)*/) {
 								gainMissedAmount += 1 - strategy.confidence;
 								missedGains += 1;
 							}
