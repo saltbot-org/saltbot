@@ -338,8 +338,8 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	var parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
-	var mutationScale = 0.15;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
-	var mutationChance = 0.7;	// range [0,1]
+	var mutationScale = 0.20;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
+	var mutationChance = 0.08;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
 		if (typeof offspring[i] != "function") {
@@ -490,14 +490,13 @@ ConfidenceScore.prototype.execute = function (info) {
 	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
 		var lesserOdds = (c1Stats.averageOdds < c2Stats.averageOdds) ? c1Stats.averageOdds : c2Stats.averageOdds;
 		this.oddsConfidence = [(c1Stats.averageOdds / lesserOdds), (c2Stats.averageOdds / lesserOdds)];
-		if (this.debug) oddsMessage = "predicted odds -> (" + formatString("" + (this.oddsConfidence[0]).toFixed(2) + " : " + (this.oddsConfidence[1]).toFixed(2), messagelength) + ")"
+		if (this.debug) oddsMessage = "\n::weighted odds->(" + formatString("" + (this.oddsConfidence[0]).toFixed(2) + " : " + (this.oddsConfidence[1]).toFixed(2), messagelength) + ")"
 	} else {
 		this.oddsConfidence = null;
 	}
 
-    
-    var c1WT = c1Stats.wins + c1Stats.losses + padValue;
-    var c2WT = c2Stats.wins + c2Stats.losses + padValue;
+    var c1WT = /*c1Stats.wins +*/ c1Stats.losses + padValue;
+    var c2WT = /*c2Stats.wins +*/ c2Stats.losses + padValue;
     var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue) / c1WT : 0;
     var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue) / c2WT : 0;
     //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
@@ -521,17 +520,17 @@ ConfidenceScore.prototype.execute = function (info) {
     // weight in win percent
 	var WPSum = c1WP + c2WP;
     if (WPSum > 0) {
-        if (c1Score > c2Score ) {
+        if (c1WP > c2WP ) {
 		    c1Score += winPercentageWeight * c1WP / WPSum;
            // c2Score += winPercentageWeight * c2WP / WPSum;
-        } else if (c1Score < c2Score) {
+        } else if (c1WP < c2WP) {
             c2Score += winPercentageWeight * c2WP / WPSum;
            // c1Score += winPercentageWeight * c1WP / WPSum;  // redundent, but open for new measures.
         }
 	}
 	else {
-		c1Score += winPercentageWeight * 0.5;
-		c2Score += winPercentageWeight * 0.5;
+		// c1Score += winPercentageWeight * 0.5;
+		// c2Score += winPercentageWeight * 0.5;
 	}
     // weight for upset odds
     if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
@@ -546,13 +545,13 @@ ConfidenceScore.prototype.execute = function (info) {
     }
     // weight for shortest win time
     if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null) {
-        var aWTT = c1Stats.averageWinTime + c2Stats.averageWinTime;
+        var aWT = c1Stats.averageWinTime + c2Stats.averageWinTime;
         if (c1Stats.averageWinTime < c2Stats.averageWinTime) {
-            c1Score += timeAveWinWeight * c2Stats.averageWinTime / aWTT;
+            c1Score += timeAveWinWeight * c2Stats.averageWinTime / aWT;
            // c2Score += timeAveWinWeight * c1Stats.averageWinTime / aWTT;
         }
         else if (c1Stats.averageWinTime > c2Stats.averageWinTime) {
-            c2Score += timeAveWinWeight * c1Stats.averageWinTime / aWTT;
+            c2Score += timeAveWinWeight * c1Stats.averageWinTime / aWT;
            // c1Score += timeAveWinWeight * c2Stats.averageWinTime / aWTT;
         }
         if (this.debug) timeMessage = "\n::avg win time (red:blue)->(" + formatString(c1Stats.averageWinTimeRaw.toFixed(2) + " : " + c2Stats.averageWinTimeRaw.toFixed(2), messagelength) + ")"
@@ -560,13 +559,13 @@ ConfidenceScore.prototype.execute = function (info) {
 	}
     // weight for longest lose time
     if (c1Stats.averageLossTime != null && c2Stats.averageLossTime != null) {
-        var aLTT = c1Stats.averageLossTime + c2Stats.averageLossTime;
+        var aLT = c1Stats.averageLossTime + c2Stats.averageLossTime;
         if (c1Stats.averageLossTime > c2Stats.averageLossTime) {
-            c1Score += timeAveLoseWeight * c1Stats.averageLossTime / aLTT;
+            c1Score += timeAveLoseWeight * c1Stats.averageLossTime / aLT;
            // c2Score += timeAveLoseWeight * c2Stats.averageLossTime / aLTT;
         }
         else if (c1Stats.averageLossTime < c2Stats.averageLossTime) {   // redundent, but open for new measures.
-            c2Score += timeAveLoseWeight * c2Stats.averageLossTime / aLTT;
+            c2Score += timeAveLoseWeight * c2Stats.averageLossTime / aLT;
            // c1Score += timeAveLoseWeight * c1Stats.averageLossTime / aLTT;
         }
 		if (this.debug) {
@@ -597,11 +596,11 @@ ConfidenceScore.prototype.execute = function (info) {
     if (c1Stats.ifPercent != null && c2Stats.ifPercent != null) {
         var ifPT = c1Stats.ifPercent + c2Stats.ifPercent;
         if (c1Stats.ifPercent > c2Stats.ifPercent) {
-            c1Score += illumFavorWeight * c1Stats.ifPercent / cfPT;
+            c1Score += illumFavorWeight * c1Stats.ifPercent / ifPT;
            // c2Score += illumFavorWeight * c2Stats.ifPercent / cfPT;
         }
         else if (c1Stats.ifPercent < c2Stats.ifPercent) {    // redundent
-            c2Score += illumFavorWeight * c2Stats.ifPercent / cfPT;;
+            c2Score += illumFavorWeight * c2Stats.ifPercent / ifPT;;
           //  c1Score += illumFavorWeight * c1Stats.ifPercent / cfPT;;
         }
 		var ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
