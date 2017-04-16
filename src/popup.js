@@ -165,9 +165,9 @@ Simulator.prototype.updateMoney = function (index, odds, selection, amount, corr
 			this.money[index] = this.minimum;
 	} else {
 		if (selection == 0)
-			this.money[index] += amount * parseFloat(oddsArr[1]) / parseFloat(oddsArr[0]);
+            this.money[index] += amount * Number(oddsArr[1]) / Number(oddsArr[0]);
 		else if (selection == 1)
-			this.money[index] += amount * parseFloat(oddsArr[0]) / parseFloat(oddsArr[1]);
+            this.money[index] += amount * Number(oddsArr[0]) / Number(oddsArr[1]);
 	}
 };
 Simulator.prototype.getBetAmount = function (strategy, index) {
@@ -331,8 +331,8 @@ Simulator.prototype.evalMutations = function (mode) {
 					if (mode == "mass")
 						if (matches[i].o != "U") {
 							var t = matches[i].o.split(":");
-							var o1 = parseFloat(t[0]);
-							var o2 = parseFloat(t[1]);
+                            var o1 = Number(t[0]);
+                            var o2 = Number(t[1]);
 							var greaterNumber = o1 < o2 ? o2 / o1 : o1 / o2;
 							denominators.push(greaterNumber);
 
