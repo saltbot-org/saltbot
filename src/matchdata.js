@@ -7,7 +7,7 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
 		}
 
 		var odds_split = odds.split(":");
-        return Number(odds_split[0] / odds_split[1]);
+		return parseFloat(odds_split[0] / odds_split[1]);
 	},
 
 	"odds-asc": function (a, b) {
