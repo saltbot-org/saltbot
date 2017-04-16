@@ -123,9 +123,9 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 	};
 
 	// this.tiers will correspond with the odds
-    if (mObj.o != null && mObj.o != "U") {
-        var oc1 = Number(mObj.o.split(":")[0]);
-        var oc2 = Number(mObj.o.split(":")[1]);
+	if (mObj.o != null && mObj.o != "U") {
+		var oc1 = parseFloat(mObj.o.split(":")[0]);
+		var oc2 = parseFloat(mObj.o.split(":")[1]);
 		c1Obj.odds.push(oc1 / oc2);
 		c2Obj.odds.push(oc2 / oc1);
 	} else {
