@@ -266,7 +266,7 @@ Chromosome.prototype.normalize = function(){
 	var lowest = 0;
 	for (var e0 in this){
 		if(this.hasOwnProperty(e0)){
-			var low =  parseFloat(this[e0]);
+            var low = Number(this[e0]);
 			if (low < lowest){
 				lowest = low;
 			}
@@ -285,7 +285,7 @@ Chromosome.prototype.normalize = function(){
 	var highIndex = null;
 	for (var e0 in this){
 		if(this.hasOwnProperty(e0)){
-			var high =  parseFloat(this[e0]);
+            var high = Number(this[e0]);
 			if (high > highest){
 				highest = high;
 				highIndex = e0;
@@ -301,7 +301,7 @@ Chromosome.prototype.normalize = function(){
 	var sum = 0;
 	for(var el in this) {
 		if(this.hasOwnProperty(el)) {
-			sum += parseFloat(this[el]);
+            sum += Number(this[el]);
 		}
 	}
 	for (var el2 in this) {
@@ -315,13 +315,13 @@ Chromosome.prototype.normalize = function(){
 Chromosome.prototype.loadFromJSON = function (json) {
 	var copy = JSON.parse(json);
 	for (var i in copy) {
-		this[i] = parseFloat(copy[i]);
+        this[i] = Number(copy[i]);
 	}
 	return this;
 };
 Chromosome.prototype.loadFromObject = function (obj) {
 	for (var i in obj) {
-		this[i] = parseFloat(obj[i]);
+        this[i] = Number(obj[i]);
 	}
 	return this;
 };
@@ -626,8 +626,8 @@ ConfidenceScore.prototype.execute = function (info) {
 	this.prediction = (c1Score > c2Score) ? c1.name : c2.name;
 
 	var winnerPoints = (this.prediction == c1.name) ? c1Score : c2Score;
-	var totalAvailablePoints = c1Score + c2Score;
-	this.confidence = parseFloat((winnerPoints / totalAvailablePoints));
+    var totalAvailablePoints = c1Score + c2Score;
+    this.confidence = ((winnerPoints / totalAvailablePoints)).toFixed(4);
 
 	/*---------------------------------------------------------------------------------------------------*/
 	// CONFIDENCE ADJUSTMENT SECTION
