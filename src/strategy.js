@@ -219,12 +219,12 @@ RatioConfidence.prototype.execute = function (info) {
 
 var Chromosome = function() {
 	// confidence weights
-	this.oddsWeight = 1;
+	this.oddsWeight = 0.5;
 	this.timeAveWin = 1;	//this.timeWeight  =  1;
 	this.timeAveLose = 1;
 	this.winPercentageWeight = 1;
-	this.crowdFavorWeight = 1;
-	this.illumFavorWeight = 1;
+	this.crowdFavorWeight = 0.5;
+	this.illumFavorWeight = 0.5;
 	// tier scoring            
 	this.wX = 1;
 	this.wS = 1;
@@ -263,7 +263,7 @@ var Chromosome = function() {
 
 //
 Chromosome.prototype.normalize = function(){
-    var ratioDampen = 0.90;
+    var ratioDampen = 0.96;
     var lowValueControl = 0.000001;
 	// make weights > 0
 	var lowest = 0;
@@ -502,9 +502,10 @@ ConfidenceScore.prototype.execute = function (info) {
     //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
 
     var wpTotal = c1Stats.wins + c2Stats.wins + padValue;
+    var WPSum = c1WP + c2WP;
     var c1WPDisplay = wpTotal > 0 ? (c1Stats.wins + padValue) / wpTotal : 0;
     var c2WPDisplay = wpTotal > 0 ? (c2Stats.wins + padValue) / wpTotal : 0;
-	if (this.debug) winsMessage = "\xBB WINS/LOSSES:\n::weighted totals as % (red:blue)->(" + (c1WPDisplay * 100).toFixed(2) + " : " + (c2WPDisplay * 100).toFixed(2) + ")" +
+    if (this.debug) winsMessage = "\xBB WINS/LOSSES:\n::weighted totals as % (red:blue)->(" + (c1WP / WPSum * 100).toFixed(2) + " : " + (c2WP / WPSum* 100).toFixed(2) + ")" +
 		"\n::unweighted (red W:L)(blue W:L)->(" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")" +
 		"\n::details (red W:L)(blue W:L)->(" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
 		"(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
@@ -600,7 +601,7 @@ ConfidenceScore.prototype.execute = function (info) {
            // c2Score += illumFavorWeight * c2Stats.ifPercent / cfPT;
         }
         else if (c1Stats.ifPercent < c2Stats.ifPercent) {    // redundent
-            c2Score += illumFavorWeight * c2Stats.ifPercent / ifPT;;
+            c2Score += illumFavorWeight * c2Stats.ifPercent / ifPT;
           //  c1Score += illumFavorWeight * c1Stats.ifPercent / cfPT;;
         }
 		var ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
