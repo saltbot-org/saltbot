@@ -478,8 +478,9 @@ ConfidenceScore.prototype.execute = function (info) {
     var scoreDebugP = "\n:: ";
 
 	// the weights come in from the chromosome
-	var c1Score = 0.5;
-	var c2Score = 0.5;
+    var scoreBase = 0.001;
+    var c1Score = scoreBase;
+    var c2Score = scoreBase;
 	//
     var padValue = 0.0001;
 
