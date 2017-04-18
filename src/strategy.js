@@ -389,6 +389,9 @@ var CSStats = function (cObj, chromosome) {
 	this.averageLossTimeRaw = null;
 	this.cfPercent = null;
 	this.ifPercent = null;
+    this.totalFights = 0;
+
+    this.totalFights = cObj.totalFights.length;
 
 	for (var jj = 0; jj < cObj.wins.length; jj++)
 		this.wins += chromosome["w" + cObj.wins[jj]];
@@ -478,20 +481,23 @@ ConfidenceScore.prototype.execute = function (info) {
     var scoreDebugP = "\n:: ";
 
 	// the weights come in from the chromosome
-    var scoreBase = 0.001;
+    var scoreBase = 0.001;      // range (0,0.5], prevents over-confidence.
     var c1Score = scoreBase;
     var c2Score = scoreBase;
-	//
-    var padValue = 0.0001;
 
 	//
 	var c1Stats = new CSStats(c1, this.chromosome);
 	var c2Stats = new CSStats(c2, this.chromosome);
+    // win % precision control for low total fights count. Must scale to tier weights.
+    var padValue = 0;//0.0001;
+    var winsRatioPop = 0.34;
+    var gamesCountPop = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 1);
+    gamesCountPop *= 0.03125;
     
-    var c1WT = /*c1Stats.wins +*/ c1Stats.losses + padValue;
-    var c2WT = /*c2Stats.wins +*/ c2Stats.losses + padValue;
-    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue) / c1WT : 0;
-    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue) / c2WT : 0;
+    var c1WT = c1Stats.wins + c1Stats.losses + padValue;
+    var c2WT = c2Stats.wins + c2Stats.losses + padValue;
+    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + gamesCountPop * winsRatioPop + padValue) / (c1WT + gamesCountPop) : 0;
+    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + gamesCountPop * winsRatioPop + padValue) / (c2WT + gamesCountPop) : 0;
     //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
     /*
 	if (c1WP > c2WP) {
@@ -537,7 +543,7 @@ ConfidenceScore.prototype.execute = function (info) {
         } else if (c1Stats.averageOdds > c2Stats.averageOdds) {
             c2Score += oddsWeight * c1Stats.averageOdds / aOT;
             //c1Score += oddsWeight * c2Stats.averageOdds / aOT;
-            scoreDebugP += "||odd(2:" + c1Score.toFixed(6) + ")";
+            scoreDebugP += "||odd(2:" + c2Score.toFixed(6) + ")";
         }
     }
     if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
