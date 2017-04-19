@@ -489,7 +489,7 @@ ConfidenceScore.prototype.execute = function (info) {
 	var c1Stats = new CSStats(c1, this.chromosome);
     var c2Stats = new CSStats(c2, this.chromosome);
 
-    var matchesSample = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 1);
+    var matchesSample = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 15); //min 15 as lowest records kept per char.
     var padValue = 0.0001;
     
     var c1WT = c1Stats.wins + c1Stats.losses + padValue;
@@ -509,7 +509,7 @@ ConfidenceScore.prototype.execute = function (info) {
     // weight in win percent
     var WPSum = c1WP + c2WP;
     var winsRatioTemper = 0.5;
-    var gamesWinPopulation = matchesSample * WPSum * 0.1;
+    var gamesWinPopulation = matchesSample * WPSum * 0.01;
     var c1TWinP = (c1WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
     var c2TWinP = (c2WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
     if (WPSum > 0) {
@@ -533,7 +533,7 @@ ConfidenceScore.prototype.execute = function (info) {
     if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
         var aOT = c1Stats.averageOdds + c2Stats.averageOdds;
         var oddsTemper = 0.5;
-        var oddsPopulation = matchesSample * aOT * 0.1;
+        var oddsPopulation = matchesSample * aOT * 0.01;
         var c1TOddsP = (c1Stats.averageOdds + oddsTemper * oddsPopulation) / (aOT + oddsPopulation);
         var c2TOddsP = (c2Stats.averageOdds + oddsTemper * oddsPopulation) / (aOT + oddsPopulation);
         if (c1TOddsP < c2TOddsP) {
@@ -556,7 +556,7 @@ ConfidenceScore.prototype.execute = function (info) {
     if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null) {
         var aWT = c1Stats.averageWinTime + c2Stats.averageWinTime;
         var aWTTemper = 0.5;
-        var aWTPop = matchesSample * aWT * 0.1;
+        var aWTPop = matchesSample * aWT * 0.01;
         var c1AWTP = (c1Stats.averageWinTime + aWTTemper * aWTPop) / (aWT + aWTPop);
         var c2AWTP = (c2Stats.averageWinTime + aWTTemper * aWTPop) / (aWT + aWTPop);
         if (c1Stats.averageWinTime < c2Stats.averageWinTime) {
@@ -575,7 +575,7 @@ ConfidenceScore.prototype.execute = function (info) {
     if (c1Stats.averageLossTime != null && c2Stats.averageLossTime != null) {
         var aLT = c1Stats.averageLossTime + c2Stats.averageLossTime;
         var aLTTemper = 0.5;
-        var aLTPop = matchesSample * aLT * 0.1;
+        var aLTPop = matchesSample * aLT * 0.01;
         var c1ALTP = (c1Stats.averageLossTime + aLTTemper * aLTPop) / (aLT + aLTPop);
         var c2ALTP = (c2Stats.averageLossTime + aLTTemper * aLTPop) / (aLT + aLTPop);
         if (c1Stats.averageLossTime > c2Stats.averageLossTime) {
