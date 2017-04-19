@@ -486,15 +486,12 @@ ConfidenceScore.prototype.execute = function (info) {
 	var c1Stats = new CSStats(c1, this.chromosome);
 	var c2Stats = new CSStats(c2, this.chromosome);
     // win % precision control for low total fights count. Must scale to tier weights.
-    var padValue = 0;//0.0001;
-    var winsRatioPop = 0.34;
-    var gamesCountPop = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 1);
-    gamesCountPop *= 0.03125;
+    var padValue = 0.0001;
     
     var c1WT = c1Stats.wins + c1Stats.losses + padValue;
     var c2WT = c2Stats.wins + c2Stats.losses + padValue;
-    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + gamesCountPop * winsRatioPop + padValue) / (c1WT + gamesCountPop) : 0;
-    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + gamesCountPop * winsRatioPop + padValue) / (c2WT + gamesCountPop) : 0;
+    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue) / (c1WT) : 0;
+    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue) / (c2WT) : 0;
     //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
     /*
 	if (c1WP > c2WP) {
@@ -506,26 +503,24 @@ ConfidenceScore.prototype.execute = function (info) {
 	    c2Score += 0.5*winPercentageWeight;
 	 }*/
     // weight in win percent
-	var WPSum = c1WP + c2WP;
+    var WPSum = c1WP + c2WP;
+    var winsRatioTemper = 0.5;
+    var gamesWinPopulation = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 1) * WPSum * 0.5;
+    var c1TWinP = (c1WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
+    var c2TWinP = (c2WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
     if (WPSum > 0) {
-        if (c1WP > c2WP ) {
-		    c1Score += winPercentageWeight * c1WP / WPSum;
-            // c2Score += winPercentageWeight * c2WP / WPSum;
+        if (c1TWinP > c2TWinP) {
+            c1Score += winPercentageWeight * c1TWinP;
             scoreDebugP += "||win(1:" + c1Score.toFixed(6) + ")";
-        } else if (c1WP < c2WP) {
-            c2Score += winPercentageWeight * c2WP / WPSum;
-            // c1Score += winPercentageWeight * c1WP / WPSum;  // redundent, but open for new measures.
+        } else if (c1TWinP < c2TWinP) {
+            c2Score += winPercentageWeight * c2TWinP;
             scoreDebugP += "||win(2:" + c2Score.toFixed(6) + ")";
         }
 	}
-	else {
-		// c1Score += winPercentageWeight * 0.5;
-		// c2Score += winPercentageWeight * 0.5;
-    }
-    var wpTotal = c1Stats.wins + c2Stats.wins + padValue;
+    //var wpTotal = c1Stats.wins + c2Stats.wins + padValue;
     //var c1WPDisplay = wpTotal > 0 ? (c1Stats.wins + padValue) / wpTotal : 0;
     //var c2WPDisplay = wpTotal > 0 ? (c2Stats.wins + padValue) / wpTotal : 0;
-    if (this.debug) winsMessage = "\xBB WINS/LOSSES:\n::weighted totals as % (red:blue)->(" + (c1WP / WPSum * 100).toFixed(2) + " : " + (c2WP / WPSum * 100).toFixed(2) + ")" +
+    if (this.debug) winsMessage = "\xBB WINS/LOSSES:\n::weighted totals as % (red:blue)->(" + (c1TWinP * 100).toFixed(2) + " : " + (c2TWinP * 100).toFixed(2) + ")" +
         "\n::unweighted (red W:L)(blue W:L)->(" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")" +
         "\n::details (red W:L)(blue W:L)->(" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
         "(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
@@ -533,24 +528,26 @@ ConfidenceScore.prototype.execute = function (info) {
     // weight for upset odds
     if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
         var aOT = c1Stats.averageOdds + c2Stats.averageOdds;
-        if (c1Stats.averageOdds < c2Stats.averageOdds) {
-            c1Score += oddsWeight * c2Stats.averageOdds / aOT;
-            //c2Score += oddsWeight * c1Stats.averageOdds / aOT;
+        var oddsTemper = 0.1;
+        var oddsPopulation = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 1) * aOT * 0.5;
+        var c1TOddsP = (c1Stats.averageOdds + oddsTemper * oddsPopulation) / (aOT + oddsPopulation);
+        var c2TOddsP = (c2Stats.averageOdds + oddsTemper * oddsPopulation) / (aOT + oddsPopulation);
+        if (c1TOddsP < c2TOddsP) {
+            c1Score += oddsWeight * c2TOddsP;
             scoreDebugP += "||odd(1:" + c1Score.toFixed(6) + ")";
-        } else if (c1Stats.averageOdds > c2Stats.averageOdds) {
-            c2Score += oddsWeight * c1Stats.averageOdds / aOT;
-            //c1Score += oddsWeight * c2Stats.averageOdds / aOT;
+        } else if (c1TOddsP > c2TOddsP) {
+            c2Score += oddsWeight * c1TOddsP;
             scoreDebugP += "||odd(2:" + c2Score.toFixed(6) + ")";
         }
-    }
-    if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
+
         if (this.debug) {
-            var lesserOdds = (c1Stats.averageOdds < c2Stats.averageOdds) ? c1Stats.averageOdds : c2Stats.averageOdds;
-            var oddsConfidence = [(c1Stats.averageOdds / lesserOdds), (c2Stats.averageOdds / lesserOdds)];
-            oddsMessage = "\n::weighted odds->(" + formatString("" + (oddsConfidence[0]).toFixed(2) + " : " + (oddsConfidence[1]).toFixed(2), messagelength) + ")";
+            var lesserOdds = (c1TOddsP < c2TOddsP) ? c1TOddsP : c2TOddsP;
+            var oddsConfidence = [(c1TOddsP / lesserOdds), (c2TOddsP / lesserOdds)];
+            oddsMessage = "\n::weighted odds->(" + formatString("" + (oddsConfidence[0]).toFixed(2) + " : " + (oddsConfidence[1]).toFixed(2), messagelength) + ")"
+                + "\n::weighted raw (" + c1Stats.averageOdds.toFixed(3) + ":" + c2Stats.averageOdds.toFixed(3) +")";
         }
     } 
-
+    
     // weight for shortest win time
     if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null) {
         var aWT = c1Stats.averageWinTime + c2Stats.averageWinTime;
