@@ -400,7 +400,7 @@ var CSStats = function (cObj, chromosome) {
 		this.losses += chromosome["l" + cObj.losses[kk]];
 
 	for (var i = 0; i < cObj.odds.length; i++) {
-		if (cObj.odds[i] != -1) {
+		if (!(cObj.odds[i] < 0)) {
 			oddsSum += cObj.odds[i] * chromosome["o" + cObj.tiers[i]];
 			oddsCount += 1;
 		}
