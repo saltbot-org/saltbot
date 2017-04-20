@@ -125,14 +125,17 @@ Match.prototype.init = function () {
 		self.multiplier = result.settings_v1.multiplier;
 
 		//self.fillCharacters(result);//get character record objects or make new ones
-		if (recs)
-			for (var i = 0; i < recs.length; i++) {
+        if (recs)
+            var foundCount = 0;
+            for (var i = 0; i < recs.length && foundCount<2; i++) {
 				var c = recs[i];
 				if (c.name == self.names[0]) {
-					self.character1 = c;
+                    self.character1 = c;
+                    foundCount++;
 				}
 				if (c.name == self.names[1]) {
-					self.character2 = c;
+                    self.character2 = c;
+                    foundCount++;
 				}
 			}
 
