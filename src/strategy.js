@@ -338,7 +338,7 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	var parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
-	var mutationScale = 0.15;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
+	var mutationScale = 0.25;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
 	var mutationChance = 0.08;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
@@ -400,7 +400,7 @@ var CSStats = function (cObj, chromosome) {
 		this.losses += chromosome["l" + cObj.losses[kk]];
 
 	for (var i = 0; i < cObj.odds.length; i++) {
-		if (cObj.odds[i] != -1) {
+		if (!(cObj.odds[i] < 0)) {
 			oddsSum += cObj.odds[i] * chromosome["o" + cObj.tiers[i]];
 			oddsCount += 1;
 		}
@@ -518,10 +518,10 @@ ConfidenceScore.prototype.execute = function (info) {
     if (WPSum > 0) {
         if (c1TWinP > c2TWinP) {
             c1Score += winPercentageWeight * c1TWinP;
-            scoreDebugP += "||win(1:" + c1Score.toFixed(6) + ")";
+            scoreDebugP += " win(1:" + c1Score.toFixed(6) + ")";
         } else if (c1TWinP < c2TWinP) {
             c2Score += winPercentageWeight * c2TWinP;
-            scoreDebugP += "||win(2:" + c2Score.toFixed(6) + ")";
+            scoreDebugP += " win(2:" + c2Score.toFixed(6) + ")";
         }
 	}
     //var wpTotal = c1Stats.wins + c2Stats.wins + padValue;
@@ -541,10 +541,10 @@ ConfidenceScore.prototype.execute = function (info) {
         var c2TOddsP = (c2Stats.averageOdds + oddsTemper * oddsPopulation) / (aOT + oddsPopulation);
         if (c1TOddsP < c2TOddsP) {
             c1Score += oddsWeight * c2TOddsP;
-            scoreDebugP += "||odd(1:" + c1Score.toFixed(6) + ")";
+            scoreDebugP += " odd(1:" + c1Score.toFixed(6) + ")";
         } else if (c1TOddsP > c2TOddsP) {
             c2Score += oddsWeight * c1TOddsP;
-            scoreDebugP += "||odd(2:" + c2Score.toFixed(6) + ")";
+            scoreDebugP += " odd(2:" + c2Score.toFixed(6) + ")";
         }
 
         if (this.debug) {
@@ -564,11 +564,11 @@ ConfidenceScore.prototype.execute = function (info) {
         var c2AWTP = (c2Stats.averageWinTime + aWTTemper * aWTPop) / (aWT + aWTPop);
         if (c1AWTP < c2AWTP) {
             c1Score += timeAveWinWeight * c2AWTP;
-            scoreDebugP += "||awt(1:" + c1Score.toFixed(6) + ")";
+            scoreDebugP += " awt(1:" + c1Score.toFixed(6) + ")";
         }
         else if (c1AWTP > c2AWTP) {
             c2Score += timeAveWinWeight * c1AWTP;
-            scoreDebugP += "||awt(2:" + c2Score.toFixed(6) + ")";
+            scoreDebugP += " awt(2:" + c2Score.toFixed(6) + ")";
         }
         if (this.debug) timeMessage = "\n::avg win time (red:blue)->(" + formatString(c1Stats.averageWinTimeRaw.toFixed(2) + " : " + c2Stats.averageWinTimeRaw.toFixed(2), messagelength) + ")"
             + "\n::Weighted:(" + formatString(c1Stats.averageWinTime.toFixed(2) + ":" + c2Stats.averageWinTime.toFixed(2), messagelength) + ")" ;
@@ -583,11 +583,11 @@ ConfidenceScore.prototype.execute = function (info) {
         var c2ALTP = (c2Stats.averageLossTime + aLTTemper * aLTPop) / (aLT + aLTPop);
         if (c1ALTP > c2ALTP) {
             c1Score += timeAveLoseWeight * c1ALTP;
-            scoreDebugP += "||alt(1:" + c1Score.toFixed(6) + ")";
+            scoreDebugP += " alt(1:" + c1Score.toFixed(6) + ")";
         }
         else if (c1ALTP < c2ALTP) {
             c2Score += timeAveLoseWeight * c2ALTP;
-            scoreDebugP += "||alt(2:" + c2Score.toFixed(6) + ")";
+            scoreDebugP += " alt(2:" + c2Score.toFixed(6) + ")";
         }
 		if (this.debug) {
             var msg = "\n::avg loss time (red:blue)->(" + formatString(c1Stats.averageLossTimeRaw.toFixed(2) + " : " + c2Stats.averageLossTimeRaw.toFixed(2), messagelength) + ")"
@@ -603,11 +603,11 @@ ConfidenceScore.prototype.execute = function (info) {
         var cfPT = c1Stats.cfPercent + c2Stats.cfPercent;
         if (c1Stats.cfPercent > c2Stats.cfPercent) {
             c1Score += crowdFavorWeight * c1Stats.cfPercent / cfPT;
-            scoreDebugP += "||cf(1:" + c1Score.toFixed(6) + ")";
+            scoreDebugP += " cf(1:" + c1Score.toFixed(6) + ")";
         }
         else if (c1Stats.cfPercent < c2Stats.cfPercent) {
             c2Score += crowdFavorWeight * c2Stats.cfPercent / cfPT;
-            scoreDebugP += "||cf(2:" + c2Score.toFixed(6) + ")";
+            scoreDebugP += " cf(2:" + c2Score.toFixed(6) + ")";
         }
 		var cfPercentTotal = c1Stats.cfPercent + c2Stats.cfPercent;
 		if (this.debug) crwdMessage = "\n::crowd favor (red:blue) -> (" + formatString((c1Stats.cfPercent / cfPercentTotal * 100).toFixed(2) +
@@ -618,11 +618,11 @@ ConfidenceScore.prototype.execute = function (info) {
         var ifPT = c1Stats.ifPercent + c2Stats.ifPercent;
         if (c1Stats.ifPercent > c2Stats.ifPercent) {
             c1Score += illumFavorWeight * c1Stats.ifPercent / ifPT;
-            scoreDebugP += "||if(1:" + c1Score.toFixed(6) + ")";
+            scoreDebugP += " if(1:" + c1Score.toFixed(6) + ")";
         }
         else if (c1Stats.ifPercent < c2Stats.ifPercent) {
             c2Score += illumFavorWeight * c2Stats.ifPercent / ifPT;
-            scoreDebugP += "||if(2:" + c2Score.toFixed(6) + ")";
+            scoreDebugP += " if(2:" + c2Score.toFixed(6) + ")";
         }
 		var ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
 		if (this.debug) ilumMessage = "\n::illuminati favor (red:blue) -> (" + formatString((c1Stats.ifPercent / ifPercentTotal * 100).toFixed(2) +
