@@ -263,8 +263,8 @@ var Chromosome = function() {
 
 //
 Chromosome.prototype.normalize = function(){
-    var ratioDampen = 0.97;
-    var lowValueControl = 0.000001;
+  var ratioDampen = 0.97;
+  var lowValueControl = 0.000001;
 	// make weights > 0
 	var lowest = 0;
 	for (var e0 in this){
@@ -288,7 +288,7 @@ Chromosome.prototype.normalize = function(){
 	var highIndex = null;
 	for (var e0 in this){
 		if(this.hasOwnProperty(e0)){
-            var high = Number(this[e0]);
+      var high = Number(this[e0]);
 			if (high > highest){
 				highest = high;
 				highIndex = e0;
@@ -478,29 +478,29 @@ ConfidenceScore.prototype.execute = function (info) {
 	var crwdMessage = null;
 	var ilumMessage = null;
 	var messagelength = 15;
-    var scoreDebugP = "\n:: ";
+  var scoreDebugP = "\n:: ";
 
 	// the weights come in from the chromosome
-    var scoreBase = 0.001;      // range (0,0.5], prevents over-confidence.
-    var c1Score = scoreBase;
-    var c2Score = scoreBase;
+  var scoreBase = 0.001;      // range (0,0.5], prevents over-confidence.
+  var c1Score = scoreBase;
+  var c2Score = scoreBase;
 
 	//
 	var c1Stats = new CSStats(c1, this.chromosome);
-    var c2Stats = new CSStats(c2, this.chromosome);
+  var c2Stats = new CSStats(c2, this.chromosome);
 
-    var matchesFakeSample = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 15); //min 15 as lowest records kept per char.
-    var padValue = 0;// 0.0001;
+  var matchesFakeSample = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 15); //min 15 as lowest records kept per char.
+  var padValue = 0;// 0.0001;
    
-    var winsPTemper = 0.5;
-    var c1WT = c1Stats.wins + c1Stats.losses + padValue;
-    var c2WT = c2Stats.wins + c2Stats.losses + padValue;
-    var c1WPPop = matchesFakeSample * 0.01;
-    var c2WPPop = matchesFakeSample * 0.01;
-    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue + winsPTemper * c1WPPop) / (c1WT + c1WPPop) : 1;
-    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue + winsPTemper * c2WPPop) / (c2WT + c2WPPop) : 1;
-    //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
-    /*
+  var winsPTemper = 0.5;
+  var c1WT = c1Stats.wins + c1Stats.losses + padValue;
+  var c2WT = c2Stats.wins + c2Stats.losses + padValue;
+  var c1WPPop = matchesFakeSample * 0.01;
+  var c2WPPop = matchesFakeSample * 0.01;
+  var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue + winsPTemper * c1WPPop) / (c1WT + c1WPPop) : 1;
+  var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue + winsPTemper * c2WPPop) / (c2WT + c2WPPop) : 1;
+  //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
+  /*
 	if (c1WP > c2WP) {
 	    c1Score += winPercentageWeight;
 	 } else if (c2WP > c1WP) {
@@ -509,13 +509,13 @@ ConfidenceScore.prototype.execute = function (info) {
 	    c1Score += 0.5*winPercentageWeight;
 	    c2Score += 0.5*winPercentageWeight;
 	 }*/
-    // weight in win percent
-    var WPSum = c1WP + c2WP;
-    var winsRatioTemper = 0.5;
-    var gamesWinPopulation = matchesFakeSample * WPSum * 0.00;
-    var c1TWinP = (c1WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
-    var c2TWinP = (c2WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
-    if (WPSum > 0) {
+  // weight in win percent
+  var WPSum = c1WP + c2WP;
+  var winsRatioTemper = 0.5;
+  var gamesWinPopulation = matchesFakeSample * WPSum * 0.00;
+  var c1TWinP = (c1WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
+  var c2TWinP = (c2WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
+  if (WPSum > 0) {
         if (c1TWinP > c2TWinP) {
             c1Score += winPercentageWeight * c1TWinP;
             scoreDebugP += " win(1:" + c1Score.toFixed(6) + ")";
