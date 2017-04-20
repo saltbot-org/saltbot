@@ -127,7 +127,7 @@ Match.prototype.init = function () {
 		//self.fillCharacters(result);//get character record objects or make new ones
         if (recs)
             var foundCount = 0;
-            for (var i = 0; i < recs.length && foundCount<2; i++) {
+            for (var i = 0; i < recs.length && foundCount < 2; i++) {
 				var c = recs[i];
 				if (c.name == self.names[0]) {
                     self.character1 = c;
