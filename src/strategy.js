@@ -460,62 +460,62 @@ ConfidenceScore.prototype.getBetAmount = function (balance, tournament, debug) {
 };
 // find confidence by comparing current match's characters stats.
 ConfidenceScore.prototype.execute = function (info) {
-	var c1 = info.character1;
-	var c2 = info.character2;
-	//
-	var oddsWeight = this.chromosome.oddsWeight;
-	var timeAveWinWeight = this.chromosome.timeAveWin;
-	var timeAveLoseWeight = this.chromosome.timeAveLose;
-	var winPercentageWeight = this.chromosome.winPercentageWeight;
-	var crowdFavorWeight = this.chromosome.crowdFavorWeight;
-	var illumFavorWeight = this.chromosome.illumFavorWeight;
-	var totalWeight = oddsWeight + timeAveWinWeight + timeAveLoseWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
+    var c1 = info.character1;
+    var c2 = info.character2;
+    //
+    var oddsWeight = this.chromosome.oddsWeight;
+    var timeAveWinWeight = this.chromosome.timeAveWin;
+    var timeAveLoseWeight = this.chromosome.timeAveLose;
+    var winPercentageWeight = this.chromosome.winPercentageWeight;
+    var crowdFavorWeight = this.chromosome.crowdFavorWeight;
+    var illumFavorWeight = this.chromosome.illumFavorWeight;
+    var totalWeight = oddsWeight + timeAveWinWeight + timeAveLoseWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
 
-	// messages
-	var oddsMessage = null;
-	var timeMessage = null;
-	var winsMessage = null;
-	var crwdMessage = null;
-	var ilumMessage = null;
-	var messagelength = 15;
-  var scoreDebugP = "\n:: ";
+    // messages
+    var oddsMessage = null;
+    var timeMessage = null;
+    var winsMessage = null;
+    var crwdMessage = null;
+    var ilumMessage = null;
+    var messagelength = 15;
+    var scoreDebugP = "\n:: ";
 
-	// the weights come in from the chromosome
-  var scoreBase = 0.001;      // range (0,0.5], prevents over-confidence.
-  var c1Score = scoreBase;
-  var c2Score = scoreBase;
+    // the weights come in from the chromosome
+    var scoreBase = 0.001;      // range (0,0.5], prevents over-confidence.
+    var c1Score = scoreBase;
+    var c2Score = scoreBase;
 
-	//
-	var c1Stats = new CSStats(c1, this.chromosome);
-  var c2Stats = new CSStats(c2, this.chromosome);
+    //
+    var c1Stats = new CSStats(c1, this.chromosome);
+    var c2Stats = new CSStats(c2, this.chromosome);
 
-  var matchesFakeSample = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 15); //min 15 as lowest records kept per char.
-  var padValue = 0;// 0.0001;
-   
-  var winsPTemper = 0.5;
-  var c1WT = c1Stats.wins + c1Stats.losses + padValue;
-  var c2WT = c2Stats.wins + c2Stats.losses + padValue;
-  var c1WPPop = matchesFakeSample * 0.01;
-  var c2WPPop = matchesFakeSample * 0.01;
-  var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue + winsPTemper * c1WPPop) / (c1WT + c1WPPop) : 1;
-  var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue + winsPTemper * c2WPPop) / (c2WT + c2WPPop) : 1;
-  //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
-  /*
-	if (c1WP > c2WP) {
-	    c1Score += winPercentageWeight;
-	 } else if (c2WP > c1WP) {
-	    c2Score += winPercentageWeight;
-	 } else {
-	    c1Score += 0.5*winPercentageWeight;
-	    c2Score += 0.5*winPercentageWeight;
-	 }*/
-  // weight in win percent
-  var WPSum = c1WP + c2WP;
-  var winsRatioTemper = 0.5;
-  var gamesWinPopulation = matchesFakeSample * WPSum * 0.00;
-  var c1TWinP = (c1WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
-  var c2TWinP = (c2WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
-  if (WPSum > 0) {
+    var matchesFakeSample = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 15); //min 15 as lowest records kept per char.
+    var padValue = 0;// 0.0001;
+
+    var winsPTemper = 0.5;
+    var c1WT = c1Stats.wins + c1Stats.losses + padValue;
+    var c2WT = c2Stats.wins + c2Stats.losses + padValue;
+    var c1WPPop = matchesFakeSample * 0.01;
+    var c2WPPop = matchesFakeSample * 0.01;
+    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue + winsPTemper * c1WPPop) / (c1WT + c1WPPop) : 1;
+    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue + winsPTemper * c2WPPop) / (c2WT + c2WPPop) : 1;
+    //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
+    /*
+      if (c1WP > c2WP) {
+          c1Score += winPercentageWeight;
+       } else if (c2WP > c1WP) {
+          c2Score += winPercentageWeight;
+       } else {
+          c1Score += 0.5*winPercentageWeight;
+          c2Score += 0.5*winPercentageWeight;
+       }*/
+    // weight in win percent
+    var WPSum = c1WP + c2WP;
+    var winsRatioTemper = 0.5;
+    var gamesWinPopulation = matchesFakeSample * WPSum * 0.00;
+    var c1TWinP = (c1WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
+    var c2TWinP = (c2WP + winsRatioTemper * gamesWinPopulation) / (WPSum + gamesWinPopulation);
+    if (WPSum > 0) {
         if (c1TWinP > c2TWinP) {
             c1Score += winPercentageWeight * c1TWinP;
             scoreDebugP += " win(1:" + c1Score.toFixed(6) + ")";
@@ -523,7 +523,7 @@ ConfidenceScore.prototype.execute = function (info) {
             c2Score += winPercentageWeight * c2TWinP;
             scoreDebugP += " win(2:" + c2Score.toFixed(6) + ")";
         }
-	}
+    }
     //var wpTotal = c1Stats.wins + c2Stats.wins + padValue;
     //var c1WPDisplay = wpTotal > 0 ? (c1Stats.wins + padValue) / wpTotal : 0;
     //var c2WPDisplay = wpTotal > 0 ? (c2Stats.wins + padValue) / wpTotal : 0;
@@ -551,10 +551,10 @@ ConfidenceScore.prototype.execute = function (info) {
             var lesserOdds = (c1TOddsP < c2TOddsP) ? c1TOddsP : c2TOddsP;
             var oddsConfidence = [(c1TOddsP / lesserOdds), (c2TOddsP / lesserOdds)];
             oddsMessage = "\n::weighted odds->(" + formatString("" + (oddsConfidence[0]).toFixed(2) + " : " + (oddsConfidence[1]).toFixed(2), messagelength) + ")"
-                + "\n::weighted raw (" + c1Stats.averageOdds.toFixed(3) + ":" + c2Stats.averageOdds.toFixed(3) +")";
+                + "\n::weighted raw (" + c1Stats.averageOdds.toFixed(3) + ":" + c2Stats.averageOdds.toFixed(3) + ")";
         }
-    } 
-    
+    }
+
     // weight for shortest win time
     if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null) {
         var aWT = c1Stats.averageWinTime + c2Stats.averageWinTime;
@@ -571,7 +571,7 @@ ConfidenceScore.prototype.execute = function (info) {
             scoreDebugP += " awt(2:" + c2Score.toFixed(6) + ")";
         }
         if (this.debug) timeMessage = "\n::avg win time (red:blue)->(" + formatString(c1Stats.averageWinTimeRaw.toFixed(2) + " : " + c2Stats.averageWinTimeRaw.toFixed(2), messagelength) + ")"
-            + "\n::Weighted:(" + formatString(c1Stats.averageWinTime.toFixed(2) + ":" + c2Stats.averageWinTime.toFixed(2), messagelength) + ")" ;
+            + "\n::Weighted:(" + formatString(c1Stats.averageWinTime.toFixed(2) + ":" + c2Stats.averageWinTime.toFixed(2), messagelength) + ")";
     }
 
     // weight for longest lose time
@@ -589,15 +589,15 @@ ConfidenceScore.prototype.execute = function (info) {
             c2Score += timeAveLoseWeight * c2ALTP;
             scoreDebugP += " alt(2:" + c2Score.toFixed(6) + ")";
         }
-		if (this.debug) {
+        if (this.debug) {
             var msg = "\n::avg loss time (red:blue)->(" + formatString(c1Stats.averageLossTimeRaw.toFixed(2) + " : " + c2Stats.averageLossTimeRaw.toFixed(2), messagelength) + ")"
                 + "\n::Weighted:(" + formatString(c1Stats.averageLossTime.toFixed(2) + ":" + c2Stats.averageLossTime.toFixed(2), messagelength) + ")";
-			if (timeMessage)
-				timeMessage += msg;
-			else
-				timeMessage = msg;
-		}
-	}
+            if (timeMessage)
+                timeMessage += msg;
+            else
+                timeMessage = msg;
+        }
+    }
     // weight for crowd insight
     if (c1Stats.cfPercent != null && c2Stats.cfPercent != null) {
         var cfPT = c1Stats.cfPercent + c2Stats.cfPercent;
@@ -609,10 +609,10 @@ ConfidenceScore.prototype.execute = function (info) {
             c2Score += crowdFavorWeight * c2Stats.cfPercent / cfPT;
             scoreDebugP += " cf(2:" + c2Score.toFixed(6) + ")";
         }
-		var cfPercentTotal = c1Stats.cfPercent + c2Stats.cfPercent;
-		if (this.debug) crwdMessage = "\n::crowd favor (red:blue) -> (" + formatString((c1Stats.cfPercent / cfPercentTotal * 100).toFixed(2) +
-				" : " + (c2Stats.cfPercent / cfPercentTotal * 100).toFixed(2), messagelength) + ")";
-	}
+        var cfPercentTotal = c1Stats.cfPercent + c2Stats.cfPercent;
+        if (this.debug) crwdMessage = "\n::crowd favor (red:blue) -> (" + formatString((c1Stats.cfPercent / cfPercentTotal * 100).toFixed(2) +
+            " : " + (c2Stats.cfPercent / cfPercentTotal * 100).toFixed(2), messagelength) + ")";
+    }
     // weight for illuminati insight (whoa)
     if (c1Stats.ifPercent != null && c2Stats.ifPercent != null) {
         var ifPT = c1Stats.ifPercent + c2Stats.ifPercent;
@@ -624,59 +624,59 @@ ConfidenceScore.prototype.execute = function (info) {
             c2Score += illumFavorWeight * c2Stats.ifPercent / ifPT;
             scoreDebugP += " if(2:" + c2Score.toFixed(6) + ")";
         }
-		var ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
-		if (this.debug) ilumMessage = "\n::illuminati favor (red:blue) -> (" + formatString((c1Stats.ifPercent / ifPercentTotal * 100).toFixed(2) +
-				" : " + (c2Stats.ifPercent / ifPercentTotal * 100).toFixed(2), messagelength) + ")";
-	}
+        var ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
+        if (this.debug) ilumMessage = "\n::illuminati favor (red:blue) -> (" + formatString((c1Stats.ifPercent / ifPercentTotal * 100).toFixed(2) +
+            " : " + (c2Stats.ifPercent / ifPercentTotal * 100).toFixed(2), messagelength) + ")";
+    }
 
-	if (this.debug) {
-		console.log("\n");
-		console.log("\xBB PREDICTION STATS for (" + c1.name + " VS " + c2.name + ") \xBB");
-		console.log(winsMessage);
-		var line2 = "\xBB ";
-		if (oddsMessage) line2 += oddsMessage;
-		if (timeMessage) line2 += "  ::  " + timeMessage;
-		if (line2.length > 2) console.log(line2);
-		var line3 = "\xBB ";
-		if (crwdMessage) line3 += crwdMessage;
-		if (ilumMessage) line3 += "  ::  " + ilumMessage;
+    if (this.debug) {
+        console.log("\n");
+        console.log("\xBB PREDICTION STATS for (" + c1.name + " VS " + c2.name + ") \xBB");
+        console.log(winsMessage);
+        var line2 = "\xBB ";
+        if (oddsMessage) line2 += oddsMessage;
+        if (timeMessage) line2 += "  ::  " + timeMessage;
+        if (line2.length > 2) console.log(line2);
+        var line3 = "\xBB ";
+        if (crwdMessage) line3 += crwdMessage;
+        if (ilumMessage) line3 += "  ::  " + ilumMessage;
         if (line3.length > 2) console.log(line3);
         console.log(scoreDebugP);
-	}
+    }
 
-	// final decision
+    // final decision
 
-	// figure out prediction, confidence
-	this.prediction = (c1Score > c2Score) ? c1.name : c2.name;
+    // figure out prediction, confidence
+    this.prediction = (c1Score > c2Score) ? c1.name : c2.name;
 
-	var winnerPoints = (this.prediction == c1.name) ? c1Score : c2Score;
+    var winnerPoints = (this.prediction == c1.name) ? c1Score : c2Score;
     var totalAvailablePoints = c1Score + c2Score;
     this.confidence = ((winnerPoints / totalAvailablePoints)).toFixed(4);
 
-	/*---------------------------------------------------------------------------------------------------*/
-	// CONFIDENCE ADJUSTMENT SECTION
-	/*---------------------------------------------------------------------------------------------------*/
-	var nerfPoorScore = 0.66;
-	var nerfAmount = 0;
-	var nerfMsg = "-- PROBLEMS:";
-    if ((c1Score == c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3 || c1.wins.length == 0 || c2.wins.length==0) {
-		nerfAmount += nerfPoorScore;
-		nerfMsg += "\n- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
-	}
+    /*---------------------------------------------------------------------------------------------------*/
+    // CONFIDENCE ADJUSTMENT SECTION
+    /*---------------------------------------------------------------------------------------------------*/
+    var nerfPoorScore = 0.66;
+    var nerfAmount = 0;
+    var nerfMsg = "-- PROBLEMS:";
+    if ((c1Score == c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3 || c1.wins.length == 0 || c2.wins.length == 0) {
+        nerfAmount += nerfPoorScore;
+        nerfMsg += "\n- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
+    }
 
-	// nerf the confidence if there is a reason
-	if (nerfAmount != 0) {
-		if (this.debug)
-			console.log(nerfMsg + "\n--> dropping confidence by " + (nerfAmount * 100).toFixed(0) + "%");
-		this.confidence *= 1 - nerfAmount;
-	}
+    // nerf the confidence if there is a reason
+    if (nerfAmount != 0) {
+        if (this.debug)
+            console.log(nerfMsg + "\n--> dropping confidence by " + (nerfAmount * 100).toFixed(0) + "%");
+        this.confidence *= 1 - nerfAmount;
+    }
 
-	// make sure something gets bet
-	if (this.confidence <= 0)
-		this.confidence = .01;
+    // make sure something gets bet
+    if (this.confidence <= 0)
+        this.confidence = .01;
 
-	if (this.debug) console.log("::Predicting: " + this.prediction +"\n::confidence: "+this.confidence+"\n");
-	return this.prediction;
+    if (this.debug) console.log("::Predicting: " + this.prediction + "\n::confidence: " + this.confidence + "\n");
+    return this.prediction;
 };
 
 var ChromosomeIPU = function () {
