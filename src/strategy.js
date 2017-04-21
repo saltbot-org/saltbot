@@ -492,11 +492,13 @@ ConfidenceScore.prototype.execute = function (info) {
     var matchesFakeSample = Math.max(Math.max(c1Stats.totalFights, c1Stats.totalFights), 15); //min 15 as lowest records kept per char.
     var padValue = 0;// 0.0001;
 
+    // wins
     var winsPTemper = 0.5;
     var c1WT = c1Stats.wins + c1Stats.losses + padValue;
     var c2WT = c2Stats.wins + c2Stats.losses + padValue;
-    var c1WPPop = matchesFakeSample * 0.01;
-    var c2WPPop = matchesFakeSample * 0.01;
+    var cnWPPopScale = 0.05
+    var c1WPPop = matchesFakeSample * cnWPPopScale;
+    var c2WPPop = matchesFakeSample * cnWPPopScale;
     var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue + winsPTemper * c1WPPop) / (c1WT + c1WPPop) : 1;
     var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue + winsPTemper * c2WPPop) / (c2WT + c2WPPop) : 1;
     //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
