@@ -317,52 +317,52 @@ Simulator.prototype.evalMutations = function (mode) {
 			// check results
 			if (strategies.length != predictions.length)
 				throw "Strategies and predictions are not the same length.";
-			for (var k = 0; k < strategies.length; k++) {
-				var prediction = predictions[k];
-				var strategy = strategies[k];
-				var predictionWasCorrect = prediction == actualWinner;
-				if (!strategy.abstain) {
-					correct[k] += (predictionWasCorrect) ? 1 : 0;
+            for (var k = 0; k < strategies.length; k++) {
+                var prediction = predictions[k];
+                var strategy = strategies[k];
+                var predictionWasCorrect = prediction == actualWinner;
+                if (!strategy.abstain) {
+                    correct[k] += (predictionWasCorrect) ? 1 : 0;
 
-					totalBettedOn[k] += 1;
-					totalPercentCorrect[k] = correct[k] / totalBettedOn[k];
-					data[k].push([totalBettedOn[k], totalPercentCorrect[k]]);
+                    totalBettedOn[k] += 1;
+                    totalPercentCorrect[k] = correct[k] / totalBettedOn[k];
+                    data[k].push([totalBettedOn[k], totalPercentCorrect[k]]);
 
-					if (mode == "mass")
-						if (matches[i].o != "U") {
-							var t = matches[i].o.split(":");
+                    if (mode == "mass")
+                        if (matches[i].o != "U") {
+                            var t = matches[i].o.split(":");
                             var o1 = Number(t[0]);
                             var o2 = Number(t[1]);
-							var greaterNumber = o1 < o2 ? o2 / o1 : o1 / o2;
-							denominators.push(greaterNumber);
+                            var greaterNumber = o1 < o2 ? o2 / o1 : o1 / o2;
+                            denominators.push(greaterNumber);
 
-							var isAnUpset = (matches[i].w == 0 && o2 > o1) || (matches[i].w == 1 && o1 > o2);
-							if (isAnUpset) {
-								upsetDenominators.push(greaterNumber);
-								if (predictionWasCorrect)
-									upsetsBetOn += 1;
-							} else {
-								nonupsetDenominators.push(greaterNumber);
-								if (predictionWasCorrect)
-									nonUpsetsBetOn += 1;
-							}
-							// how smart we are.
-              if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses) /*&& (strategy.confidence > 0.5)*/) {
-								lossMinimizationAmount += 1 - strategy.confidence;
-								minimizedLosses += 1;
-							}
-							// how chicken we are.
-							if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains) /*&& (strategy.confidence>0.5)*/) {
-								gainMissedAmount += 1 - strategy.confidence;
-								missedGains += 1;
-							}
+                            var isAnUpset = (matches[i].w == 0 && o2 > o1) || (matches[i].w == 1 && o1 > o2);
+                            if (isAnUpset) {
+                                upsetDenominators.push(greaterNumber);
+                                if (predictionWasCorrect)
+                                    upsetsBetOn += 1;
+                            } else {
+                                nonupsetDenominators.push(greaterNumber);
+                                if (predictionWasCorrect)
+                                    nonUpsetsBetOn += 1;
+                            }
+                            // how smart we are.
+                            if (!predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMinizLoses) /*&& (strategy.confidence > 0.5)*/) {
+                                lossMinimizationAmount += 1 - strategy.confidence;
+                                minimizedLosses += 1;
+                            }
+                            // how chicken we are.
+                            if (predictionWasCorrect && strategy.confidence && (strategy.confidence < ratioMissedGains) /*&& (strategy.confidence>0.5)*/) {
+                                gainMissedAmount += 1 - strategy.confidence;
+                                missedGains += 1;
+                            }
 
 
-							// var avgOddsC1 = updater.getCharAvgOdds(matches[i].c1);
-							// var avgOddsC2 = updater.getCharAvgOdds(matches[i].c2);
+                            // var avgOddsC1 = updater.getCharAvgOdds(matches[i].c1);
+                            // var avgOddsC2 = updater.getCharAvgOdds(matches[i].c2);
 
-						}
-				}
+                        }
+                }
 				//update simulated money
 				if (matches[i].o != "U") {
 					var moneyBefore = self.money[k];
