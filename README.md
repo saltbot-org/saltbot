@@ -32,7 +32,7 @@ The more info you provide, the better we can diagnose the issue and remedy it.
 
 # Subreddit
 
-We have a subreddit for saltbot now at [**/r/saltbot**](https://www.reddit.com/r/saltbot/). Use this for extensive discussions of saltbot's features, improvements, strategy, etc. This community is temporarily restricted, for an invite [message /u/calexil](https://www.reddit.com/message/compose/?to=calexil&subject=/r/saltbot%20invite&message=I%20Would%20Like%20An%20Invite!)
+We have a subreddit for saltbot now at [**/r/saltbot**](https://www.reddit.com/r/saltbot/). Use this for extensive discussions of saltbot's features, improvements, strategy, etc.
 
 # Contributors & Members
 
