@@ -173,7 +173,7 @@ Simulator.prototype.updateMoney = function (index, odds, selection, amount, corr
 Simulator.prototype.getBetAmount = function (strategy, index) {
 	var amountToBet;
 	var tournament = false;
-	var debug = false;
+	var debug = true;
 	var balance = this.money[index];
 
 	if (!strategy.confidence)

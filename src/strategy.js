@@ -347,12 +347,12 @@ var CSStats = function (cObj, chromosome) {
 		for (var l = 0; l < cObj.crowdFavor.length; l++) {
 			cfSum += cObj.crowdFavor[l];
 		}
-		this.cfPercent = cfSum / cObj.cf.length;
+		this.cfPercent = cfSum / cObj.crowdFavor.length;
 	}
 	if (cObj.illumFavor.length > 0) {
 		var ifSum = 0;
 		for (var m = 0; m < cObj.illumFavor.length; m++) {
-			cfSum += cObj.illumFavor[m];
+			ifSum += cObj.illumFavor[m];
 		}
 		this.ifPercent = ifSum / cObj.illumFavor.length;
 	}
@@ -495,20 +495,18 @@ ConfidenceScore.prototype.execute = function (info) {
 				" : " + (c2Stats.ifPercent / ifPercentTotal * 100).toFixed(0), messagelength) + ")";
 	}
 
-	if (this.debug) {
-		console.log("\n");
-		console.log("\xBB PREDICTION STATS for (" + c1.name + " VS " + c2.name + ") \xBB");
-		console.log(winsMessage);
-		var line2 = "\xBB ";
-		if (oddsMessage) line2 += oddsMessage;
-		if (timeMessage) line2 += "  ::  " + timeMessage;
-		if (line2.length > 2) console.log(line2);
-		var line3 = "\xBB ";
-		if (crwdMessage) line3 += crwdMessage;
-		if (ilumMessage) line3 += "  ::  " + ilumMessage;
-		if (line3.length > 2) console.log(line3);
-		console.log("\n");
-	}
+	console.log("\n");
+	console.log("\xBB PREDICTION STATS for (" + c1.name + " VS " + c2.name + ") \xBB");
+	console.log(winsMessage);
+	var line2 = "\xBB ";
+	if (oddsMessage) line2 += oddsMessage;
+	if (timeMessage) line2 += "  ::  " + timeMessage;
+	if (line2.length > 2) console.log(line2);
+	var line3 = "\xBB ";
+	if (crwdMessage) line3 += crwdMessage;
+	if (ilumMessage) line3 += "  ::  " + ilumMessage;
+	if (line3.length > 2) console.log(line3);
+	console.log("\n");
 
 	// final decision
 

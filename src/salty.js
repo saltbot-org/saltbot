@@ -160,24 +160,9 @@ var Controller = function () {
 						if (results.characters_v1)
 							characters_v1 = results.characters_v1;
 
-						//find if characters are already in local storage
-						var c1_index = -1;
-						var c2_index = -1;
-						for (var i = 0; i < characters_v1.length; i++) {
-							if (characters_v1[i].name == c1.name)
-								c1_index = i;
-							if (characters_v1[i].name == c2.name)
-								c2_index = i;
-						}
 						//update records accordingly
-						if (c1_index != -1)
-							characters_v1[c1_index] = c1;
-						else
-							characters_v1.push(c1);
-						if (c2_index != -1)
-							characters_v1[c2_index] = c2;
-						else
-							characters_v1.push(c2);
+						binaryInsertByProperty(c1, characters_v1, 'name');
+						binaryInsertByProperty(c2, characters_v1, 'name');
 
 						//bettor records
 						if (results.bettors_v1)

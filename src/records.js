@@ -35,15 +35,10 @@ Updater.prototype.getCharacter = function (cname, characterRecords, namesOfChara
 	var cobject = null;
 	if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
 		cobject = new Character(cname);
-		characterRecords.push(cobject);
+		binaryInsertByProperty(cobject, characterRecords, 'name');
 		namesOfCharactersWhoAlreadyHaveRecords.push(cname);
 	} else {
-		for (var k = 0; k < characterRecords.length; k++) {
-			if (cname == characterRecords[k].name) {
-				cobject = characterRecords[k];
-				break;
-			}
-		}
+		cobject = characterRecords[binarySearchByProperty({name: cname}, characterRecords, 'name')];
 	}
 	return cobject;
 };
@@ -134,7 +129,7 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 	c1Obj.tiers.push(mObj.t);
 	c2Obj.tiers.push(mObj.t);
 	// expert favor is seemingly worthless but what the hell
-	if (mObj.if != null && mObj.if.length > 0) {
+	if (mObj.cf !== undefined && mObj.cf != null) {
 		if (mObj.cf == 0) {
 			c1Obj.crowdFavor.push(1);
 			c2Obj.crowdFavor.push(0);
@@ -142,6 +137,8 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 			c1Obj.crowdFavor.push(0);
 			c2Obj.crowdFavor.push(1);
 		}
+	}
+	if (mObj.if !== undefined && mObj.if != null) {
 		if (mObj.if == 0) {
 			c1Obj.illumFavor.push(1);
 			c2Obj.illumFavor.push(0);
