@@ -412,7 +412,7 @@ Simulator.prototype.evalMutations = function (mode) {
 			var money = true;
 			var accuracy = true;
 			var unshackle = true;
-			var weightAccToMoney = 0.5;//1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
+			var weightAccToMoney = 0.75;//1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
 			
 			// these ratios controls how critters are breed using the sorted array of critters after the heuristic method. Think of percents as from top best to worst.
 			var ratioTopKeep = 0;				// valid range [0,1], from the sorted listed of last gen, the best retained and reused. Not recommended as it prevents "jitter" in finding solutions.
