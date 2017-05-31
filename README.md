@@ -1,4 +1,5 @@
-# SaltBot
+# SaltBot [![CodeFactor](https://www.codefactor.io/repository/github/calexil/saltbot/badge)](https://www.codefactor.io/repository/github/calexil/saltbot)
+
 A betting bot for SaltyBet. 
 
 * Read about it [**here**](http://explosionduck.com/wp/story-of-a-betting-bot/) and learn how to use it [**here**](http://explosionduck.com/wp/so-you-want-to-use-saltbot/). 
