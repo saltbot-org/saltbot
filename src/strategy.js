@@ -43,8 +43,6 @@ Strategy.prototype.flatBet = function (balance, debug) {
 	var flatAmount = 100;
 	var multiplierIndex = 2;
 	var intendedBet = flatAmount * this.levels[this.level][multiplierIndex] * this.confidence;
-	if (debug)
-		console.log("- betting at level: " + this.level + ", confidence: " + (this.confidence * 100).toFixed(2));
 	if (this.level == 0)
 		return balance;
 	else
@@ -420,10 +418,12 @@ ConfidenceScore.prototype.execute = function (info) {
 	var wpTotal = c1Stats.wins + c2Stats.wins;
 	var c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
 	var c2WPDisplay = wpTotal > 0 ? c2Stats.wins / wpTotal : 0;
-	if (this.debug) winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> (" + (c1WPDisplay * 100).toFixed(0) + " : " + (c2WPDisplay * 100).toFixed(0) + ")" +
-		"  ::  unweighted (red W:L)(blue W:L) -> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")" +
-		"  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
-		"(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
+	if (this.debug) {
+		winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> (" + (c1WPDisplay * 100).toFixed(0) + " : " + (c2WPDisplay * 100).toFixed(0) + ")" +
+			"  ::  unweighted (red W:L)(blue W:L) -> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")" +
+			"  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
+			"(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
+	}
 
 	/*if (c1WP > c2WP) {
 	 c1Score += winPercentageWeight;
@@ -494,19 +494,19 @@ ConfidenceScore.prototype.execute = function (info) {
 		if (this.debug) ilumMessage = "illuminati favor (red:blue) -> (" + formatString((c1Stats.ifPercent / ifPercentTotal * 100).toFixed(0) +
 				" : " + (c2Stats.ifPercent / ifPercentTotal * 100).toFixed(0), messagelength) + ")";
 	}
-
-	console.log("\n");
-	console.log("\xBB PREDICTION STATS for (" + c1.name + " VS " + c2.name + ") \xBB");
-	console.log(winsMessage);
-	var line2 = "\xBB ";
-	if (oddsMessage) line2 += oddsMessage;
-	if (timeMessage) line2 += "  ::  " + timeMessage;
-	if (line2.length > 2) console.log(line2);
-	var line3 = "\xBB ";
-	if (crwdMessage) line3 += crwdMessage;
-	if (ilumMessage) line3 += "  ::  " + ilumMessage;
-	if (line3.length > 2) console.log(line3);
-	console.log("\n");
+	
+	if (this.debug) {
+		console.log("\xBB PREDICTION STATS for (" + c1.name + " VS " + c2.name + ") \xBB");
+		console.log(winsMessage);
+		var line2 = "\xBB ";
+		if (oddsMessage) line2 += oddsMessage;
+		if (timeMessage) line2 += "  ::  " + timeMessage;
+		if (line2.length > 2) console.log(line2);
+		var line3 = "\xBB ";
+		if (crwdMessage) line3 += crwdMessage;
+		if (ilumMessage) line3 += "  ::  " + ilumMessage;
+		if (line3.length > 2) console.log(line3);
+	}
 
 	// final decision
 
