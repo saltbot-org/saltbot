@@ -548,7 +548,7 @@ var ChromosomeIPU = function () {
 	this.baseBettingTier = 1500;
 };
 ChromosomeIPU.prototype = Object.create(Chromosome.prototype);
-;
+
 var InternetPotentialUpset = function (cipu, level) {
 	Strategy.call(this, "ipu");
 	this.debug = true;
