@@ -1,4 +1,4 @@
-# SaltBot [![CodeFactor](https://www.codefactor.io/repository/github/calexil/saltbot/badge)](https://www.codefactor.io/repository/github/calexil/saltbot)
+# SaltBot [![CodeFactor](https://www.codefactor.io/repository/github/calexil/saltbot/badge)](https://www.codefactor.io/repository/github/calexil/saltbot)  [![GitHub issues](https://img.shields.io/github/issues/synkarius/saltbot.svg)](https://github.com/synkarius/saltbot/issues)  [![GitHub stars](https://img.shields.io/github/stars/synkarius/saltbot.svg)](https://github.com/synkarius/saltbot/stargazers)  [![GitHub forks](https://img.shields.io/github/forks/synkarius/saltbot.svg)](https://github.com/synkarius/saltbot/network)
 
 A betting bot for SaltyBet. 
 
