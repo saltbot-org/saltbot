@@ -342,6 +342,8 @@ Chromosome.prototype.mate = function (other) {
 	var mutationChance = 0.08;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
+		var mutationScale = 0.20;	// range 0..<1 (a danger if offspring weight becomes < 0).
+		var mutationChance = 0.15;	// range 0..1
 		if (typeof offspring[i] != "function") {
 			offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
