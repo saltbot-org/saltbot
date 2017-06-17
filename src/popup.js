@@ -438,10 +438,9 @@ Simulator.prototype.evalMutations = function (mode) {
 					return ( ((weightAccToMoney * b[1]) + (negate * b[2])) * b[3]) - (((weightAccToMoney * a[1]) + (negate * a[2])) * a[3]);
 				});
 
-				var sizeNextGen = sortingArray.length;
-				var ratioTopKeep = 0.10;
-				var ratioTopBestBreeding = 0.5;
-				var sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep half of sorted population
+				var sizeNextGen = sortingArray.length;	
+				var sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep part of sorted population
+				var sizeTopParentsBreed = Math.floor(sizeNextGen * ratioTopKeptBreeding);
 				for (var o = 0; o < sizeTopParents; o++) {
 					parents.push(sortingArray[o][0]);
 					//ranking guarantees that we send the best one
@@ -481,6 +480,10 @@ Simulator.prototype.evalMutations = function (mode) {
 						}
 						atmp++;
 					} while ((parent1 == parent2) && (atmp < attemps));
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/develop
 					child = parent1.mate(parent2);
 					nextGeneration.push(child);
 				}

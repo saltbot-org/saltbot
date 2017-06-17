@@ -226,45 +226,45 @@ var Chromosome = function() {
 	this.crowdFavorWeight = 0.5;
 	this.illumFavorWeight = 0.5;
 	// tier scoring            
-	this.wX = 5					/82	;
-	this.wS = 4					/82	;
-	this.wA = 3					/82	;
-	this.wB = 2					/82	;
-	this.wP = 1					/82	;
-	this.wU = 0.5				/82	;// 15.5
-	this.lX = 1					/82	;
-	this.lS = 2					/82	;
-	this.lA = 3					/82	;
-	this.lB = 4					/82	;
-	this.lP = 5					/82	;
-	this.lU = 0.5				/82	;// 15.5
+	this.wX = 1;
+	this.wS = 1;
+	this.wA = 1;
+	this.wB = 1;
+	this.wP = 1;
+	this.wU = 1;
+	this.lX = 1;
+	this.lS = 1;
+	this.lA = 1;
+	this.lB = 1;
+	this.lP = 1;
+	this.lU = 1;
 	// odds weights
-	this.oX = 5					/82	;
-	this.oS = 4					/82	;
-	this.oA = 3					/82	;
-	this.oB = 2					/82	;
-	this.oP = 1					/82	;
-	this.oU = 0.5				/82	;// 15.5
+	this.oX = 1;
+	this.oS = 1;
+	this.oA = 1;
+	this.oB = 1;
+	this.oP = 1;
+	this.oU = 1;
 	// times weights
-	this.wtX = 5				/82	;
-	this.wtS = 4				/82	;
-	this.wtA = 3				/82	;
-	this.wtB = 2				/82	;
-	this.wtP = 1				/82	;
-	this.wtU = 0.5				/82	;// 15.5
-	this.ltX = 1				/82	;
-	this.ltS = 2				/82	;
-	this.ltA = 3				/82	;
-	this.ltB = 4				/82	;
-	this.ltP = 5				/82	;
-	this.ltU = 0.5				/82	;// 15.5
-	return this;					 // total=82
+	this.wtX = 1;
+	this.wtS = 1;
+	this.wtA = 1;
+	this.wtB = 1;
+	this.wtP = 1;
+	this.wtU = 1;
+	this.ltX = 1;
+	this.ltS = 1;
+	this.ltA = 1;
+	this.ltB = 1;
+	this.ltP = 1;
+	this.ltU = 1;
+	return this;
 };
 
 //
 Chromosome.prototype.normalize = function(){
-    var ratioDampen = 0.90;
-    var lowValueControl = 0.000001;
+  var ratioDampen = 0.97;
+  var lowValueControl = 0.000001;
 	// make weights > 0
 	var lowest = 0;
 	for (var e0 in this){
@@ -275,9 +275,9 @@ Chromosome.prototype.normalize = function(){
 			}
 		}
 	}
-	if (lowest<0){
+	//if (lowest<0){
         lowest -= lowValueControl;	// extra sum for near zero prevention.
-	}
+	//}
 	for (var e01 in this){
 		if(this.hasOwnProperty(e01)){
 			this[e01] -= lowest;
@@ -288,7 +288,7 @@ Chromosome.prototype.normalize = function(){
 	var highIndex = null;
 	for (var e0 in this){
 		if(this.hasOwnProperty(e0)){
-			var high =  parseFloat(this[e0]);
+      var high = Number(this[e0]);
 			if (high > highest){
 				highest = high;
 				highIndex = e0;
@@ -309,7 +309,6 @@ Chromosome.prototype.normalize = function(){
 	}
 	for (var el2 in this) {
 		if (this.hasOwnProperty(el2)) {
-			//* 0.01 because of normalizing to a sum of 100
 			this[el2] /= sum;
 		}
 	}
@@ -339,8 +338,8 @@ Chromosome.prototype.toDisplayString = function () {
 Chromosome.prototype.mate = function (other) {
 	var offspring = new Chromosome();
 	var parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
-	var mutationScale = 0.20;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
-	var mutationChance = 0.09;	// range [0,1]
+	var mutationScale = 0.25;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
+	var mutationChance = 0.08;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
 		var mutationScale = 0.20;	// range 0..<1 (a danger if offspring weight becomes < 0).
@@ -349,7 +348,10 @@ Chromosome.prototype.mate = function (other) {
 			offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
 			var radiation =  (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
-			if ((Math.random() < mutationChance) && (offspring[i] != null))
+			if (Math.abs(change) < smallVal) {
+				change = smallVal;
+			}
+			if ((Math.random() < mutationChance) && (offspring[i] != null)){
 				offspring[i] += change;
 			}
 			if (Math.abs(offspring[i]) < smallVal) {
@@ -503,48 +505,6 @@ ConfidenceScore.prototype.execute = function (info) {
     var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue + winsPTemper * c2WPPop) / (c2WT + c2WPPop) : 1;
     //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
     /*
-	if (c1WP > c2WP) {
-	    c1Score += winPercentageWeight;
-	 } else if (c2WP > c1WP) {
-	    c2Score += winPercentageWeight;
-	 } else {
-	    c1Score += 0.5*winPercentageWeight;
-	    c2Score += 0.5*winPercentageWeight;
-	var c2Stats = new CSStats(c2, this.chromosome);
-
-	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
-		var lesserOdds = (c1Stats.averageOdds < c2Stats.averageOdds) ? c1Stats.averageOdds : c2Stats.averageOdds;
-		this.oddsConfidence = [(c1Stats.averageOdds / lesserOdds), (c2Stats.averageOdds / lesserOdds)];
-		if (this.debug) oddsMessage = "predicted odds -> (" + formatString("" + (this.oddsConfidence[0]).toFixed(2) + " : " + (this.oddsConfidence[1]).toFixed(2), messagelength) + ")"
-	} else {
-		this.oddsConfidence = null;
-	}
-
-    var padValue = 0.0001;
-    var c1WT = c1Stats.wins + c1Stats.losses + padValue;
-    var c2WT = c2Stats.wins + c2Stats.losses + padValue;
-    var c1WP = (padValue < Math.abs(padValue - c1WT)) ? (c1Stats.wins + padValue) / c1WT : 0;
-    var c2WP = (padValue < Math.abs(padValue - c2WT)) ? (c2Stats.wins + padValue) / c2WT : 0;
-    //var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
-
-	var wpTotal = c1Stats.wins + c2Stats.wins;
-	var c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
-	var c2WPDisplay = wpTotal > 0 ? c2Stats.wins / wpTotal : 0;
-	if (this.debug) winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> (" + (c1WPDisplay * 100).toFixed(0) + " : " + (c2WPDisplay * 100).toFixed(0) + ")" +
-		"  ::  unweighted (red W:L)(blue W:L) -> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")" +
-		"  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +
-		"(" + c2.wins.toString().replace(/,/g, '') + ":" + c2.losses.toString().replace(/,/g, '') + ")";
-
-	/*if (c1WP > c2WP) {
-	 c1Score += winPercentageWeight;
-	 }
-	 else if (c2WP > c1WP) {
-	 c2Score += winPercentageWeight;
-	 }
-	 else {
-	 c1Score += 0.5*winPercentageWeight;
-	 c2Score += 0.5*winPercentageWeight;
-	 }*/
       if (c1WP > c2WP) {
           c1Score += winPercentageWeight;
        } else if (c2WP > c1WP) {
