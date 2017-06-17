@@ -37,8 +37,8 @@ Match.prototype.update = function (infoFromWaifu, odds, timeInfo, crowdFavor, il
 
 	if (timeInfo.ticks > 0)
 		this.time = timeInfo.ticks * timeInfo.interval / 1000;
-	//Ignore times from matches that occurred before changing modes; 350 is the maximum time that can occur
-	if (this.time >= 240)
+	//Ignore times from matches that occurred before changing modes; 350 is the maximum time that can occur. 630=9*70
+	if (this.time >= 350)
 		this.time = 0;
 	//add more time to matches that are recognized as being in exhibition mode, proportional to the amount of required matches missing
 	if (this.mode == "e")
@@ -125,14 +125,17 @@ Match.prototype.init = function () {
 		self.multiplier = result.settings_v1.multiplier;
 
 		//self.fillCharacters(result);//get character record objects or make new ones
-		if (recs)
-			for (var i = 0; i < recs.length; i++) {
+        if (recs)
+            var foundCount = 0;
+            for (var i = 0; i < recs.length && foundCount < 2; i++) {
 				var c = recs[i];
 				if (c.name == self.names[0]) {
-					self.character1 = c;
+                    self.character1 = c;
+                    foundCount++;
 				}
 				if (c.name == self.names[1]) {
-					self.character2 = c;
+                    self.character2 = c;
+                    foundCount++;
 				}
 			}
 
