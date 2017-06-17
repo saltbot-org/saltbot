@@ -26,7 +26,7 @@ To keep your version up to date simply:
 
 # Subreddit
 
-We have a subreddit for saltbot now at [/r/saltbot](https://www.reddit.com/r/saltbot/). Use this for extensive discussions of saltbot's features.
+We have a subreddit for saltbot now at [**/r/saltbot**](https://www.reddit.com/r/saltbot/). Use this for extensive discussions of saltbot's features, improvements, strategy, etc. This community is temporarily restricted, for an invite [message /u/calexil](https://www.reddit.com/message/compose/?to=calexil)
 
 # Contributors & Members
 
