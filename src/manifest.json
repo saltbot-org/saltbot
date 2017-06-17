@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "SaltBot",
 	"description": "This extension automates betting on SaltyBet.com.",
-	"version": "2.4.4",
+	"version": "2.4.5",
 	"permissions": [
 		"storage",
 		"unlimitedStorage",
@@ -19,6 +19,7 @@
 			"js": [
 				"lib/FileSaver.min.js",
 				"lib/jquery.min.js",
+				"utils.js",
 				"records.js",
 				"tracker.js",
 				"strategy.js",
@@ -33,6 +34,7 @@
 			],
 			"js": [
 				"lib/jquery.min.js",
+				"utils.js",
 				"twitch_content.js"
 			]
 		}
@@ -40,6 +42,7 @@
 	"background": {
 		"persistent": false,
 		"scripts": [
+			"utils.js",
 			"records.js",
 			"twitch_background.js"
 		]

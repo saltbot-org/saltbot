@@ -42,10 +42,10 @@ var addListener = function () {
 			for (var i = 0; i < chatLines.length; i++) {
 
 				var line = chatLines[i];
-				var from = $(line).find(".from")[0].innerHTML;
+				var from = $(line).find(".from")[0].innerText;
 
 				if (from.toUpperCase() == "WAIFU4U") {
-					var message = $(line).find(".message")[0].innerHTML;
+					var message = $(line).find(".message")[0].innerText;
 					if (oldWaifuMessages.indexOf(message) == -1) {
 						oldWaifuMessages.push(message);
 						Waifu4uLines.push(message);
