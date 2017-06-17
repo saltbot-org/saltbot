@@ -480,10 +480,6 @@ Simulator.prototype.evalMutations = function (mode) {
 						}
 						atmp++;
 					} while ((parent1 == parent2) && (atmp < attemps));
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/develop
 					child = parent1.mate(parent2);
 					nextGeneration.push(child);
 				}
