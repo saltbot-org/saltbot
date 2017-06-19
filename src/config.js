@@ -14,7 +14,7 @@ var btnClicked = function (clicktype, data) {
 };
 var elementChanged = function(changetype, data) {
 	btnClicked(changetype, data);
-}
+};
 
 var dr = function (sortByMoney) {
 	var rankingElement = $("#ranking")[0];
