@@ -29,7 +29,7 @@ The more info you provide, the better we can diagnose the issue and remedy it.
 
 # Screenshot
 
-<img src="/theme/screenshot.png" width="950" height="526">
+<img src="/src/images/screenshot.png" width="950" height="526">
 
 # Subreddit
 
