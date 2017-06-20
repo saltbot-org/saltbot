@@ -12,7 +12,7 @@ var btnClicked = function (clicktype, data) {
 		});
 	});
 };
-var elementChanged = function(changetype, data) {
+var elementChanged = function (changetype, data) {
 	btnClicked(changetype, data);
 };
 

@@ -38,11 +38,11 @@ chrome.runtime.onInstalled.addListener(function () {
 //variable used so the tabs aren't closed and reopened multiple times
 var restartedSaltyBet = false;
 
-function setRestarted(){
+function setRestarted() {
 	//set restarted to true and then to false in 5 seconds
 	//this is done to ensure that multiple messages in a short amount of time do not create multiple tabs
 	restartedSaltyBet = true;
-	setTimeout(function(){
+	setTimeout(function () {
 		restartedSaltyBet = false;
 	}, 5000);
 }

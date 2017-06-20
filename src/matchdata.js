@@ -7,7 +7,7 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
 		}
 
 		var odds_split = odds.split(":");
-        return Number(odds_split[0] / odds_split[1]);
+		return Number(odds_split[0] / odds_split[1]);
 	},
 
 	"odds-asc": function (a, b) {
@@ -21,7 +21,7 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
 
 chrome.storage.local.get("matches_v1", function (result) {
 	var matches = [];
-	
+
 	if (result.matches_v1) {
 		var matches = result.matches_v1;
 		var matchesMirrored = $.extend(true, [], matches);

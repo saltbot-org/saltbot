@@ -140,7 +140,7 @@ var Controller = function () {
 					console.log("- match result code: " + "c1:" + mr.c1 + "|c2:" + mr.c2 + "|w:" + mr.w + "|s:" + mr.sn + "|p:" + mr.pw + "|t:" + mr.t + "|m:" + mr.m + "|o:" + mr.o + "|t:" + mr.ts);
 
 					var s = self;
-					var updateRecords = function(results) {
+					var updateRecords = function (results) {
 						var matches_v1 = [];
 						var characters_v1 = [];
 						var bettors_v1 = [];
@@ -160,24 +160,9 @@ var Controller = function () {
 						if (results.characters_v1)
 							characters_v1 = results.characters_v1;
 
-						//find if characters are already in local storage
-						var c1_index = -1;
-						var c2_index = -1;
-						for (var i = 0; i < characters_v1.length; i++) {
-							if (characters_v1[i].name == c1.name)
-								c1_index = i;
-							if (characters_v1[i].name == c2.name)
-								c2_index = i;
-						}
 						//update records accordingly
-						if (c1_index != -1)
-							characters_v1[c1_index] = c1;
-						else
-							characters_v1.push(c1);
-						if (c2_index != -1)
-							characters_v1[c2_index] = c2;
-						else
-							characters_v1.push(c2);
+						binaryInsertByProperty(c1, characters_v1, 'name');
+						binaryInsertByProperty(c2, characters_v1, 'name');
 
 						//bettor records
 						if (results.bettors_v1)
@@ -225,7 +210,11 @@ var Controller = function () {
 					};
 
 					if (!dirtyRecords) {
-						updateRecords({matches_v1: self.matches_v1, characters_v1: self.characters_v1, bettors_v1: self.bettors_v1});
+						updateRecords({
+							matches_v1: self.matches_v1,
+							characters_v1: self.characters_v1,
+							bettors_v1: self.bettors_v1
+						});
 					}
 					else {
 						chrome.storage.local.get(["matches_v1", "characters_v1", "bettors_v1"], function (results) {
@@ -305,14 +294,13 @@ var Controller = function () {
 					self.currentMatch.mode = "U";
 
 				//set aggro:
-				if (self.settings.talimit_enabled == true && self.currentMatch.getBalance() <= self.settings.talimit){
+				if (self.settings.talimit_enabled == true && self.currentMatch.getBalance() <= self.settings.talimit) {
 					self.currentMatch.setAggro(true);
 				}
-				else
-				{
+				else {
 					self.currentMatch.setAggro(false);
 				}
-				
+
 			}
 
 			//skip team matches, mirror matches
