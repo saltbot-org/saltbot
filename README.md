@@ -29,7 +29,7 @@ The more info you provide, the better we can diagnose the issue and remedy it.
 
 # Screenshot
 
-![Alt text](https://u.teknik.io/HpM8r.png)
+<img src="/src/images/screenshot.png" width="950" height="525">
 
 # Subreddit
 
