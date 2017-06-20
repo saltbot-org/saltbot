@@ -1,0 +1,13 @@
+archive
+node_modules
+.project
+.idea
+*.iml
+*.pem
+orig/
+*.dropbox
+desktop.ini
+src/.vs/ProjectSettings.json
+src/.vs/slnx.sqlite
+src/.vs/VSWorkspaceState.json
+*.suo

@@ -35,10 +35,15 @@ Updater.prototype.getCharacter = function (cname, characterRecords, namesOfChara
 	var cobject = null;
 	if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
 		cobject = new Character(cname);
-		binaryInsertByProperty(cobject, characterRecords, 'name');
+		characterRecords.push(cobject);
 		namesOfCharactersWhoAlreadyHaveRecords.push(cname);
 	} else {
-		cobject = characterRecords[binarySearchByProperty({name: cname}, characterRecords, 'name')];
+		for (var k = 0; k < characterRecords.length; k++) {
+			if (cname == characterRecords[k].name) {
+				cobject = characterRecords[k];
+				break;
+			}
+		}
 	}
 	return cobject;
 };
@@ -74,6 +79,7 @@ Updater.prototype.updateBettorsFromMatch = function (mObj, bc1, bc2) {
 	}
 };
 Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
+  var rememberRecordsLast = 45;  // changing this requires re-importing matches.
 	// wins, losses, and times
 	if (mObj.w == 0) {
 		c1Obj.wins.push(mObj.t);
@@ -117,9 +123,9 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 	};
 
 	// this.tiers will correspond with the odds
-	if (mObj.o != null && mObj.o != "U") {
-		var oc1 = parseFloat(mObj.o.split(":")[0]);
-		var oc2 = parseFloat(mObj.o.split(":")[1]);
+    if (mObj.o != null && mObj.o != "U") {
+        var oc1 = Number(mObj.o.split(":")[0]);
+        var oc2 = Number(mObj.o.split(":")[1]);
 		c1Obj.odds.push(oc1 / oc2);
 		c2Obj.odds.push(oc2 / oc1);
 	} else {
@@ -129,7 +135,7 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 	c1Obj.tiers.push(mObj.t);
 	c2Obj.tiers.push(mObj.t);
 	// expert favor is seemingly worthless but what the hell
-	if (mObj.cf !== undefined && mObj.cf != null) {
+    if (mObj.if != null || mObj.cf != null ) {
 		if (mObj.cf == 0) {
 			c1Obj.crowdFavor.push(1);
 			c2Obj.crowdFavor.push(0);
@@ -137,8 +143,6 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 			c1Obj.crowdFavor.push(0);
 			c2Obj.crowdFavor.push(1);
 		}
-	}
-	if (mObj.if !== undefined && mObj.if != null) {
 		if (mObj.if == 0) {
 			c1Obj.illumFavor.push(1);
 			c2Obj.illumFavor.push(0);
@@ -148,8 +152,8 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 		}
 	}
 
-	limitRecordsTo(c1Obj, 15);
-	limitRecordsTo(c2Obj, 15);
+    limitRecordsTo(c1Obj, rememberRecordsLast);
+    limitRecordsTo(c2Obj, rememberRecordsLast);
 
 };
 
