@@ -14,6 +14,8 @@ To install the git version of this extension:
 * Open chrome extension settings and enable developer mode
 * Click "load unpacked extension"
 * Navigate to the '/src/' folder and load it
+* Import the data and chromosome files
+* Select your preferred mode and settings and let it run.
 
 # Updating
 
