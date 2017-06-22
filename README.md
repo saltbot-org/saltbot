@@ -10,7 +10,7 @@ A betting bot for SaltyBet.
 **Minimum Requirements:**
 * Dual core processor 1.5Ghz+
 * 4gb DDR3 RAM 1333mhz
-* 10mbps internet connection
+* 10 mbps internet connection
 
 **To run saltbot at maximum efficiency:**
 * Quad Core processor 3.0Ghz+
