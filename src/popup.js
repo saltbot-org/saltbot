@@ -64,11 +64,11 @@ var limitChange = function () {
 	if (limit < 1000) {
 		return;
 	}
-	
+
 	elementChanged("limit_" + (($("#tl")[0].checked) ? "enable" : "disable"), limit);
 };
 
-var multiplierChange = function() {
+var multiplierChange = function () {
 	var multiplierValue = $("#multiplierSlider")[0].value;
 	elementChanged("multiplier", multiplierValue);
 };
@@ -97,12 +97,12 @@ var changeStrategyClickIPU = function () {
 	btnClicked("cs_ipu");
 	setButtonActive("#cs_ipu");
 };
-var setButtonActive = function(identifier) {
+var setButtonActive = function (identifier) {
 	$("#cs_o").removeClass("active");
 	$("#cs_rc").removeClass("active");
 	$("#cs_cs").removeClass("active");
 	$("#cs_ipu").removeClass("active");
-	
+
 	$(identifier).addClass("active");
 }
 var onFileReadRecord = function (e) {
@@ -198,15 +198,15 @@ Simulator.prototype.evalMutations = function (mode) {
 	var self = this;
 	chrome.storage.local.get(["matches_v1", "characters_v1", "chromosomes_v1"], function (results) {
 		var matches = [];
-		
+
 		if (results.matches_v1)
 			matches = results.matches_v1;
-		
+
 		if (matches.length == 0) {
 			console.log('No matches have been recorded yet.');
 			return;
 		}
-		
+
 		var data = [];
 		var correct = [];
 		var totalBettedOn = [];
@@ -423,7 +423,7 @@ Simulator.prototype.evalMutations = function (mode) {
 				// i really only need to see the best one
 				console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 				// created and push children of that half of best sorted population
-				for (var mf = 0; mf < sizeNextGen-sizeTopParents ; mf++) {
+				for (var mf = 0; mf < sizeNextGen - sizeTopParents; mf++) {
 					var parent1 = null;
 					var parent2 = null;
 					var child = null;
@@ -433,17 +433,17 @@ Simulator.prototype.evalMutations = function (mode) {
 					} else if (mf < sizeTopParents * ratioTopBestBreeding) {		// breed the best with next few best kept
 						parent1 = parents[0];
 						parent2 = parents[mf];
-					} else if (mf < sizeTopParents){			// breed best kept remaining
-						parent1 = parents[mf];			
+					} else if (mf < sizeTopParents) {			// breed best kept remaining
+						parent1 = parents[mf];
 						parent2 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeTopParents))][0];	// pick random after top
 					} else {		// fill remaining population by random breeding below the best kept.
 						var attemps = 2;
 						var atmp = 0;
-						do {							
+						do {
 							parent1 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeNextGen - sizeTopParents))][0];
 							parent2 = sortingArray[sizeTopParents + Math.floor(Math.random() * (sizeNextGen - sizeTopParents))][0];
 							atmp++;
-						} 
+						}
 						while ((parent1 != parent2) && (atmp < attemps));
 					}
 					child = parent1.mate(parent2);
@@ -539,9 +539,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			$("#talimit")[0].value = result.settings_v1.talimit || 10000;
 			$("#multiplierField")[0].value = result.settings_v1.multiplier || 1;
 			$("#multiplierSlider")[0].value = result.settings_v1.multiplier || 1;
-			
+
 			setButtonActive("#cs_" + result.settings_v1.nextStrategy);
-			
+
 			console.log($("#tl")[0]);
 			console.log($("#limit")[0].value);
 		}
@@ -568,7 +568,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	$("#tl")[0].addEventListener("change", limitChange);
 	$("#limit").bind('keyup input', limitChange);
 	$("#multiplierSlider").bind("change", multiplierChange);
-	$("#multiplierSlider").bind("input", function() {
+	$("#multiplierSlider").bind("input", function () {
 		var multiplierValue = $("#multiplierSlider")[0].value;
 		$("#multiplierField")[0].value = multiplierValue;
 	})

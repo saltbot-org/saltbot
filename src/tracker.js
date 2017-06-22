@@ -1,4 +1,4 @@
-var detectTournament = function() {
+var detectTournament = function () {
 	var tournamentModeIndicator = "characters are left in the bracket!";
 	var tournamentModeIndicator2 = "Tournament mode start";
 	var tournamentModeIndicator3 = "FINAL ROUND! Stay tuned for exhibitions after the tournament!";
