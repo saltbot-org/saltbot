@@ -6,6 +6,17 @@ A betting bot for SaltyBet.
 * Download sample data(match record and chromosome) above or [**click here.**](https://github.com/synkarius/saltbot/blob/master/data/86k%20Records%20%2B%20Chromosome%20Mar%202017.zip) (updated Mar.25,2017). 
 * Download the app from the Chrome Store [**here**](https://chrome.google.com/webstore/detail/saltbot/bholoegapebhflljekancpcnajigaiih).
 
+# System Requirements
+**Minimum Requirements:**
+* Dual core processor 1.5Ghz+
+* 4gb DDR3 RAM 1333mhz
+* 10mbps internet connection
+
+**To run saltbot at maximum efficiency:**
+* Quad Core processor 3.0Ghz+
+* 8gb DDR3 RAM 1600mhz
+* 30 mbps internet connection
+
 # Installing latest version(Chrome/Chromium)
 
 To install the git version of this extension:
