@@ -7,15 +7,13 @@ A betting bot for SaltyBet.
 * Download the app from the Chrome Store [**here**](https://chrome.google.com/webstore/detail/saltbot/bholoegapebhflljekancpcnajigaiih).
 
 # System Requirements
-**Minimum Requirements:**
+**Minimum Specs:**
 * Dual core processor 1.5Ghz+
 * 4gb DDR3 RAM 1333mhz
-* 10 mbps internet connection
 
-**To run saltbot at maximum efficiency:**
+**Recommended Specs:**
 * Quad Core processor 3.0Ghz+
 * 8gb DDR3 RAM 1600mhz
-* 30 mbps internet connection
 
 # Installing latest version(Chrome/Chromium)
 
