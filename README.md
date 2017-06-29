@@ -1,6 +1,6 @@
 # SaltBot [![CodeFactor](https://www.codefactor.io/repository/github/synkarius/saltbot/badge)](https://www.codefactor.io/repository/github/synkarius/saltbot)  [![GitHub issues](https://img.shields.io/github/issues/synkarius/saltbot.svg)](https://github.com/synkarius/saltbot/issues)  [![GitHub stars](https://img.shields.io/github/stars/synkarius/saltbot.svg)](https://github.com/synkarius/saltbot/stargazers)  [![GitHub forks](https://img.shields.io/github/forks/synkarius/saltbot.svg)](https://github.com/synkarius/saltbot/network)
 
-A betting bot for SaltyBet. 
+A betting bot for [SaltyBet.com](http://saltybet.com)
 
 * Read about it [**here**](http://explosionduck.com/wp/story-of-a-betting-bot/) and learn how to use it [**here**](http://explosionduck.com/wp/so-you-want-to-use-saltbot/). 
 * Download sample data(match record and chromosome) above or [**click here.**](https://github.com/synkarius/saltbot/blob/master/data/86k%20Records%20%2B%20Chromosome%20Mar%202017.zip) (updated Mar.25,2017). 
