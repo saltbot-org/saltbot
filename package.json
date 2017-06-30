@@ -1,6 +1,6 @@
 {
   "name": "Saltbot",
-  "version": "https://github.com/synkarius/saltbot.git",
+  "version": "2.0.5",
   "description": "automated virtual betting bot",
   "main": "src/*.js",
   "scripts": {
