@@ -1,0 +1,33 @@
+{
+  "name": "Saltbot",
+  "version": "2.0.5",
+  "description": "automated virtual betting bot",
+  "main": "src/*.js",
+  "scripts": {
+    "build": "browserify *.js > js/build.js",
+    "test:integration": "npm run build && mocha ./test/integration/*-test.js",
+    "test:unit": "mocha ./test/unit/*-test.js",
+    "watch:test:unit": "watch-run -i -p './test/**/*,./lib/*.js,./lib/**/*.js,./index.js' mocha ./test/unit/*-test.js ./test/unit/**/*-test.js",
+    "test": "npm run test:unit && npm run test:integration",
+    "selenium-install": "selenium-standalone install",
+    "selenium-start": "selenium-standalone start"
+  },
+  "author": "David Conway",
+  "license": "GPL-2.0",
+  "devDependencies": {
+    "async": "^2.0.1",
+    "body-parser": "^1.15.2",
+    "browserify": "^13.1.0",
+    "chai": "^3.5.0",
+    "chromedriver": "^2.21.2",
+    "concat-stream": "^1.5.1",
+    "express": "^4.14.0",
+    "mocha": "^2.5.3",
+    "proxyquire": "^1.7.10",
+    "selenium-standalone": "^5.5.0",
+    "server-destroy": "^1.0.1",
+    "sinon": "^1.17.5",
+    "watch-run": "^1.2.4",
+    "webdriverio": "^4.2.1"
+  }
+}
