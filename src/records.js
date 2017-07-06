@@ -253,6 +253,7 @@ var ir = function (f) {
 		'characters_v1': characterRecords
 	}, function () {
 		console.log("-\nrecords imported:\n" + nmr + " match records\n" + ncr + " character records");
+		displayDialogMessage('Records imported:\n' + nmr + " match records\n" + ncr + " character records");
 		dirtyRecords = true;
 	});
 };
@@ -303,6 +304,7 @@ var ic = function (f) {
 			'chromosomes_v1': chromosomes
 		}, function () {
 			console.log("- Chromosome imported successfully.");
+			displayDialogMessage('Chromosome imported successfully.');
 		});
 	});
 

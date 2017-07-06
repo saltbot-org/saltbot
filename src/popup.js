@@ -7,13 +7,6 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-	$("#upload_c").on("click", function (e) {
-		e.stopPropagation();
-	});
-	$("#upload_r").on("click", function (e) {
-		e.stopPropagation();
-	});
-
 	$("#bic").on("click", function (e) {
 		$('#upload_c').trigger('click');
 	});
@@ -125,6 +118,7 @@ var irClick = function () {
 	console.log("Attempting to read file...");
 
 	var file = files[0];
+	$("#upload_r").val("");
 	var reader = new FileReader();
 	reader.onload = onFileReadRecord;
 	reader.readAsText(file);
@@ -139,6 +133,7 @@ var icClick = function () {
 	console.log("Attempting to read file...");
 
 	var file = files[0];
+	$("#upload_c").val("");
 	var reader = new FileReader();
 	reader.onload = onFileReadChromosome;
 	reader.readAsText(file);
@@ -549,9 +544,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 
 	$("#ber")[0].addEventListener("click", erClick);
-	$("#bir")[0].addEventListener("change", irClick);
+	$("#upload_r")[0].addEventListener("change", irClick);
 	$("#bec")[0].addEventListener("click", ecClick);
-	$("#bic")[0].addEventListener("change", icClick);
+	$("#upload_c")[0].addEventListener("change", icClick);
 	$("#ugw")[0].addEventListener("click", function () {
 		simulator.evalMutations("evolution");
 	});
