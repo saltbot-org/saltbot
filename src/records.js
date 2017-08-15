@@ -74,6 +74,7 @@ Updater.prototype.updateBettorsFromMatch = function (mObj, bc1, bc2) {
 	}
 };
 Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
+	var rememberRecordsLast = 15;  // changing this requires re-importing matches.
 	// wins, losses, and times
 	if (mObj.w == 0) {
 		c1Obj.wins.push(mObj.t);
@@ -118,8 +119,8 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 
 	// this.tiers will correspond with the odds
 	if (mObj.o != null && mObj.o != "U") {
-		var oc1 = parseFloat(mObj.o.split(":")[0]);
-		var oc2 = parseFloat(mObj.o.split(":")[1]);
+		var oc1 = Number(mObj.o.split(":")[0]);
+		var oc2 = Number(mObj.o.split(":")[1]);
 		c1Obj.odds.push(oc1 / oc2);
 		c2Obj.odds.push(oc2 / oc1);
 	} else {
@@ -148,8 +149,8 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 		}
 	}
 
-	limitRecordsTo(c1Obj, 15);
-	limitRecordsTo(c2Obj, 15);
+	limitRecordsTo(c1Obj, rememberRecordsLast);
+	limitRecordsTo(c2Obj, rememberRecordsLast);
 
 };
 
