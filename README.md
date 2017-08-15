@@ -50,3 +50,4 @@ The more info you provide, the better we can diagnose the issue and remedy it.
 # Contributors & Members
 
 [**Click here for the current list of Contributors & Members**](https://github.com/synkarius/saltbot/network/members)
+
