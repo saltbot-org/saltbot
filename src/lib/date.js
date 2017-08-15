@@ -87,7 +87,8 @@ Date.getMonthNumberFromName = function (name) {
 	return -1;
 };
 Date.getDayNumberFromName = function (name) {
-	var n = Date.CultureInfo.dayNames, m = Date.CultureInfo.abbreviatedDayNames, o = Date.CultureInfo.shortestDayNames, s = name.toLowerCase();
+	var n = Date.CultureInfo.dayNames, m = Date.CultureInfo.abbreviatedDayNames, o = Date.CultureInfo.shortestDayNames,
+		s = name.toLowerCase();
 	for (var i = 0; i < n.length; i++) {
 		if (n[i].toLowerCase() == s || m[i].toLowerCase() == s) {
 			return i;
@@ -445,7 +446,9 @@ Number.prototype.ago = function () {
 };
 (function () {
 	var $D = Date.prototype, $N = Number.prototype;
-	var dx = ("sunday monday tuesday wednesday thursday friday saturday").split(/\s/), mx = ("january february march april may june july august september october november december").split(/\s/), px = ("Millisecond Second Minute Hour Day Week Month Year").split(/\s/), de;
+	var dx = ("sunday monday tuesday wednesday thursday friday saturday").split(/\s/),
+		mx = ("january february march april may june july august september october november december").split(/\s/),
+		px = ("Millisecond Second Minute Hour Day Week Month Year").split(/\s/), de;
 	var df = function (n) {
 		return function () {
 			if (this._is) {

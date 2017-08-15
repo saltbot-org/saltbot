@@ -628,3 +628,38 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 window.addEventListener("beforeunload", function () {
 	ctrl.enableVideoWindow();
 });
+
+var prepareJQueryDialog = function() {
+	$('link[href="../css/jquery-ui-1.11.min.css"]').prop('disabled', true);
+	var link = '<link rel="stylesheet" type="text/css" href="' + chrome.extension.getURL('css/jquery-ui.css') + '">'
+	$('head').append(link)
+
+	var wrapper = document.getElementById('wrapper');
+	messageDialogue = document.createElement('div');
+	messageDialogue.setAttribute('id', 'dialog');
+	wrapper.appendChild(messageDialogue);
+
+	var dialogTimer = null;
+
+	$('#dialog').dialog({
+		autoOpen: false,
+		title: 'Saltbot Notification',
+		open: function(event, ui){
+			if (dialogTimer != null) {
+				clearTimeout(dialogTimer);
+			}
+			
+			var dia = $(this);
+			dialogTimer = setTimeout(function() {
+				dia.dialog('close');
+			}, 5000);
+		}
+	});
+}
+
+prepareJQueryDialog()
+
+var displayDialogMessage = function(message) {
+	$('#dialog').html(message.replace(/\n/g, '<br />'));
+	$('#dialog').dialog('open');
+}

@@ -188,7 +188,7 @@ RatioConfidence.prototype.execute = function (info) {
 		//confidence score
 		self.confidence = (pChar.name == c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
 		self.confidence += 0.5;
-		if (self.confidence > 1)self.confidence = 1;
+		if (self.confidence > 1) self.confidence = 1;
 		if (self.confidence < 0.6) {
 			if (this.debug)
 				console.log("- Cowboy has insufficient confidence (confidence: " + self.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");

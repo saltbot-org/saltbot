@@ -60,13 +60,11 @@ form.wufoo {
 	min-height: 40px;
 	height: 40px;
 	display: block;
-	background: url(../images/wflogo.png) no-repeat left top;
 	overflow: hidden
 }
 
 * html #logo a {
 	_background-image: none;
-	_filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../images/wflogo.png", sizingMethod="crop")
 }
 
 img,
