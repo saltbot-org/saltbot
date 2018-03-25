@@ -1,54 +1,54 @@
 <!doctype html>
 <html>
 <head>
-	<title>SaltBot Controls</title>
-	<script type="text/javascript" src="lib/jquery.min.js"></script>
-	<script type="text/javascript" src="utils.js"></script>
-	<script type="text/javascript" src="records.js"></script>
-	<script type="text/javascript" src="strategy.js"></script>
-	<script type="text/javascript" src="popup.js"></script>
-	<link rel="stylesheet" href="css/obvious-buttons.css"/>
-	<style>
-		body {
-			min-width: 350px;
-			overflow-x: hidden;
-			overflow-y: hidden;
-			/*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fcfff4), color-stop(40%, #dfe5d7), color-stop(100%, #b3bead));*/
-			background: #F7F8FB;
-			font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
-		}
+    <title>SaltBot Controls</title>
+    <script type="text/javascript" src="js/lib/jquery.min.js"></script>
+    <script type="text/javascript" src="js/lib/idb.js"></script>
+    <script type="text/javascript" src="js/utils.js"></script>
+    <script type="text/javascript" src="js/records.js"></script>
+    <script type="text/javascript" src="js/strategy.js"></script>
+    <script type="text/javascript" src="js/popup.js"></script>
+    <link rel="stylesheet" href="css/obvious-buttons.css" />
+    <style>
+        body {
+            min-width: 350px;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            /*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fcfff4), color-stop(40%, #dfe5d7), color-stop(100%, #b3bead));*/
+            background: #F7F8FB;
+            font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+        }
 
-		#player1, #player2 {
-			display: none;
-		}
+        #player1, #player2 {
+            display: none;
+        }
 
-		.subheading {
-			margin-bottom: 5px;
-			clear: both;
-			margin-top: 8px;
-		}
+        .subheading {
+            margin-bottom: 5px;
+            clear: both;
+            margin-top: 8px;
+        }
 
-		input[type="number"] {
-			width: 100px;
-		}
+        input[type="number"] {
+            width: 100px;
+        }
 
-		.btn {
-			margin-bottom: 5px;
-			-webkit-touch-callout: none; /* iOS Safari */
-			-webkit-user-select: none; /* Safari */
-			-khtml-user-select: none; /* Konqueror HTML */
-			-moz-user-select: none; /* Firefox */
-			-ms-user-select: none; /* Internet Explorer/Edge */
-			user-select: none;
-			/* Non-prefixed version, currently
-													   supported by Chrome and Opera */
-		}
+        .btn {
+            margin-bottom: 5px;
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+            /* Non-prefixed version, currently
+                                                       supported by Chrome and Opera */
+        }
 
-		.btn.active {
-			color: black;
-		}
-
-	</style>
+            .btn.active {
+                color: black;
+            }
+    </style>
 </head>
 <body>
 <div style="position:absolute;top:20px;right:20px;">
@@ -92,7 +92,7 @@
 <input type="file" id="upload_c" style="display: none">
 <br>
 <label style="display: block;clear: both;"> Messages:
-	<input type="text" name="msgbox" id="msgbox"/>
+	<input type="text" name="msgbox" id="msgbox" size="40"/>
 </label>
 <h2 class="subheading">Records Management</h2>
 <div id="ber" class="btn btn-inline btn-small btn-success">

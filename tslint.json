@@ -1,0 +1,25 @@
+{
+    "defaultSeverity": "warning",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+  "rules": {
+    "no-var-keyword": false,
+    "indent": [ true, "tabs", 4 ],
+    "only-arrow-functions": false,
+    "no-console": false,
+    "comment-format": false,
+    "one-line": false,
+    "eofline": false,
+    "max-line-length": false,
+    "no-bitwise":  false
+
+
+
+
+
+
+  },
+    "rulesDirectory": []
+}

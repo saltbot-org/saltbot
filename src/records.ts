@@ -1,3 +1,4 @@
+declare function saveAs(data: Blob, filename?: string, disableAutoBOM?: boolean);
 var dirtyRecords = true;
 
 var Bettor = function (name) {
@@ -19,6 +20,25 @@ var Character = function (name) {
 	this.tiers = [];
 	this.totalFights = [];
 };
+
+class MatchRecord {
+	public c1: string;
+	public c2: string;
+	public w: number;
+	public sn: string;
+	public pw: string;
+	public t: string;
+	public m: string;
+	public o: string;
+	public ts: number;
+	public cf: number;
+	public if: number;
+	public dt: string;
+
+	public constructor(init?: Partial<MatchRecord>) {
+		Object.assign(this, init);
+	}
+}
 
 var Updater = function () {
 
@@ -58,8 +78,8 @@ Updater.prototype.getBettor = function (bname, bettorRecords, namesOfBettorsWhoA
 	}
 	return bobject;
 };
-Updater.prototype.updateBettorsFromMatch = function (mObj, bc1, bc2) {
-	var c1Won = (mObj.w == 0);
+Updater.prototype.updateBettorsFromMatch = function(mObj: MatchRecord, bc1, bc2) {
+	const c1Won = (mObj.w === 0);
 	for (var i = 0; i < bc1.length; i++) {
 		if (c1Won)
 			bc1[i].wins += 1;
@@ -73,10 +93,10 @@ Updater.prototype.updateBettorsFromMatch = function (mObj, bc1, bc2) {
 			bc2[j].losses += 1;
 	}
 };
-Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
+Updater.prototype.updateCharactersFromMatch = function (mObj: MatchRecord, c1Obj, c2Obj) {
 	var rememberRecordsLast = 15;  // changing this requires re-importing matches.
 	// wins, losses, and times
-	if (mObj.w == 0) {
+	if (mObj.w === 0) {
 		c1Obj.wins.push(mObj.t);
 		c2Obj.losses.push(mObj.t);
 		c1Obj.winTimes.push(mObj.ts);
@@ -84,7 +104,7 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 
 		c1Obj.totalFights.push(1);
 		c2Obj.totalFights.push(0);
-	} else if (mObj.w == 1) {
+	} else if (mObj.w === 1) {
 		c2Obj.wins.push(mObj.t);
 		c1Obj.losses.push(mObj.t);
 		c2Obj.winTimes.push(mObj.ts);
@@ -94,7 +114,7 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 		c2Obj.totalFights.push(1);
 	}
 
-	var limitRecordsTo = function (charObj, limit) {
+	const limitRecordsTo = function (charObj, limit) {
 		if (charObj.totalFights.length > limit) {
 			if (charObj.totalFights[0] == 0) {
 				charObj.losses.shift();
@@ -118,7 +138,7 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 	};
 
 	// this.tiers will correspond with the odds
-	if (mObj.o != null && mObj.o != "U") {
+	if (mObj.o != null && mObj.o !== "U") {
 		var oc1 = Number(mObj.o.split(":")[0]);
 		var oc2 = Number(mObj.o.split(":")[1]);
 		c1Obj.odds.push(oc1 / oc2);
@@ -131,19 +151,19 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 	c2Obj.tiers.push(mObj.t);
 	// expert favor is seemingly worthless but what the hell
 	if (mObj.cf !== undefined && mObj.cf != null) {
-		if (mObj.cf == 0) {
+		if (mObj.cf === 0) {
 			c1Obj.crowdFavor.push(1);
 			c2Obj.crowdFavor.push(0);
-		} else if (mObj.cf == 1) {
+		} else if (mObj.cf === 1) {
 			c1Obj.crowdFavor.push(0);
 			c2Obj.crowdFavor.push(1);
 		}
 	}
 	if (mObj.if !== undefined && mObj.if != null) {
-		if (mObj.if == 0) {
+		if (mObj.if === 0) {
 			c1Obj.illumFavor.push(1);
 			c2Obj.illumFavor.push(0);
-		} else if (mObj.if == 1) {
+		} else if (mObj.if === 1) {
 			c1Obj.illumFavor.push(0);
 			c2Obj.illumFavor.push(1);
 		}
@@ -154,63 +174,60 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 
 };
 
-var er = function () {
-	chrome.storage.local.get(["matches_v1"], function (results) {
-		var lines = [];
-		for (var i = 0; i < results.matches_v1.length; i++) {
-			var match = results.matches_v1[i];
+var er = async function() {
+	const lines = [];
+	const matches = await getMatchRecords();
+	for (const match of matches) {
+		var record = match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + ",";
+		record += (match.hasOwnProperty("t")) ? match.t : "U";
+		record += ",";
+		record += (match.hasOwnProperty("m")) ? match.m : "U";
+		record += ",";
+		record += (match.hasOwnProperty("o")) ? match.o : "U";
+		record += ",";
+		record += (match.hasOwnProperty("ts")) ? match.ts : 0;
+		record += ",";
+		record += (match.hasOwnProperty("cf")) ? match.cf : 2;
+		record += ",";
+		record += (match.hasOwnProperty("if")) ? match.if : 2;
+		record += ",";
+		record += (match.hasOwnProperty("dt")) ? match.dt : moment().format("DD-MM-YYYY");
+		record += "\n";
+		lines.push(record);
+	}
 
-			var record = match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + ",";
-			record += (match.hasOwnProperty("t")) ? match.t : "U";
-			record += ",";
-			record += (match.hasOwnProperty("m")) ? match.m : "U";
-			record += ",";
-			record += (match.hasOwnProperty("o")) ? match.o : "U";
-			record += ",";
-			record += (match.hasOwnProperty("ts")) ? match.ts : 0;
-			record += ",";
-			record += (match.hasOwnProperty("cf")) ? match.cf : 2;
-			record += ",";
-			record += (match.hasOwnProperty("if")) ? match.if : 2;
-			record += ",";
-			record += (match.hasOwnProperty("dt")) ? match.dt : new Date().toString("dd-MM-yyyy");
-			record += "\n";
-			lines.push(record);
-		}
-
-		var time = new Date();
-		var blobM = new Blob(lines, {
-			type: "text/plain;charset=utf-8"
-		});
-		var timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
-		saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
+	const time = new Date();
+	const blobM = new Blob(lines, {
+		type: "text/plain;charset=utf-8",
 	});
+	const timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+	saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
 };
 
-var ir = function (f) {
-	var updater = new Updater();
-	var matchRecords = [];
-	var characterRecords = [];
-	var namesOfCharactersWhoAlreadyHaveRecords = [];
+var ir = function(f: string) {
+	const updater = new Updater();
+	const matchRecords = [];
+	const characterRecords = [];
+	const namesOfCharactersWhoAlreadyHaveRecords = [];
 
 	//numberOfProperties refers to c1, c2, w, sn, etc.
-	var numberOfProperties = 12;
-	var mObj = null;
-	var lines = f.split("\n");
-	for (var i = 0; i < lines.length; i++) {
-		var match = lines[i].split(",");
+	const numberOfProperties = 12;
+	let mObj: MatchRecord = null;
+	const lines = f.split("\n");
+	for (const line of lines) {
+		const match = line.split(",");
 
-		for (var j = 0; j < match.length; j++) {
+		for (let j = 0; j < match.length; j++) {
 			switch (j % numberOfProperties) {
 				case 0:
-					mObj = {};
+					mObj = new MatchRecord();
 					mObj.c1 = match[j];
 					break;
 				case 1:
 					mObj.c2 = match[j];
 					break;
 				case 2:
-					mObj.w = parseInt(match[j]);
+					mObj.w = +match[j];
 					break;
 				case 3:
 					mObj.sn = match[j];
@@ -228,33 +245,34 @@ var ir = function (f) {
 					mObj.o = match[j];
 					break;
 				case 8:
-					mObj.ts = parseInt(match[j]);
+					mObj.ts = +match[j];
 					break;
 				case 9:
-					mObj.cf = parseInt(match[j]);
+					mObj.cf = +match[j];
 					break;
 				case 10:
-					mObj.if = parseInt(match[j]);
+					mObj.if = +match[j];
 					break;
 				case 11:
 					mObj.dt = match[j];
 					matchRecords.push(mObj);
-					var c1Obj = updater.getCharacter(mObj.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
-					var c2Obj = updater.getCharacter(mObj.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
+					const c1Obj = updater.getCharacter(mObj.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
+					const c2Obj = updater.getCharacter(mObj.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
 					updater.updateCharactersFromMatch(mObj, c1Obj, c2Obj);
 					break;
 			}
 		}
 	}
-	var nmr = matchRecords.length;
-	var ncr = characterRecords.length;
+	const nmr = matchRecords.length;
+	const ncr = characterRecords.length;
 	//All records have been rebuilt, so update them
+
+	setMatchRecords(matchRecords);
 	chrome.storage.local.set({
-		'matches_v1': matchRecords,
-		'characters_v1': characterRecords
-	}, function () {
+		characters_v1: characterRecords,
+	}, function() {
 		console.log("-\nrecords imported:\n" + nmr + " match records\n" + ncr + " character records");
-		displayDialogMessage('Records imported:\n' + nmr + " match records\n" + ncr + " character records");
+		displayDialogMessage("Records imported:\n" + nmr + " match records\n" + ncr + " character records");
 		dirtyRecords = true;
 	});
 };
@@ -283,7 +301,7 @@ var ec = function () {
 };
 
 var ic = function (f) {
-	var chromosome = new Chromosome();
+	const chromosome = new Chromosome();
 	try {
 		chromosome.loadFromJSON(f);
 	}
@@ -302,19 +320,19 @@ var ic = function (f) {
 			chromosomes = [chromosome];
 		}
 		chrome.storage.local.set({
-			'chromosomes_v1': chromosomes
+			chromosomes_v1: chromosomes,
 		}, function () {
 			console.log("- Chromosome imported successfully.");
-			displayDialogMessage('Chromosome imported successfully.');
+			displayDialogMessage("Chromosome imported successfully.");
 		});
 	});
 
 
 };
 
-if (window.location.href == "http://www.saltybet.com/" || window.location.href == "http://mugen.saltybet.com/" ||
-	window.location.href == "https://www.saltybet.com/" || window.location.href == "https://mugen.saltybet.com/")
-	chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+if (window.location.href === "http://www.saltybet.com/" || window.location.href === "http://mugen.saltybet.com/" ||
+	window.location.href === "https://www.saltybet.com/" || window.location.href === "https://mugen.saltybet.com/") {
+	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		switch (request.type) {
 			case "er":
 				er();
@@ -364,10 +382,10 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 				ctrl.setLimit(false, request.text);
 				break;
 			case "tourney_limit_enable":
-				ctrl.setTourneyLimit(true, request.text);
+				ctrl.setTourneyLimit(true, +request.text);
 				break;
 			case "tourney_limit_disable":
-				ctrl.setTourneyLimit(false, request.text);
+				ctrl.setTourneyLimit(false, +request.text);
 				break;
 			case "multiplier":
 				ctrl.setMultiplier(request.text);
@@ -376,7 +394,8 @@ if (window.location.href == "http://www.saltybet.com/" || window.location.href =
 				ctrl.setKeepAlive(request.text);
 				break;
 			default:
-				sendResponse({farewell: ("Request type " + request.type + " cannot be handled.")});
+				sendResponse({ farewell: ("Request type " + request.type + " cannot be handled.") });
 				break;
 		}
 	});
+}

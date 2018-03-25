@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{329b464f-62b0-4a29-8821-1ddda794f9f6}</ProjectGuid>
+    <ProjectHome>..\</ProjectHome>
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
+    <StartWebBrowser>True</StartWebBrowser>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="dist\config.html" />
+    <Content Include="dist\css\form.css" />
+    <Content Include="dist\css\jquery-ui.css" />
+    <Content Include="dist\css\obvious-buttons.css" />
+    <Content Include="dist\css\structure.css" />
+    <Content Include="dist\css\theme.css" />
+    <Content Include="dist\fonts\pictos.eot" />
+    <Content Include="dist\fonts\pictos.svg" />
+    <Content Include="dist\fonts\pictos.ttf" />
+    <Content Include="dist\fonts\pictos.woff" />
+    <Content Include="dist\images\128.png" />
+    <Content Include="dist\images\16.png" />
+    <Content Include="dist\images\32.png" />
+    <Content Include="dist\images\48.png" />
+    <Content Include="dist\images\config.png" />
+    <Content Include="dist\images\fieldbg.gif" />
+    <Content Include="dist\images\github.png" />
+    <Content Include="dist\images\help.png" />
+    <Content Include="dist\images\reddit.png" />
+    <Content Include="dist\images\screenshot.png" />
+    <Content Include="dist\images\spinner.gif" />
+    <Content Include="dist\images\table.png" />
+    <Content Include="dist\images\ui-icons_444444_256x240.png" />
+    <Content Include="dist\images\ui-icons_555555_256x240.png" />
+    <Content Include="dist\images\ui-icons_777620_256x240.png" />
+    <Content Include="dist\images\ui-icons_777777_256x240.png" />
+    <Content Include="dist\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="dist\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="dist\manifest.json" />
+    <Content Include="dist\matchdata.html" />
+    <Content Include="dist\popup.html" />
+    <Content Include="LICENSE" />
+    <Content Include="package-lock.json" />
+    <Content Include="package.json" />
+    <Content Include="tsconfig.json" />
+    <Content Include="bugreports.md" />
+    <Content Include="README.md" />
+    <Content Include="data\86k records incl exhb 0-time removed.txt" />
+    <Content Include="data\chromosome--2017-3-9-21.3.txt" />
+    <Compile Include="src\main.ts">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\matchdata.ts" />
+    <Compile Include="src\lib\date-eu.js" />
+    <Compile Include="src\lib\date.js" />
+    <Compile Include="src\lib\FileSaver.min.js" />
+    <Compile Include="src\lib\jquery-ui.min.js" />
+    <Compile Include="src\lib\jquery.dataTables.min.js" />
+    <Compile Include="src\lib\jquery.min.js" />
+    <Content Include="tslint.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="data" />
+    <Folder Include="dist" />
+    <Folder Include="dist\css\" />
+    <Folder Include="dist\fonts\" />
+    <Folder Include="dist\images\" />
+    <Folder Include="dist\js\" />
+    <Folder Include="project" />
+    <Folder Include="Saltbot" />
+    <Folder Include="Saltbot\Saltbot" />
+    <Folder Include="src" />
+    <Folder Include="src\lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="src\config.ts" />
+    <TypeScriptCompile Include="src\popup.ts" />
+    <TypeScriptCompile Include="src\records.ts" />
+    <TypeScriptCompile Include="src\salty.ts" />
+    <TypeScriptCompile Include="src\strategy.ts" />
+    <TypeScriptCompile Include="src\tracker.ts" />
+    <TypeScriptCompile Include="src\twitch_background.ts" />
+    <TypeScriptCompile Include="src\twitch_content.ts" />
+    <TypeScriptCompile Include="src\utils.ts" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

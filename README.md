@@ -20,9 +20,12 @@ A betting bot for [SaltyBet.com](http://saltybet.com)
 To install the git version of this extension:
 * Clone the repo:  
 `git clone https://github.com/synkarius/saltbot.git`
+* Make sure you have Node.js installed. It is available at https://nodejs.org/en/download/
+* Open the command line and go to the base of the project where the file package.json is located
+* Run "npm install" and then "npm run build"
 * Open chrome extension settings and enable developer mode
 * Click "load unpacked extension"
-* Navigate to the '/src/' folder and load it
+* Navigate to the '/dist/' folder and load it
 * Import the data and chromosome files
 * Select your preferred mode and settings and let it run.
 
@@ -30,6 +33,7 @@ To install the git version of this extension:
 
 To keep your version up to date simply:
 * Re-clone the git periodically
+* Run "npm install" and then "npm run build"
 * Open Chrome Extension settings and click "reload" on Saltbot
 * Reload saltybet.com and the twitch chat tab
 
