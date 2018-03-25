@@ -1,14 +1,14 @@
 declare function saveAs(data: Blob, filename?: string, disableAutoBOM?: boolean);
 var dirtyRecords = true;
 
-var Bettor = function (name) {
+var Bettor = function(name) {
 	this.name = name;
 	this.wins = 0;
 	this.losses = 0;
 	this.type = "U";
 };
 
-var Character = function (name) {
+var Character = function(name) {
 	this.name = name;
 	this.wins = [];
 	this.losses = [];
@@ -40,29 +40,30 @@ class MatchRecord {
 	}
 }
 
-var Updater = function () {
+var Updater = function() {
 
 };
-Updater.prototype.getCharAvgOdds = function (c) {
+Updater.prototype.getCharAvgOdds = function(c) {
 	var o = 0;
 	var i;
-	for (i = 0; i < c.odds.length; i++)
+	for (i = 0; i < c.odds.length; i++) {
 		o += c.odds[i];
+	}
 	i = (i > 0) ? i : 1;
 	return o / i;
 };
-Updater.prototype.getCharacter = function (cname, characterRecords, namesOfCharactersWhoAlreadyHaveRecords) {
+Updater.prototype.getCharacter = function(cname, characterRecords, namesOfCharactersWhoAlreadyHaveRecords) {
 	var cobject = null;
 	if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
 		cobject = new Character(cname);
-		binaryInsertByProperty(cobject, characterRecords, 'name');
+		binaryInsertByProperty(cobject, characterRecords, "name");
 		namesOfCharactersWhoAlreadyHaveRecords.push(cname);
 	} else {
-		cobject = characterRecords[binarySearchByProperty({name: cname}, characterRecords, 'name')];
+		cobject = characterRecords[binarySearchByProperty({name: cname}, characterRecords, "name")];
 	}
 	return cobject;
 };
-Updater.prototype.getBettor = function (bname, bettorRecords, namesOfBettorsWhoAlreadyHaveRecords) {
+Updater.prototype.getBettor = function(bname, bettorRecords, namesOfBettorsWhoAlreadyHaveRecords) {
 	var bobject = null;
 	if (namesOfBettorsWhoAlreadyHaveRecords.indexOf(bname) == -1) {
 		bobject = new Bettor(bname);
@@ -81,19 +82,23 @@ Updater.prototype.getBettor = function (bname, bettorRecords, namesOfBettorsWhoA
 Updater.prototype.updateBettorsFromMatch = function(mObj: MatchRecord, bc1, bc2) {
 	const c1Won = (mObj.w === 0);
 	for (var i = 0; i < bc1.length; i++) {
-		if (c1Won)
+		if (c1Won) {
 			bc1[i].wins += 1;
-		else
+		}
+		else {
 			bc1[i].losses += 1;
+		}
 	}
 	for (var j = 0; j < bc2.length; j++) {
-		if (!c1Won)
+		if (!c1Won) {
 			bc2[j].wins += 1;
-		else
+		}
+		else {
 			bc2[j].losses += 1;
+		}
 	}
 };
-Updater.prototype.updateCharactersFromMatch = function (mObj: MatchRecord, c1Obj, c2Obj) {
+Updater.prototype.updateCharactersFromMatch = function(mObj: MatchRecord, c1Obj, c2Obj) {
 	var rememberRecordsLast = 15;  // changing this requires re-importing matches.
 	// wins, losses, and times
 	if (mObj.w === 0) {
@@ -114,7 +119,7 @@ Updater.prototype.updateCharactersFromMatch = function (mObj: MatchRecord, c1Obj
 		c2Obj.totalFights.push(1);
 	}
 
-	const limitRecordsTo = function (charObj, limit) {
+	const limitRecordsTo = function(charObj, limit) {
 		if (charObj.totalFights.length > limit) {
 			if (charObj.totalFights[0] == 0) {
 				charObj.losses.shift();
@@ -277,8 +282,8 @@ var ir = function(f: string) {
 	});
 };
 
-var ec = function () {
-	chrome.storage.local.get(["chromosomes_v1"], function (results) {
+var ec = function() {
+	chrome.storage.local.get(["chromosomes_v1"], function(results) {
 		if (results.chromosomes_v1 && results.chromosomes_v1.length > 0) {
 			var chromosome = new Chromosome();
 			chromosome = chromosome.loadFromObject(results.chromosomes_v1[0]);
@@ -289,7 +294,7 @@ var ec = function () {
 
 			var time = new Date();
 			var blobM = new Blob(lines, {
-				type: "text/plain;charset=utf-8"
+				type: "text/plain;charset=utf-8",
 			});
 			var timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
 			saveAs(blobM, "chromosome--" + timeStr + ".txt");
@@ -300,7 +305,7 @@ var ec = function () {
 	});
 };
 
-var ic = function (f) {
+var ic = function(f) {
 	const chromosome = new Chromosome();
 	try {
 		chromosome.loadFromJSON(f);
@@ -311,7 +316,7 @@ var ic = function (f) {
 	}
 
 	//get the chromosomes currently saved in the list
-	chrome.storage.local.get(["chromosomes_v1"], function (results) {
+	chrome.storage.local.get(["chromosomes_v1"], function(results) {
 		var chromosomes = results.chromosomes_v1;
 		if (chromosomes) {
 			chromosomes[0] = chromosome;
@@ -321,12 +326,11 @@ var ic = function (f) {
 		}
 		chrome.storage.local.set({
 			chromosomes_v1: chromosomes,
-		}, function () {
+		}, function() {
 			console.log("- Chromosome imported successfully.");
 			displayDialogMessage("Chromosome imported successfully.");
 		});
 	});
-
 
 };
 

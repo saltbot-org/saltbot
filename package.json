@@ -11,6 +11,9 @@
     "url": "git+https://github.com/synkarius/saltbot.git"
   },
   "author": "David Conway",
+  "contributors": [
+    { "name" : "Stefan Berger"}
+  ],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/synkarius/saltbot/issues"

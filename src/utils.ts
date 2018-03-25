@@ -1,7 +1,7 @@
 function binaryInsertByProperty(value, array: any[], propertyToSort: string, start: number = 0, end: number = array.length - 1): void {
 
-	let length: number = array.length;
-	let m: number = start + Math.floor((end - start) / 2);
+	const length: number = array.length;
+	const m: number = start + Math.floor((end - start) / 2);
 
 	if (length == 0) {
 		array.push(value);
@@ -37,8 +37,8 @@ function binaryInsertByProperty(value, array: any[], propertyToSort: string, sta
 
 function binarySearchByProperty(value, array: any[], propertyToSort: string, start: number = 0, end: number = array.length - 1): number {
 
-	let length : number = array.length;
-	let m : number = start + Math.floor((end - start) / 2);
+	const length: number = array.length;
+	const m: number = start + Math.floor((end - start) / 2);
 
 	if (length == 0) {
 		return -1;

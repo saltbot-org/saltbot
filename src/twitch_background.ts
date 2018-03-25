@@ -51,7 +51,7 @@ let reimportMatches = function() {
 		getAllRequest.onsuccess = function() {
 			updateCharacters(getAllRequest.result);
 		};
-	}
+	};
 };
 
 chrome.runtime.onInstalled.addListener(function() {
