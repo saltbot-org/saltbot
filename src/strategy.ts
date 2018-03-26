@@ -27,8 +27,8 @@ Strategy.prototype.getBailout = function(tournament) {
 	const rank = $("#rank")[0];
 	if (rank !== null && rank.childNodes.length !== 0) {
 		const re = /rank([0-9]{1,2})\.png/g;
-		var match = re.exec((rank.childNodes[0] as HTMLImageElement).src);
-		      level = parseInt(match[1]);
+		const match = re.exec((rank.childNodes[0] as HTMLImageElement).src);
+        level = parseInt(match[1]);
 	}
 
 	if (isIlluminati) {
@@ -299,7 +299,7 @@ Chromosome.prototype.normalize = function() {
 	//if (lowest<0){
 	lowest -= lowValueControl;	// extra sum for near zero prevention.
 	//}
-	for (var e01 in this) {
+	for (const e01 in this) {
 		if (this.hasOwnProperty(e01)) {
 			this[e01] -= lowest;
 		}
@@ -307,7 +307,7 @@ Chromosome.prototype.normalize = function() {
 	// nerf very highest. A constant dampening.
 	var highest = 0;
 	var highIndex = null;
-	for (var e0 in this) {
+	for (const e0 in this) {
 		if (this.hasOwnProperty(e0)) {
 			const high = Number(this[e0]);
 			if (high > highest) {
@@ -517,8 +517,8 @@ ConfidenceScore.prototype.execute = function(info) {
 	const winsPTemper = 0.5;
 	const c1WT = c1Stats.wins + c1Stats.losses;
 	const c2WT = c2Stats.wins + c2Stats.losses;
- var c1WP = (c1WT !== 0) ? c1Stats.wins / c1WT : 0;
- var c2WP = (c2WT !== 0) ? c2Stats.wins / c2WT : 0;
+ const c1WP = (c1WT !== 0) ? c1Stats.wins / c1WT : 0;
+ const c2WP = (c2WT !== 0) ? c2Stats.wins / c2WT : 0;
 
  const wpTotal = c1Stats.wins + c2Stats.wins;
  const c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
@@ -622,7 +622,7 @@ ConfidenceScore.prototype.execute = function(info) {
 	// figure out prediction, confidence
 	this.prediction = (c1Score > c2Score) ? c1.name : c2.name;
 
-	var winnerPoints = (this.prediction ===  c1.name) ? c1Score : c2Score;
+	const winnerPoints = (this.prediction ===  c1.name) ? c1Score : c2Score;
 	const totalAvailablePoints = c1Score + c2Score;
 	this.confidence = ((winnerPoints / totalAvailablePoints)).toFixed(4);
 
