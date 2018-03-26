@@ -70,7 +70,7 @@ Updater.prototype.getBettor = function(bname, bettorRecords, namesOfBettorsWhoAl
 		bettorRecords.push(bobject);
 		namesOfBettorsWhoAlreadyHaveRecords.push(bname);
 	} else {
-		for (var k = 0; k < bettorRecords.length; k++) {
+		for (let k = 0; k < bettorRecords.length; k++) {
 			if (bname == bettorRecords[k].name) {
 				bobject = bettorRecords[k];
 				break;
@@ -81,7 +81,7 @@ Updater.prototype.getBettor = function(bname, bettorRecords, namesOfBettorsWhoAl
 };
 Updater.prototype.updateBettorsFromMatch = function(mObj: MatchRecord, bc1, bc2) {
 	const c1Won = (mObj.w === 0);
-	for (var i = 0; i < bc1.length; i++) {
+	for (let i = 0; i < bc1.length; i++) {
 		if (c1Won) {
 			bc1[i].wins += 1;
 		}
@@ -89,7 +89,7 @@ Updater.prototype.updateBettorsFromMatch = function(mObj: MatchRecord, bc1, bc2)
 			bc1[i].losses += 1;
 		}
 	}
-	for (var j = 0; j < bc2.length; j++) {
+	for (let j = 0; j < bc2.length; j++) {
 		if (!c1Won) {
 			bc2[j].wins += 1;
 		}
@@ -99,7 +99,7 @@ Updater.prototype.updateBettorsFromMatch = function(mObj: MatchRecord, bc1, bc2)
 	}
 };
 Updater.prototype.updateCharactersFromMatch = function(mObj: MatchRecord, c1Obj, c2Obj) {
-	var rememberRecordsLast = 15;  // changing this requires re-importing matches.
+	const rememberRecordsLast = 15;  // changing this requires re-importing matches.
 	// wins, losses, and times
 	if (mObj.w === 0) {
 		c1Obj.wins.push(mObj.t);
@@ -121,7 +121,7 @@ Updater.prototype.updateCharactersFromMatch = function(mObj: MatchRecord, c1Obj,
 
 	const limitRecordsTo = function(charObj, limit) {
 		if (charObj.totalFights.length > limit) {
-			if (charObj.totalFights[0] == 0) {
+			if (charObj.totalFights[0] === 0) {
 				charObj.losses.shift();
 				charObj.lossTimes.shift();
 			}
@@ -144,8 +144,8 @@ Updater.prototype.updateCharactersFromMatch = function(mObj: MatchRecord, c1Obj,
 
 	// this.tiers will correspond with the odds
 	if (mObj.o != null && mObj.o !== "U") {
-		var oc1 = Number(mObj.o.split(":")[0]);
-		var oc2 = Number(mObj.o.split(":")[1]);
+		const oc1 = Number(mObj.o.split(":")[0]);
+		const oc2 = Number(mObj.o.split(":")[1]);
 		c1Obj.odds.push(oc1 / oc2);
 		c2Obj.odds.push(oc2 / oc1);
 	} else {
@@ -211,8 +211,6 @@ var er = async function() {
 		const timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
 		saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
 	});
-
-	
 };
 
 var ir = function(f: string) {
@@ -291,18 +289,18 @@ var ir = function(f: string) {
 var ec = function() {
 	chrome.storage.local.get(["chromosomes_v1"], function(results) {
 		if (results.chromosomes_v1 && results.chromosomes_v1.length > 0) {
-			var chromosome = new Chromosome();
+			let chromosome = new Chromosome();
 			chromosome = chromosome.loadFromObject(results.chromosomes_v1[0]);
-			var lines = JSON.stringify(chromosome, null, "\t").split("\n");
-			for (var i = 0; i < lines.length; ++i) {
+			const lines = JSON.stringify(chromosome, null, "\t").split("\n");
+			for (let i = 0; i < lines.length; ++i) {
 				lines[i] += "\n";
 			}
 
-			var time = new Date();
-			var blobM = new Blob(lines, {
+			const time = new Date();
+			const blobM = new Blob(lines, {
 				type: "text/plain;charset=utf-8",
 			});
-			var timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+			const timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
 			saveAs(blobM, "chromosome--" + timeStr + ".txt");
 		}
 		else {

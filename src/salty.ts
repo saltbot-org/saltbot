@@ -49,7 +49,7 @@ var StatusScanner = function() {
 	this.getWinner = function() {
 		const recent = self.getAnnouncements();
 		recent.reverse();
-		for (var i = 0; i < recent.length; i++) {
+		for (let i = 0; i < recent.length; i++) {
 			if (recent[i].indexOf(winIndicator) > -1) {
 				return recent[i].split(winIndicator)[0];
 			}
@@ -616,11 +616,11 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 						const crowdC2 = $(betsForC2).find(".bettor-line");
 						self.bettorsC1 = [];
 						self.bettorsC2 = [];
-						for (var i = 0; i < crowdC1.length; i++) {
+						for (let i = 0; i < crowdC1.length; i++) {
 							const e = $(crowdC1[i]).find("strong")[0];
 							self.bettorsC1.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
-						for (var j = 0; j < crowdC2.length; j++) {
+						for (let j = 0; j < crowdC2.length; j++) {
 							const e = $(crowdC2[j]).find("strong")[0];
 							self.bettorsC2.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}

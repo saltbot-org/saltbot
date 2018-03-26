@@ -427,7 +427,7 @@ var CSStats = function(cObj, chromosome) {
 		this.losses += chromosome["l" + loss];
 	}
 
-	for (var i = 0; i < cObj.odds.length; i++) {
+	for (let i = 0; i < cObj.odds.length; i++) {
 		if (cObj.odds[i] >= 0) {
 			oddsSum += cObj.odds[i] * chromosome["o" + cObj.tiers[i]];
 			oddsCount += 1;
@@ -435,7 +435,7 @@ var CSStats = function(cObj, chromosome) {
 	}
 	this.averageOdds = (oddsCount !== 0) ? oddsSum / oddsCount : null;
 	//
-	for (var j = 0; j < cObj.winTimes.length; j++) {
+	for (let j = 0; j < cObj.winTimes.length; j++) {
 		if (cObj.winTimes[j] !== 0) {
 			winTimesTotal += cObj.winTimes[j] * chromosome["wt" + cObj.wins[j]];
 			winTimesTotalRaw += cObj.winTimes[j];
@@ -445,7 +445,7 @@ var CSStats = function(cObj, chromosome) {
 	this.averageWinTime = (winTimesTotal !== 0) ? winTimesTotal / timedWonMatchesCount : null;
 	this.averageWinTimeRaw = (winTimesTotal !== 0) ? winTimesTotalRaw / timedWonMatchesCount : null;
 
-	for (var k = 0; k < cObj.lossTimes.length; k++) {
+	for (let k = 0; k < cObj.lossTimes.length; k++) {
 		if (cObj.winTimes[k] !== 0) {
 			lossTimesTotal += cObj.lossTimes[k] * chromosome["lt" + cObj.losses[k]];
 			lossTimesTotalRaw += cObj.lossTimes[k];

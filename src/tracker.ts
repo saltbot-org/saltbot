@@ -161,9 +161,6 @@ Match.prototype.init = function() {
 				}, (Math.floor(Math.random() * baseSeconds * 2) + baseSeconds));
 			}
 		});
-
-		
-
 	});
 };
 Match.prototype.setAggro = function(aggro) {
