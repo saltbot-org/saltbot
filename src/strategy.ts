@@ -25,7 +25,7 @@ Strategy.prototype.getBailout = function(tournament) {
 	}
 	var level = 0;
 	var rank = $("#rank")[0];
-	if (rank != null && rank.childNodes.length != 0) {
+	if (rank !== null && rank.childNodes.length !== 0) {
 		var re = /rank([0-9]{1,2})\.png/g;
 		var match = re.exec((rank.childNodes[0] as HTMLImageElement).src);
 		      level = parseInt(match[1]);
@@ -120,7 +120,7 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 			if (allIn) {
 				console.log("- ALL IN: " + balance);
 			}
-			else if (bailoutMessage != 0) {
+			else if (bailoutMessage !== 0) {
 				console.log("- amount is less than bailout (" + bailoutMessage + "), betting bailout: " + amountToBet);
 								}
 			else if (this.confidence) {
@@ -198,7 +198,7 @@ RatioConfidence.prototype.execute = function(info) {
 	var c1Ratio = (c1TotalMatches) ? c1.wins.length / c1TotalMatches : 0;
 	var c2Ratio = (c2TotalMatches) ? c2.wins.length / c2TotalMatches : 0;
 
-	if (c1Ratio != c2Ratio) {
+	if (c1Ratio !== c2Ratio) {
 		c1.ratio = c1Ratio;
 		c2.ratio = c2Ratio;
 		var pChar = (c1.ratio > c2.ratio) ? c1 : c2;
@@ -350,7 +350,7 @@ Chromosome.prototype.loadFromObject = function(obj) {
 Chromosome.prototype.toDisplayString = function() {
 	var results = "-\nchromosome:";
 	for (var i in this) {
-		if (typeof this[i] != "function") {
+		if (typeof this[i] !== "function") {
 			results += "\n" + i + " : " + this[i];
 		}
 	}
@@ -363,14 +363,14 @@ Chromosome.prototype.mate = function(other) {
 	var mutationChance = 0.08;	// range [0,1]
 	var smallVal = 0.000001;
 	for (var i in offspring) {
-		if (typeof offspring[i] != "function") {
+		if (typeof offspring[i] !== "function") {
 			offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
 			var radiation = (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
 			if (Math.abs(change) < smallVal) {
 				change = smallVal;
 			}
-			if ((Math.random() < mutationChance) && (offspring[i] != null)) {
+			if ((Math.random() < mutationChance) && (offspring[i] !== null)) {
 				offspring[i] += change;
 			}
 			if (Math.abs(offspring[i]) < smallVal) {
@@ -385,8 +385,8 @@ Chromosome.prototype.mate = function(other) {
 Chromosome.prototype.equals = function(other) {
 	var anyDifference = false;
 	for (var i in other) {
-		if (typeof other[i] != "function") {
-			if (this[i] != other[i]) {
+		if (typeof other[i] !== "function") {
+			if (this[i] !== other[i]) {
 				anyDifference = true;
 		}
 			}
@@ -429,27 +429,27 @@ var CSStats = function(cObj, chromosome) {
 			oddsCount += 1;
 		}
 	}
-	this.averageOdds = (oddsCount != 0) ? oddsSum / oddsCount : null;
+	this.averageOdds = (oddsCount !== 0) ? oddsSum / oddsCount : null;
 	//
 	for (var j = 0; j < cObj.winTimes.length; j++) {
-		if (cObj.winTimes[j] != 0) {
+		if (cObj.winTimes[j] !== 0) {
 			winTimesTotal += cObj.winTimes[j] * chromosome["wt" + cObj.wins[j]];
 			winTimesTotalRaw += cObj.winTimes[j];
 			timedWonMatchesCount += 1;
 		}
 	}
-	this.averageWinTime = (winTimesTotal != 0) ? winTimesTotal / timedWonMatchesCount : null;
-	this.averageWinTimeRaw = (winTimesTotal != 0) ? winTimesTotalRaw / timedWonMatchesCount : null;
+	this.averageWinTime = (winTimesTotal !== 0) ? winTimesTotal / timedWonMatchesCount : null;
+	this.averageWinTimeRaw = (winTimesTotal !== 0) ? winTimesTotalRaw / timedWonMatchesCount : null;
 
 	for (var k = 0; k < cObj.lossTimes.length; k++) {
-		if (cObj.winTimes[k] != 0) {
+		if (cObj.winTimes[k] !== 0) {
 			lossTimesTotal += cObj.lossTimes[k] * chromosome["lt" + cObj.losses[k]];
 			lossTimesTotalRaw += cObj.lossTimes[k];
 			timedLostMatchesCount += 1;
 		}
 	}
-	this.averageLossTime = (lossTimesTotal != 0) ? lossTimesTotal / timedLostMatchesCount : null;
-	this.averageLossTimeRaw = (lossTimesTotal != 0) ? lossTimesTotalRaw / timedLostMatchesCount : null;
+	this.averageLossTime = (lossTimesTotal !== 0) ? lossTimesTotal / timedLostMatchesCount : null;
+	this.averageLossTimeRaw = (lossTimesTotal !== 0) ? lossTimesTotalRaw / timedLostMatchesCount : null;
 
 	// expert opinion section
 	if (cObj.crowdFavor.length > 0) {
@@ -517,8 +517,8 @@ ConfidenceScore.prototype.execute = function(info) {
 	var winsPTemper = 0.5;
 	var c1WT = c1Stats.wins + c1Stats.losses;
 	var c2WT = c2Stats.wins + c2Stats.losses;
- var c1WP = (c1WT != 0) ? c1Stats.wins / c1WT : 0;
- var c2WP = (c2WT != 0) ? c2Stats.wins / c2WT : 0;
+ var c1WP = (c1WT !== 0) ? c1Stats.wins / c1WT : 0;
+ var c2WP = (c2WT !== 0) ? c2Stats.wins / c2WT : 0;
 
  var wpTotal = c1Stats.wins + c2Stats.wins;
  var c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
@@ -540,7 +540,7 @@ ConfidenceScore.prototype.execute = function(info) {
 				c2Score += winPercentageWeight * 0.5;
 	}
 
-	if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
+	if (c1Stats.averageOdds !== null && c2Stats.averageOdds !== null) {
 		if (c1Stats.averageOdds > c2Stats.averageOdds) {
 			c1Score += oddsWeight;
 		}
@@ -549,7 +549,7 @@ ConfidenceScore.prototype.execute = function(info) {
 		}
 	}
 
-	if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null) {
+	if (c1Stats.averageWinTime !== null && c2Stats.averageWinTime !== null) {
 		if (c1Stats.averageWinTime < c2Stats.averageWinTime) {
 			c1Score += timeAveWinWeight / 2;
 		}
@@ -559,7 +559,7 @@ ConfidenceScore.prototype.execute = function(info) {
 		if (this.debug) { timeMessage = "avg win time (red:blue) -> (" + formatString(c1Stats.averageWinTimeRaw.toFixed(0) + " : " + c2Stats.averageWinTimeRaw.toFixed(0), messagelength) + ")"; }
 	}
 
-	if (c1Stats.averageLossTime != null && c2Stats.averageLossTime != null) {
+	if (c1Stats.averageLossTime !== null && c2Stats.averageLossTime !== null) {
 		if (c1Stats.averageLossTime > c2Stats.averageLossTime) {
 			c1Score += timeAveLoseWeight / 2;
 		}
@@ -577,7 +577,7 @@ ConfidenceScore.prototype.execute = function(info) {
 		}
 	}
 
-	if (c1Stats.cfPercent != null && c2Stats.cfPercent != null) {
+	if (c1Stats.cfPercent !== null && c2Stats.cfPercent !== null) {
 		if (c1Stats.cfPercent > c2Stats.cfPercent) {
 			c1Score += crowdFavorWeight;
 		}
@@ -590,7 +590,7 @@ ConfidenceScore.prototype.execute = function(info) {
 		}
 	}
 
-	if (c1Stats.ifPercent != null && c2Stats.ifPercent != null) {
+	if (c1Stats.ifPercent !== null && c2Stats.ifPercent !== null) {
 		if (c1Stats.ifPercent > c2Stats.ifPercent) {
 			c1Score += illumFavorWeight;
 		}
@@ -638,7 +638,7 @@ ConfidenceScore.prototype.execute = function(info) {
 	}
 
 	// nerf the confidence if there is a reason
-	if (nerfAmount != 0) {
+	if (nerfAmount !== 0) {
 		if (this.debug) {
 			console.log(nerfMsg + "\n--> dropping confidence by " + (nerfAmount * 100).toFixed(0) + "%");
 		}
