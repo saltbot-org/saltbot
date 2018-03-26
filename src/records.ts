@@ -54,7 +54,7 @@ Updater.prototype.getCharAvgOdds = function(c) {
 };
 Updater.prototype.getCharacter = function(cname, characterRecords, namesOfCharactersWhoAlreadyHaveRecords) {
 	var cobject = null;
-	if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) == -1) {
+	if (namesOfCharactersWhoAlreadyHaveRecords.indexOf(cname) === -1) {
 		cobject = new Character(cname);
 		binaryInsertByProperty(cobject, characterRecords, "name");
 		namesOfCharactersWhoAlreadyHaveRecords.push(cname);
@@ -65,13 +65,13 @@ Updater.prototype.getCharacter = function(cname, characterRecords, namesOfCharac
 };
 Updater.prototype.getBettor = function(bname, bettorRecords, namesOfBettorsWhoAlreadyHaveRecords) {
 	var bobject = null;
-	if (namesOfBettorsWhoAlreadyHaveRecords.indexOf(bname) == -1) {
+	if (namesOfBettorsWhoAlreadyHaveRecords.indexOf(bname) === -1) {
 		bobject = new Bettor(bname);
 		bettorRecords.push(bobject);
 		namesOfBettorsWhoAlreadyHaveRecords.push(bname);
 	} else {
 		for (let k = 0; k < bettorRecords.length; k++) {
-			if (bname == bettorRecords[k].name) {
+			if (bname === bettorRecords[k].name) {
 				bobject = bettorRecords[k];
 				break;
 			}
