@@ -23,11 +23,11 @@ var Settings = function() {
 };
 
 var StatusScanner = function() {
-	var self = this;
+	const self = this;
 	this.announcements = [];
 	// find element and create an observer instance
-	var status = $("#betstatus")[0];
-	var observer = new MutationObserver(function(mutations) {
+	const status = $("#betstatus")[0];
+	const observer = new MutationObserver(function(mutations) {
 		self.announcements.push(status.innerHTML);
 		// console.log("- status bar updated: " + status.innerHTML);
 		observer.takeRecords();
@@ -37,17 +37,17 @@ var StatusScanner = function() {
 		childList: true,
 		attributes: true,
 	});
-	var winIndicator = " wins";
+	const winIndicator = " wins";
 
 	this.getAnnouncements = function(preserve) {
-		var copy = self.announcements.slice(0);
+		const copy = self.announcements.slice(0);
 		if (!preserve) {
 			self.announcements = [];
 		}
 		return copy;
 	};
 	this.getWinner = function() {
-		var recent = self.getAnnouncements();
+		const recent = self.getAnnouncements();
 		recent.reverse();
 		for (var i = 0; i < recent.length; i++) {
 			if (recent[i].indexOf(winIndicator) > -1) {
@@ -62,7 +62,7 @@ var Controller = function() {
 	var bettingAvailable = false;
 	var bettingEntered = false;
 	var bettingComplete = true;
-	var matchesBeforeReset = 100;
+	const matchesBeforeReset = 100;
 	var matchesProcessed = 0;
 	this.currentMatch = null;
 	this.statusScanner = new StatusScanner();
@@ -73,8 +73,8 @@ var Controller = function() {
 	this.crowdFavor = 2;
 	this.illumFavor = 2;
 	var attemptsToProcess = 0;
-	var maxAttempts = 3;
-	var timerInterval = 3000;
+	const maxAttempts = 3;
+	const timerInterval = 3000;
 	this.ticksSinceMatchBegan = -999;
 	this.bestChromosome = null;
 	this.nextStrategy = "o";
@@ -87,9 +87,9 @@ var Controller = function() {
 	this.characters_v1 = [];
 	this.bettors_v1 = [];
 
-	var self = this;
+	const self = this;
 
-	var debugMode = true;
+	const debugMode = true;
 
 	setInterval(function() {
 		if (!self.settings) {
@@ -99,8 +99,8 @@ var Controller = function() {
 		self.ticksSinceMatchBegan += 1;
 
 		//check to see if the betting buttons are visible and the footer message already changed
-		var bettingTable = $(".dynamic-view")[0];
-		var styleObj = window.getComputedStyle(bettingTable, null);
+		const bettingTable = $(".dynamic-view")[0];
+		const styleObj = window.getComputedStyle(bettingTable, null);
 		bettingAvailable = styleObj.display !== "none" && $("#footer-alert")[0].innerHTML !== self.lastFooterMessage;
 
 		if (bettingAvailable && bettingComplete) {
@@ -134,10 +134,10 @@ var Controller = function() {
 						ticks: self.ticksSinceMatchBegan,
 						interval: timerInterval,
 					}, self.crowdFavor, self.illumFavor);
-					var records = self.currentMatch.getRecords(winner);
-					var mr = records[0];
-					var c1 = records[1];
-					var c2 = records[2];
+					const records = self.currentMatch.getRecords(winner);
+					const mr = records[0];
+					const c1 = records[1];
+					const c2 = records[2];
 
 					console.log("- match result code: " + "c1:" + mr.c1 + "|c2:" + mr.c2 + "|w:" + mr.w + "|s:" + mr.sn + "|p:" + mr.pw + "|t:" + mr.t + "|m:" + mr.m + "|o:" + mr.o + "|t:" + mr.ts);
 
@@ -256,7 +256,7 @@ var Controller = function() {
 					level = self.currentMatch.strategy.level;
 				} else {
 					// get amount for first match
-					var nullMatch = new Match(new Strategy("nullStrat"));
+					const nullMatch = new Match(new Strategy("nullStrat"));
 					nullMatch.strategy.adjustLevel(nullMatch.getBalance());
 					level = nullMatch.strategy.level;
 				}
