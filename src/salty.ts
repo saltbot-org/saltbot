@@ -471,7 +471,7 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 	ctrl = new Controller();
 	ctrl.ensureTwitch();
 	chrome.storage.local.get(["settings_v1"], function(results) {
-		var self = ctrl;
+		const self = ctrl;
 		if (results.settings_v1) {
 			self.settings = results.settings_v1;
 			if (!self.settings.video) {
@@ -505,12 +505,12 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 
 	});
 	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-		var self = ctrl;
+		const self = ctrl;
 		// console.log("-\nmessage from Waifu:\t" + message);
 		if (typeof message === "string") {
-			var winMessageIndicator = " wins";
-			var newMatchIndicator = "Bets are OPEN for ";
-			var betsLockedIndicator = "Bets are locked";
+			const winMessageIndicator = " wins";
+			const newMatchIndicator = "Bets are OPEN for ";
+			const betsLockedIndicator = "Bets are locked";
 
 			//check for new match
 			if (message.indexOf(newMatchIndicator) > -1) {
@@ -519,10 +519,10 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 				// Bets are OPEN for Valdoll vs Adam! (A Tier) tournament bracket
 				//Bets are OPEN for Team RyokoAndHerTrainingPartner vs Team Aliens! (S / S Tier) (Requested by Pendaflex) (exhibitions) www.saltybet.com
 				//Bets are OPEN for Geegus vs Chris! (Requested by Yajirobe) (exhibitions) <a href="http://www.saltybet.com" target="_blank">www.saltybet.com</a>
-				var regex = /(?:Bets are OPEN for )(.*)(?: vs )(.*)(?:! \()(X|S|A|B|P|NEW)(?: Tier\))(.*)/g;
+				const regex = /(?:Bets are OPEN for )(.*)(?: vs )(.*)(?:! \()(X|S|A|B|P|NEW)(?: Tier\))(.*)/g;
 				var matches = regex.exec(message);
 				if (matches === null) {
-					var regexLoose = /(?:Bets are OPEN for )(.*)(?: vs )(.*)!(.*)/g;
+					const regexLoose = /(?:Bets are OPEN for )(.*)(?: vs )(.*)!(.*)/g;
 					matches = regexLoose.exec(message);
 					matches.push(matches[3]);
 
@@ -563,19 +563,19 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 				setTimeout(function() {
 					//save the odds
 					try {
-						var oddsBox = $("#lastbet")[0];
+						const oddsBox = $("#lastbet")[0];
 						// var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
-						var c1Odds = (oddsBox.childNodes[oddsBox.childNodes.length - 3] as HTMLElement).innerHTML;
-						var c2Odds = (oddsBox.childNodes[oddsBox.childNodes.length - 1] as HTMLElement).innerHTML;
+						const c1Odds = (oddsBox.childNodes[oddsBox.childNodes.length - 3] as HTMLElement).innerHTML;
+						const c2Odds = (oddsBox.childNodes[oddsBox.childNodes.length - 1] as HTMLElement).innerHTML;
 						self.odds = "" + c1Odds + ":" + c2Odds;
 					} catch (e) {
 						self.odds = null;
 					}
 					//save the betting totals
 					try {
-						var moneyText = $("#odds")[0].innerHTML.replace(/,/g, "");
+						const moneyText = $("#odds")[0].innerHTML.replace(/,/g, "");
 						var mtMatches = null;
-						var regex = /\$([0-9]*)/g;
+						const regex = /\$([0-9]*)/g;
 						if (regex.test(moneyText)) {
 							mtMatches = moneyText.match(regex);
 							self.lastMatchCumulativeBetTotal = parseInt(mtMatches[0].replace("$", "")) + parseInt(mtMatches[1].replace("$", ""));
@@ -587,13 +587,13 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 					}
 
 					// save the crowd favor and the illuminati favor
-					var betsForC1 = $("#sbettors1")[0];
-					var betsForC2 = $("#sbettors2")[0];
+					const betsForC1 = $("#sbettors1")[0];
+					const betsForC2 = $("#sbettors2")[0];
 					try {
-						var crowdSizeC1 = $(betsForC1).find(".bettor-line").length;
-						var crowdSizeC2 = $(betsForC2).find(".bettor-line").length;
-						var illumSizeC1 = $(betsForC1).find(".goldtext").length;
-						var illumSizeC2 = $(betsForC2).find(".goldtext").length;
+						const crowdSizeC1 = $(betsForC1).find(".bettor-line").length;
+						const crowdSizeC2 = $(betsForC2).find(".bettor-line").length;
+						const illumSizeC1 = $(betsForC1).find(".goldtext").length;
+						const illumSizeC2 = $(betsForC2).find(".goldtext").length;
 						if (crowdSizeC1 === crowdSizeC2) {
 							self.crowdFavor = 2;
 						}
@@ -612,8 +612,8 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 					}
 					// save bettor records
 					try {
-						var crowdC1 = $(betsForC1).find(".bettor-line");
-						var crowdC2 = $(betsForC2).find(".bettor-line");
+						const crowdC1 = $(betsForC1).find(".bettor-line");
+						const crowdC2 = $(betsForC2).find(".bettor-line");
 						self.bettorsC1 = [];
 						self.bettorsC2 = [];
 						for (var i = 0; i < crowdC1.length; i++) {
@@ -621,7 +621,7 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 							self.bettorsC1.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 						for (var j = 0; j < crowdC2.length; j++) {
-							var e = $(crowdC2[j]).find("strong")[0];
+							const e = $(crowdC2[j]).find("strong")[0];
 							self.bettorsC2.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 					} catch (e) {
@@ -641,11 +641,11 @@ window.addEventListener("beforeunload", function() {
 
 var prepareJQueryDialog = function() {
 	$('link[href="../css/jquery-ui-1.11.min.css"]').prop("disabled", true);
-	var link = '<link rel="stylesheet" type="text/css" href="' + chrome.extension.getURL("css/jquery-ui.css") + '">';
+	const link = '<link rel="stylesheet" type="text/css" href="' + chrome.extension.getURL("css/jquery-ui.css") + '">';
 	$("head").append(link);
 
-	var wrapper = document.getElementById("wrapper");
-	var messageDialogue = document.createElement("div");
+	const wrapper = document.getElementById("wrapper");
+	const messageDialogue = document.createElement("div");
 	messageDialogue.setAttribute("id", "dialog");
 	wrapper.appendChild(messageDialogue);
 
@@ -659,7 +659,7 @@ var prepareJQueryDialog = function() {
 				clearTimeout(dialogTimer);
 			}
 
-			var dia = $(this);
+			const dia = $(this);
 			dialogTimer = setTimeout(function() {
 				dia.dialog("close");
 			}, 5000);
@@ -670,7 +670,7 @@ var prepareJQueryDialog = function() {
 prepareJQueryDialog();
 
 var displayDialogMessage = function(message) {
-	var dialog = $("#dialog");
+	const dialog = $("#dialog");
 	dialog.html(message.replace(/\n/g, "<br />"));
 	dialog.dialog("open");
 };
