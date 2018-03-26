@@ -16,7 +16,7 @@ var Strategy = function(sn) {
 	this.lowBet = false;
 };
 Strategy.prototype.getBailout = function(tournament) {
-	var nameSpan = $("h2")[0].children[2];
+	const nameSpan = $("h2")[0].children[2];
 	var isIlluminati = false;
 	try { // the html is different for illuminati??
 		isIlluminati = nameSpan && nameSpan.children[0].classList && nameSpan.children[0].classList.contains("goldtext");
@@ -24,9 +24,9 @@ Strategy.prototype.getBailout = function(tournament) {
 		isIlluminati = nameSpan && nameSpan.classList && nameSpan.classList.contains("goldtext");
 	}
 	var level = 0;
-	var rank = $("#rank")[0];
+	const rank = $("#rank")[0];
 	if (rank !== null && rank.childNodes.length !== 0) {
-		var re = /rank([0-9]{1,2})\.png/g;
+		const re = /rank([0-9]{1,2})\.png/g;
 		var match = re.exec((rank.childNodes[0] as HTMLImageElement).src);
 		      level = parseInt(match[1]);
 	}
@@ -42,9 +42,9 @@ Strategy.prototype.getBailout = function(tournament) {
 						}
 };
 Strategy.prototype.flatBet = function(balance, debug) {
-	var flatAmount = 100;
-	var multiplierIndex = 2;
-	var intendedBet = flatAmount * this.levels[this.level][multiplierIndex] * this.confidence;
+	const flatAmount = 100;
+	const multiplierIndex = 2;
+	const intendedBet = flatAmount * this.levels[this.level][multiplierIndex] * this.confidence;
 
 	if (this.level ===  0) {
 		return balance;
@@ -58,10 +58,10 @@ Strategy.prototype.adjustLevel = function(balance) {
 		this.level = 0;
 	}
 	//this.levels = [[0, 1000, 0], [1000, 10000, 1], [10000, 100000, 10], [100000, 500000, 25], [500000, 1000000, 100], [1000000, 5000000, 250]];
-	var valley = 0;
-	var peak = 1;
-	var maxLv = this.levels.length - 1;
-	var minLv = 0;
+	const valley = 0;
+	const peak = 1;
+	const maxLv = this.levels.length - 1;
+	const minLv = 0;
 	var changed = false;
 	do {
 		changed = false;
@@ -79,17 +79,17 @@ Strategy.prototype.getWinner = function(ss) {
 	return ss.getWinner();
 };
 Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
-	var simBettingLimitScale = 0.1;
-	var lowBettingScale = 0.01;
-	var allowConfRescale = true;
-	var rangeConfidanceScale = [0.52, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
-	var rangeTourneyScale = [0.1, 0.45];			// range of tourney scale.
+	const simBettingLimitScale = 0.1;
+	const lowBettingScale = 0.01;
+	const allowConfRescale = true;
+	const rangeConfidanceScale = [0.52, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
+	const rangeTourneyScale = [0.1, 0.45];			// range of tourney scale.
 	if (!this.confidence) {
 		this.confidence = 1;
 	}
 
 	var amountToBet;
-	var bailout = this.getBailout(tournament);
+	const bailout = this.getBailout(tournament);
 
 	if (tournament) {
 		const allIn = ctrl.settings.allInTourney;
@@ -99,7 +99,7 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 		 (1 - this.confidence) * balance <= bailout;*/
 
 		var conf = (this.confidence || 0.5);
-		var confPrint = conf;
+		const confPrint = conf;
 		if (!allIn && allowConfRescale) {
 			conf = ( conf - rangeConfidanceScale[0] ) *
 				( rangeTourneyScale[1] - rangeTourneyScale[0] ) /
@@ -144,8 +144,8 @@ Strategy.prototype.getBetAmount = function(balance, tournament, debug) {
 			console.log("- betting: " + balance + " x .10 =(" + (balance * simBettingLimitScale) + ") x cf(" + (this.confidence * 100).toFixed(2) + "%) = " + amountToBet);
 									}
 	} else {
-		var p05 = Math.ceil(balance * lowBettingScale);
-		var cb = Math.ceil(balance * this.confidence);
+		const p05 = Math.ceil(balance * lowBettingScale);
+		const cb = Math.ceil(balance * this.confidence);
 		amountToBet = (p05 < cb) ? p05 : cb;
 		if (amountToBet < bailout) {
 			amountToBet = bailout;
@@ -168,8 +168,8 @@ var formatString = function(s, len) {
 };
 CoinToss.prototype = Object.create(Strategy.prototype);
 CoinToss.prototype.execute = function(info) {
-	var c1 = info.character1;
-	var c2 = info.character2;
+	const c1 = info.character1;
+	const c2 = info.character2;
 	this.prediction = (Math.random() > .5) ? c1.name : c2.name;
 	return this.prediction;
 };
@@ -180,11 +180,11 @@ var RatioConfidence = function() {
 };
 RatioConfidence.prototype = Object.create(Strategy.prototype);
 RatioConfidence.prototype.execute = function(info) {
-	var self = this;
-	var c1 = info.character1;
-	var c2 = info.character2;
-	var c1TotalMatches = c1.wins.length + c1.losses.length;
-	var c2TotalMatches = c2.wins.length + c2.losses.length;
+	const self = this;
+	const c1 = info.character1;
+	const c2 = info.character2;
+	const c1TotalMatches = c1.wins.length + c1.losses.length;
+	const c2TotalMatches = c2.wins.length + c2.losses.length;
 	var p;
 
 	if (c1TotalMatches < 3 || c2TotalMatches < 3) {
@@ -195,14 +195,14 @@ RatioConfidence.prototype.execute = function(info) {
 		self.lowBet = true;
 		return null;
 	}
-	var c1Ratio = (c1TotalMatches) ? c1.wins.length / c1TotalMatches : 0;
-	var c2Ratio = (c2TotalMatches) ? c2.wins.length / c2TotalMatches : 0;
+	const c1Ratio = (c1TotalMatches) ? c1.wins.length / c1TotalMatches : 0;
+	const c2Ratio = (c2TotalMatches) ? c2.wins.length / c2TotalMatches : 0;
 
 	if (c1Ratio !== c2Ratio) {
 		c1.ratio = c1Ratio;
 		c2.ratio = c2Ratio;
-		var pChar = (c1.ratio > c2.ratio) ? c1 : c2;
-		var npChar = (c1.ratio < c2.ratio) ? c1 : c2;
+		const pChar = (c1.ratio > c2.ratio) ? c1 : c2;
+		const npChar = (c1.ratio < c2.ratio) ? c1 : c2;
 		//confidence score
 		self.confidence = (pChar.name ===  c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
 		self.confidence += 0.5;
@@ -284,13 +284,13 @@ var Chromosome = function(): void {
 
 //
 Chromosome.prototype.normalize = function() {
-	var ratioDampen = 0.97;
-	var lowValueControl = 0.000001;
+	const ratioDampen = 0.97;
+	const lowValueControl = 0.000001;
 	// make weights > 0
 	var lowest = 0;
-	for (var e0 in this) {
+	for (const e0 in this) {
 		if (this.hasOwnProperty(e0)) {
-			var low = Number(this[e0]);
+			const low = Number(this[e0]);
 			if (low < lowest) {
 				lowest = low;
 			}
@@ -309,7 +309,7 @@ Chromosome.prototype.normalize = function() {
 	var highIndex = null;
 	for (var e0 in this) {
 		if (this.hasOwnProperty(e0)) {
-			var high = Number(this[e0]);
+			const high = Number(this[e0]);
 			if (high > highest) {
 				highest = high;
 				highIndex = e0;
@@ -322,12 +322,12 @@ Chromosome.prototype.normalize = function() {
 
 	// normalize
 	var sum = 0;
-	for (var el in this) {
+	for (const el in this) {
 		if (this.hasOwnProperty(el)) {
 			sum += Number(this[el]);
 		}
 	}
-	for (var el2 in this) {
+	for (const el2 in this) {
 		if (this.hasOwnProperty(el2)) {
 			this[el2] /= sum;
 		}
@@ -335,21 +335,21 @@ Chromosome.prototype.normalize = function() {
 };
 
 Chromosome.prototype.loadFromJSON = function(json) {
-	var copy = JSON.parse(json);
-	for (var i in copy) {
+	const copy = JSON.parse(json);
+	for (const i in copy) {
 		this[i] = Number(copy[i]);
 	}
 	return this;
 };
 Chromosome.prototype.loadFromObject = function(obj) {
-	for (var i in obj) {
+	for (const i in obj) {
 		this[i] = Number(obj[i]);
 	}
 	return this;
 };
 Chromosome.prototype.toDisplayString = function() {
 	var results = "-\nchromosome:";
-	for (var i in this) {
+	for (const i in this) {
 		if (typeof this[i] !== "function") {
 			results += "\n" + i + " : " + this[i];
 		}
@@ -357,15 +357,15 @@ Chromosome.prototype.toDisplayString = function() {
 	return results;
 };
 Chromosome.prototype.mate = function(other) {
-	var offspring = new Chromosome();
-	var parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
-	var mutationScale = 0.25;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
-	var mutationChance = 0.08;	// range [0,1]
-	var smallVal = 0.000001;
-	for (var i in offspring) {
+	const offspring = new Chromosome();
+	const parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
+	const mutationScale = 0.25;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
+	const mutationChance = 0.08;	// range [0,1]
+	const smallVal = 0.000001;
+	for (const i in offspring) {
 		if (typeof offspring[i] !== "function") {
 			offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
-			var radiation = (Math.random() - 0.5) * 2.0;
+			const radiation = (Math.random() - 0.5) * 2.0;
 			var change = offspring[i] * radiation * mutationScale;
 			if (Math.abs(change) < smallVal) {
 				change = smallVal;
@@ -384,7 +384,7 @@ Chromosome.prototype.mate = function(other) {
 // note, test equals for floats...
 Chromosome.prototype.equals = function(other) {
 	var anyDifference = false;
-	for (var i in other) {
+	for (const i in other) {
 		if (typeof other[i] !== "function") {
 			if (this[i] !== other[i]) {
 				anyDifference = true;
@@ -485,44 +485,44 @@ ConfidenceScore.prototype.getBetAmount = function(balance, tournament, debug) {
 };
 // find confidence by comparing current match's characters stats.
 ConfidenceScore.prototype.execute = function(info) {
-	var c1 = info.character1;
-	var c2 = info.character2;
+	const c1 = info.character1;
+	const c2 = info.character2;
 	//
-	var oddsWeight = this.chromosome.oddsWeight;
-	var timeAveWinWeight = this.chromosome.timeAveWin;
-	var timeAveLoseWeight = this.chromosome.timeAveLose;
-	var winPercentageWeight = this.chromosome.winPercentageWeight;
-	var crowdFavorWeight = this.chromosome.crowdFavorWeight;
-	var illumFavorWeight = this.chromosome.illumFavorWeight;
-	var totalWeight = oddsWeight + timeAveWinWeight + timeAveLoseWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
+	const oddsWeight = this.chromosome.oddsWeight;
+	const timeAveWinWeight = this.chromosome.timeAveWin;
+	const timeAveLoseWeight = this.chromosome.timeAveLose;
+	const winPercentageWeight = this.chromosome.winPercentageWeight;
+	const crowdFavorWeight = this.chromosome.crowdFavorWeight;
+	const illumFavorWeight = this.chromosome.illumFavorWeight;
+	const totalWeight = oddsWeight + timeAveWinWeight + timeAveLoseWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
 
 	// messages
-	var oddsMessage = null;
+	const oddsMessage = null;
 	var timeMessage = null;
 	var winsMessage = null;
 	var crwdMessage = null;
 	var ilumMessage = null;
-	var messagelength = 15;
+	const messagelength = 15;
 
 	// the weights come in from the chromosome
-	var scoreBase = 0.001;      // range (0,0.5], prevents over-confidence.
+	const scoreBase = 0.001;      // range (0,0.5], prevents over-confidence.
 	var c1Score = scoreBase;
 	var c2Score = scoreBase;
 
 	//
-	var c1Stats = new CSStats(c1, this.chromosome);
-	var c2Stats = new CSStats(c2, this.chromosome);
+	const c1Stats = new CSStats(c1, this.chromosome);
+	const c2Stats = new CSStats(c2, this.chromosome);
 
 	// wins
-	var winsPTemper = 0.5;
-	var c1WT = c1Stats.wins + c1Stats.losses;
-	var c2WT = c2Stats.wins + c2Stats.losses;
+	const winsPTemper = 0.5;
+	const c1WT = c1Stats.wins + c1Stats.losses;
+	const c2WT = c2Stats.wins + c2Stats.losses;
  var c1WP = (c1WT !== 0) ? c1Stats.wins / c1WT : 0;
  var c2WP = (c2WT !== 0) ? c2Stats.wins / c2WT : 0;
 
- var wpTotal = c1Stats.wins + c2Stats.wins;
- var c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
- var c2WPDisplay = wpTotal > 0 ? c2Stats.wins / wpTotal : 0;
+ const wpTotal = c1Stats.wins + c2Stats.wins;
+ const c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
+ const c2WPDisplay = wpTotal > 0 ? c2Stats.wins / wpTotal : 0;
  if (this.debug) {
 		winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> (" + (c1WPDisplay * 100).toFixed(0) + " : " + (c2WPDisplay * 100).toFixed(0) + ")" +
 			"  ::  unweighted (red W:L)(blue W:L) -> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")" +
@@ -530,7 +530,7 @@ ConfidenceScore.prototype.execute = function(info) {
 			"(" + c2.wins.toString().replace(/,/g, "") + ":" + c2.losses.toString().replace(/,/g, "") + ")";
 	}
 	// weight in win percent
-	var WPSum = c1WP + c2WP;
+	const WPSum = c1WP + c2WP;
 	if (WPSum > 0) {
 				c1Score += winPercentageWeight * c1WP / WPSum;
 				c2Score += winPercentageWeight * c2WP / WPSum;
@@ -567,7 +567,7 @@ ConfidenceScore.prototype.execute = function(info) {
 			c2Score += timeAveLoseWeight / 2;
 		}
 		if (this.debug) {
-			var msg = "  ::  avg loss time (red:blue) -> (" + formatString(c1Stats.averageLossTimeRaw.toFixed(0) + " : " + c2Stats.averageLossTimeRaw.toFixed(0), messagelength) + ")";
+			const msg = "  ::  avg loss time (red:blue) -> (" + formatString(c1Stats.averageLossTimeRaw.toFixed(0) + " : " + c2Stats.averageLossTimeRaw.toFixed(0), messagelength) + ")";
 			if (timeMessage) {
 				timeMessage += msg;
 			}
@@ -584,7 +584,7 @@ ConfidenceScore.prototype.execute = function(info) {
 		else if (c1Stats.cfPercent < c2Stats.cfPercent) {
 			c2Score += crowdFavorWeight;
 		}
-		var cfPercentTotal = c1Stats.cfPercent + c2Stats.cfPercent;
+		const cfPercentTotal = c1Stats.cfPercent + c2Stats.cfPercent;
 		if (this.debug) { crwdMessage = "crowd favor (red:blue) -> (" + formatString((c1Stats.cfPercent / cfPercentTotal * 100).toFixed(0) +
 				" : " + (c2Stats.cfPercent / cfPercentTotal * 100).toFixed(0), messagelength) + ")";
 		}
@@ -597,7 +597,7 @@ ConfidenceScore.prototype.execute = function(info) {
 		else if (c1Stats.ifPercent < c2Stats.ifPercent) {
 			c2Score += illumFavorWeight;
 							}
-		var ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
+		const ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
 		if (this.debug) { ilumMessage = "illuminati favor (red:blue) -> (" + formatString((c1Stats.ifPercent / ifPercentTotal * 100).toFixed(0) +
 				" : " + (c2Stats.ifPercent / ifPercentTotal * 100).toFixed(0), messagelength) + ")";
 		}
@@ -623,13 +623,13 @@ ConfidenceScore.prototype.execute = function(info) {
 	this.prediction = (c1Score > c2Score) ? c1.name : c2.name;
 
 	var winnerPoints = (this.prediction ===  c1.name) ? c1Score : c2Score;
-	var totalAvailablePoints = c1Score + c2Score;
+	const totalAvailablePoints = c1Score + c2Score;
 	this.confidence = ((winnerPoints / totalAvailablePoints)).toFixed(4);
 
 	/*---------------------------------------------------------------------------------------------------*/
 	// CONFIDENCE ADJUSTMENT SECTION
 	/*---------------------------------------------------------------------------------------------------*/
-	var nerfPoorScore = 0.66;
+	const nerfPoorScore = 0.66;
 	var nerfAmount = 0;
 	var nerfMsg = "-- PROBLEMS:";
 	if ((c1Score ===  c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3 || c1.wins.length ===  0 || c2.wins.length ===  0) {
