@@ -617,7 +617,7 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 						self.bettorsC1 = [];
 						self.bettorsC2 = [];
 						for (var i = 0; i < crowdC1.length; i++) {
-							var e = $(crowdC1[i]).find("strong")[0];
+							const e = $(crowdC1[i]).find("strong")[0];
 							self.bettorsC1.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 						for (var j = 0; j < crowdC2.length; j++) {
