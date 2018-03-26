@@ -28,7 +28,7 @@ Strategy.prototype.getBailout = function(tournament) {
 	if (rank !== null && rank.childNodes.length !== 0) {
 		const re = /rank([0-9]{1,2})\.png/g;
 		const match = re.exec((rank.childNodes[0] as HTMLImageElement).src);
-            level = parseInt(match[1]);
+			level = parseInt(match[1]);
 	}
 
 	if (isIlluminati) {
