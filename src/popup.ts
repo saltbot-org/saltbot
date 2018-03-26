@@ -205,7 +205,10 @@ Simulator.prototype.applyPenalties = function(c) {
 Simulator.prototype.evalMutations = function() {
 	const self = this;
 	chrome.storage.local.get(["characters_v1", "chromosomes_v1"], async function(results) {
-		const matches = await getMatchRecords();
+		let matches = [];
+		await chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(queryResult: MatchRecord[]) {
+			matches = queryResult;
+		});
 
 		if (matches.length === 0) {
 			console.log("No matches have been recorded yet.");

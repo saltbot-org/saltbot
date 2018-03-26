@@ -181,7 +181,11 @@ Updater.prototype.updateCharactersFromMatch = function(mObj: MatchRecord, c1Obj,
 
 var er = async function() {
 	const lines = [];
-	const matches = await getMatchRecords();
+	let matches = [];
+	await chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
+		matches = data;
+	});
+
 	for (const match of matches) {
 		var record = match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + ",";
 		record += (match.hasOwnProperty("t")) ? match.t : "U";
@@ -272,7 +276,7 @@ var ir = function(f: string) {
 	const ncr = characterRecords.length;
 	//All records have been rebuilt, so update them
 
-	setMatchRecords(matchRecords);
+	chrome.runtime.sendMessage({ data: matchRecords, query: "setMatchRecords" });
 	chrome.storage.local.set({
 		characters_v1: characterRecords,
 	}, function() {

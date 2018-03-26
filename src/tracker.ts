@@ -138,10 +138,15 @@ Match.prototype.init = function() {
 		self.character1 = (character1Index < 0) ? new Character(self.names[0]) : recs[character1Index];
 		self.character2 = (character2Index < 0) ? new Character(self.names[1]) : recs[character2Index];
 
+		let matches = [];
+		await chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
+			matches = data;
+		});
+
 		const prediction = self.strategy.execute({
 			character1: self.character1,
 			character2: self.character2,
-			matches: await getMatchRecords(),
+			matches,
 		});
 
 		if (prediction != null || self.strategy.lowBet) {

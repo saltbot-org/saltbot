@@ -14,12 +14,6 @@
     "eofline": false,
     "max-line-length": false,
     "no-bitwise":  false
-
-
-
-
-
-
   },
     "rulesDirectory": []
 }

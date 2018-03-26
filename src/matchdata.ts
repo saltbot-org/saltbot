@@ -20,7 +20,10 @@ jQuery.extend((jQuery.fn as any).dataTableExt.oSort, {
 });
 
 const loadMatches = async function() {
-	var matches: MatchRecord[] = await getMatchRecords();
+	let matches = [];
+	await chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
+		matches = data;
+	});
 
 	if (matches) {
 		const matchesMirrored = $.extend(true, [], matches);

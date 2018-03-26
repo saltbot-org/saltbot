@@ -150,7 +150,7 @@ var Controller = function() {
 						// self.best_chromosome=results.best_chromosome;
 
 						//store new match record
-						addMatchRecord(mr);
+						chrome.runtime.sendMessage({ data: mr, query: "addMatchRecord" });
 
 						//character records:
 						if (results.characters_v1) {

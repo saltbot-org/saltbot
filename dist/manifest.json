@@ -21,6 +21,7 @@
         "js/lib/jquery.min.js",
         "js/lib/jquery-ui.min.js",
         "js/lib/moment.min.js",
+        "js/lib/chrome-extension-async.js",
         "js/lib/idb.js",
         "js/utils.js",
         "js/records.js",
@@ -38,6 +39,7 @@
       "js": [
         "js/lib/jquery.min.js",
         "js/lib/moment.min.js",
+        "js/lib/chrome-extension-async.js",
         "js/lib/idb.js",
         "js/utils.js",
         "js/twitch_content.js"
@@ -48,6 +50,7 @@
 		"persistent": false,
     "scripts": [
       "js/lib/idb.js",
+      "js/lib/chrome-extension-async.js",
       "js/utils.js",
       "js/records.js",
       "js/twitch_background.js"

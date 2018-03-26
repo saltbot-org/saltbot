@@ -12,7 +12,9 @@
   },
   "author": "David Conway",
   "contributors": [
-    { "name" : "Stefan Berger"}
+    {
+      "name": "Stefan Berger"
+    }
   ],
   "license": "ISC",
   "bugs": {
@@ -20,17 +22,18 @@
   },
   "homepage": "https://github.com/synkarius/saltbot#readme",
   "dependencies": {
+    "chrome-extension-async": "^3.2.4",
     "datatables.net": "1.10.11",
     "datatables.net-dt": "1.10.11",
     "idb": "^2.1.1",
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1",
     "moment": "^2.19.3",
+    "npm": "^5.8.0",
     "tsify": "^3.0.4",
     "uniq": "^1.0.1"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.62",
     "@types/datatables.net": "^1.10.8",
     "@types/jquery": "^3.2.13",
     "@types/jqueryui": "^1.12.2",

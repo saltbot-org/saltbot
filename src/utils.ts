@@ -70,35 +70,3 @@ function binarySearchByProperty(value, array: any[], propertyToSort: string, sta
 
 	//we don't insert duplicates
 }
-
-async function getMatchRecords() {
-	const db = await idb.open("saltbot", 1);
-	const tx = await db.transaction("matches", "readonly");
-	const store = tx.objectStore("matches");
-
-	return await store.getAll();
-}
-
-async function setMatchRecords(matches: MatchRecord[]) {
-	const db = await idb.open("saltbot", 1);
-	const tx = await db.transaction("matches", "readwrite");
-	const store = tx.objectStore("matches");
-
-	if (matches) {
-		for (const match of matches) {
-			await store.put(match);
-		}
-	}
-}
-
-function addMatchRecord(match: MatchRecord): void {
-	const open = indexedDB.open("saltbot", 1);
-
-	open.onsuccess = function() {
-		const db = open.result;
-		const tx = db.transaction("matches", "readwrite");
-		const store = tx.objectStore("matches");
-
-		store.put(match);
-	};
-}
