@@ -8,7 +8,6 @@
   "include": [
     "./src/**/*.*s",
     "./node_modules/moment/moment.d.ts",
-    "./node_modules/idb/lib/idb.d.ts",
-    "./node_modules/chrome-extension-async/chrome-extension-async.d.ts"
+    "./node_modules/idb/lib/idb.d.ts"
   ]
 }

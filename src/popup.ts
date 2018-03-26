@@ -206,212 +206,212 @@ Simulator.prototype.evalMutations = function() {
 	const self = this;
 	chrome.storage.local.get(["characters_v1", "chromosomes_v1"], async function(results) {
 		let matches = [];
-		await chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(queryResult: MatchRecord[]) {
+		chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(queryResult: MatchRecord[]) {
 			matches = queryResult;
-		});
 
-		if (matches.length === 0) {
-			console.log("No matches have been recorded yet.");
-			return;
-		}
-
-		const data = [];
-		const correct = [];
-		const totalBettedOn = [];
-		const strategies = [];
-		const totalPercentCorrect = [];
-		self.money = [];
-		const updater = new Updater();
-
-		// create orders from string passed in
-		const orders = [];
-		// queue up the entire last batch of chromosomes
-		const chromosomes = results.chromosomes_v1;
-		if (chromosomes) {
-			for (const cIt of chromosomes) {
-				const c = new Chromosome();
-				orders.push(new Order("cs", c.loadFromObject(cIt)));
-			}
-		} else {
-			const msg = "Pool not initialized.";
-			($("#msgbox")[0] as HTMLInputElement).value = msg;
-			throw msg;
-		}
-
-		// process orders for strategy creation
-		for (const order of orders) {
-			let strategy;
-			switch (order.type) {
-				case "ct":
-					strategy = new CoinToss();
-					break;
-				case "cs":
-					strategy = new ConfidenceScore(order.chromosome);
-					break;
-				case "rc":
-					strategy = new RatioConfidence();
-					break;
-				case "ipu":
-					strategy = new InternetPotentialUpset(order.chromosome);
-					break;
-			}
-			strategy.debug = false;
-
-			data.push([]);
-			correct.push(0);
-			totalBettedOn.push(0);
-			strategies.push(strategy);
-			totalPercentCorrect.push(0);
-			self.money.push(0);
-		}
-
-		const characterRecords = [];
-		const namesOfCharactersWhoAlreadyHaveRecords = [];
-
-		// process matches
-
-		for (const match of matches) {
-			const info = {
-				character1: updater.getCharacter(match.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
-				character2: updater.getCharacter(match.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
-				matches,
-			};
-
-			const predictions = [];
-			for (const strategy of strategies) {
-				//reset abstain every time
-				strategy.abstain = false;
-				predictions.push(strategy.execute(info));
+			if (matches.length === 0) {
+				console.log("No matches have been recorded yet.");
+				return;
 			}
 
-			const actualWinner = (match.w === 0) ? match.c1 : match.c2;
+			const data = [];
+			const correct = [];
+			const totalBettedOn = [];
+			const strategies = [];
+			const totalPercentCorrect = [];
+			self.money = [];
+			const updater = new Updater();
 
-			// now update characters
-			updater.updateCharactersFromMatch(match, info.character1, info.character2);
-
-			// check results
-			if (strategies.length !== predictions.length) {
-				throw new Error("Strategies and predictions are not the same length.");
-			}
-			for (let k = 0; k < strategies.length; k++) {
-				const prediction = predictions[k];
-				const strategy = strategies[k];
-				const predictionWasCorrect = prediction === actualWinner;
-				if (!strategy.abstain) {
-					correct[k] += (predictionWasCorrect) ? 1 : 0;
-
-					totalBettedOn[k] += 1;
-					totalPercentCorrect[k] = correct[k] / totalBettedOn[k] * 100;
-					data[k].push([totalBettedOn[k], totalPercentCorrect[k]]);
+			// create orders from string passed in
+			const orders = [];
+			// queue up the entire last batch of chromosomes
+			const chromosomes = results.chromosomes_v1;
+			if (chromosomes) {
+				for (const cIt of chromosomes) {
+					const c = new Chromosome();
+					orders.push(new Order("cs", c.loadFromObject(cIt)));
 				}
-				//update simulated money
-				if (match.o !== "U") {
-					strategy.adjustLevel(10000);
-					const betAmount = self.getBetAmount(strategy, k);
-					// the 20,000 limit is to compensate for the fact that I haven't been recording the money of the matches -- that amount wouldn't swing the odds
-					/*if (betAmount > 20000)	// edit, would preserving some aspect of the rolling magnitude be better?
-					 betAmount = 20000;*/
-					self.updateMoney(k, match.o, prediction === match.c1 ? 0 : 1, betAmount, predictionWasCorrect);
+			} else {
+				const msg = "Pool not initialized.";
+				($("#msgbox")[0] as HTMLInputElement).value = msg;
+				throw msg;
+			}
+
+			// process orders for strategy creation
+			for (const order of orders) {
+				let strategy;
+				switch (order.type) {
+					case "ct":
+						strategy = new CoinToss();
+						break;
+					case "cs":
+						strategy = new ConfidenceScore(order.chromosome);
+						break;
+					case "rc":
+						strategy = new RatioConfidence();
+						break;
+					case "ipu":
+						strategy = new InternetPotentialUpset(order.chromosome);
+						break;
+				}
+				strategy.debug = false;
+
+				data.push([]);
+				correct.push(0);
+				totalBettedOn.push(0);
+				strategies.push(strategy);
+				totalPercentCorrect.push(0);
+				self.money.push(0);
+			}
+
+			const characterRecords = [];
+			const namesOfCharactersWhoAlreadyHaveRecords = [];
+
+			// process matches
+
+			for (const match of matches) {
+				const info = {
+					character1: updater.getCharacter(match.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
+					character2: updater.getCharacter(match.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords),
+					matches,
+				};
+
+				const predictions = [];
+				for (const strategy of strategies) {
+					//reset abstain every time
+					strategy.abstain = false;
+					predictions.push(strategy.execute(info));
+				}
+
+				const actualWinner = (match.w === 0) ? match.c1 : match.c2;
+
+				// now update characters
+				updater.updateCharactersFromMatch(match, info.character1, info.character2);
+
+				// check results
+				if (strategies.length !== predictions.length) {
+					throw new Error("Strategies and predictions are not the same length.");
+				}
+				for (let k = 0; k < strategies.length; k++) {
+					const prediction = predictions[k];
+					const strategy = strategies[k];
+					const predictionWasCorrect = prediction === actualWinner;
+					if (!strategy.abstain) {
+						correct[k] += (predictionWasCorrect) ? 1 : 0;
+
+						totalBettedOn[k] += 1;
+						totalPercentCorrect[k] = correct[k] / totalBettedOn[k] * 100;
+						data[k].push([totalBettedOn[k], totalPercentCorrect[k]]);
+					}
+					//update simulated money
+					if (match.o !== "U") {
+						strategy.adjustLevel(10000);
+						const betAmount = self.getBetAmount(strategy, k);
+						// the 20,000 limit is to compensate for the fact that I haven't been recording the money of the matches -- that amount wouldn't swing the odds
+						/*if (betAmount > 20000)	// edit, would preserving some aspect of the rolling magnitude be better?
+						 betAmount = 20000;*/
+						self.updateMoney(k, match.o, prediction === match.c1 ? 0 : 1, betAmount, predictionWasCorrect);
+					}
 				}
 			}
-		}
 
-		//go through totalPercentCorrect, weed out the top 10, breed them, save them
-		const sortingArray = [];
-		const parents = [];
-		const nextGeneration = [];
-		const money = true;
-		const accuracy = true;
-		const unshackle = true;
-		const weightAccToMoney = 0.75; //1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
+			//go through totalPercentCorrect, weed out the top 10, breed them, save them
+			const sortingArray = [];
+			const parents = [];
+			const nextGeneration = [];
+			const money = true;
+			const accuracy = true;
+			const unshackle = true;
+			const weightAccToMoney = 0.75; //1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
 
-		// these ratios controls how critters are breed using the sorted array of critters after the heuristic method. Think of percents as from top best to worst.
-		const ratioTopKeep = 0;				// valid range [0,1], from the sorted listed of last gen, the best retained and reused. Not recommended as it prevents "jitter" in finding solutions.
-		const ratioTopKeptBreeding = 0.5;		// valid range (0,1), Critical value; fills pool after ratioTopKeep. Controls how many critters are kept/dropped.
-		const ratioOrderedTopBestBreeding = 0;	// valid range [0, 1), treat it exclusive to ratioEvenTopBestBreeding. Ratio of controlled breeding onto the best.
-		const ratioEvenTopBestBreeding = Math.ceil(4 / 64);		// valid range [0, 1), treat it exclusive to ratioOrderedTopBestBreeding. Evenly allows the the top list a chance to breed.
+			// these ratios controls how critters are breed using the sorted array of critters after the heuristic method. Think of percents as from top best to worst.
+			const ratioTopKeep = 0;				// valid range [0,1], from the sorted listed of last gen, the best retained and reused. Not recommended as it prevents "jitter" in finding solutions.
+			const ratioTopKeptBreeding = 0.5;		// valid range (0,1), Critical value; fills pool after ratioTopKeep. Controls how many critters are kept/dropped.
+			const ratioOrderedTopBestBreeding = 0;	// valid range [0, 1), treat it exclusive to ratioEvenTopBestBreeding. Ratio of controlled breeding onto the best.
+			const ratioEvenTopBestBreeding = Math.ceil(4 / 64);		// valid range [0, 1), treat it exclusive to ratioOrderedTopBestBreeding. Evenly allows the the top list a chance to breed.
 
-		for (let l = 0; l < orders.length; l++) {
-			let penalty = 1;
-			if (!unshackle) {
-				penalty = self.applyPenalties(orders[l].chromosome);
-			}
-			sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l], penalty]);
-		}
-		//	sort the the best in order.
-		sortingArray.sort(function(a, b) {
-			if (!money && accuracy) {
-				return (b[1] * b[3]) - (a[1] * a[3]);
-			}
-			else if (money && !accuracy) {
-				return (b[2] * b[3]) - (a[2] * a[3]);
-			}
-			else {
-				return (((weightAccToMoney * b[1]) + ((1 - weightAccToMoney) * b[2])) * b[3]) - (((weightAccToMoney * a[1]) + ((1 - weightAccToMoney) * a[2])) * a[3]);
-			}
-		});
-
-		const sizeNextGen = sortingArray.length;
-		const sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep part of sorted population
-		const sizeTopParentsBreed = Math.floor(sizeNextGen * ratioTopKeptBreeding);
-		for (let o = 0; o < sizeTopParents; o++) {
-			parents.push(sortingArray[o][0]);
-			//ranking guarantees that we send the best one
-			sortingArray[o][0].rank = o + 1;
-			nextGeneration.push(sortingArray[o][0]);
-		}
-
-		// i really only need to see the best one
-		console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2], 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-
-		// created and push children of that half of best sorted population
-		for (let mf = 0; mf < sizeNextGen - sizeTopParents; mf++) {
-			const attempts = 2;
-			let atmp = 0;
-
-			let parent1 = null;
-			let parent2 = null;
-			let child = null;
-
-			do {
-				/*if (mf === 0) {													// breed the best to worst.
-				 parent1 = sortingArray[0][0];
-				 parent2 = sortingArray[sizeTopParentsBreed-1][0];
-				 } else*/
-				if (mf < sizeTopParentsBreed * (ratioOrderedTopBestBreeding)) {	// breed orderly with best
-					parent1 = sortingArray[0][0];
-					parent2 = sortingArray[mf][0];
-				} else if (mf < sizeTopParentsBreed * (ratioEvenTopBestBreeding)) {		// breed all the best with a random.
-					parent1 = sortingArray[mf][0];
-					parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
-				} else {					// fill remaining population by random breeding the best with chaos.
-					parent1 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
-					parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
+			for (let l = 0; l < orders.length; l++) {
+				let penalty = 1;
+				if (!unshackle) {
+					penalty = self.applyPenalties(orders[l].chromosome);
 				}
-				atmp++;
-			} while ((parent1 === parent2) && (atmp < attempts));
+				sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], self.money[l], penalty]);
+			}
+			//	sort the the best in order.
+			sortingArray.sort(function(a, b) {
+				if (!money && accuracy) {
+					return (b[1] * b[3]) - (a[1] * a[3]);
+				}
+				else if (money && !accuracy) {
+					return (b[2] * b[3]) - (a[2] * a[3]);
+				}
+				else {
+					return (((weightAccToMoney * b[1]) + ((1 - weightAccToMoney) * b[2])) * b[3]) - (((weightAccToMoney * a[1]) + ((1 - weightAccToMoney) * a[2])) * a[3]);
+				}
+			});
 
-			child = parent1.mate(parent2);
-			nextGeneration.push(child);
-		}
+			const sizeNextGen = sortingArray.length;
+			const sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep part of sorted population
+			const sizeTopParentsBreed = Math.floor(sizeNextGen * ratioTopKeptBreeding);
+			for (let o = 0; o < sizeTopParents; o++) {
+				parents.push(sortingArray[o][0]);
+				//ranking guarantees that we send the best one
+				sortingArray[o][0].rank = o + 1;
+				nextGeneration.push(sortingArray[o][0]);
+			}
 
-		let bestPercent;
-		let bestMoney;
-		bestPercent = sortingArray[0][1];
-		bestMoney = sortingArray[0][2];
+			// i really only need to see the best one
+			console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2], 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 
-		chrome.storage.local.set({
-			best_chromosome: sortingArray[0][0],
-			chromosomes_v1: nextGeneration,
-		}, function() {
-			roundsOfEvolution += 1;
-			console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS "
-				+ totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(2) + "%m -> "
-				+ bestPercent.toFixed(1) + "%c, $" + parseInt(sortingArray[0][2], 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "   -----------------\n\n");
-			($("#msgbox")[0] as HTMLInputElement).value = "g(" + roundsOfEvolution + "), best: " + bestPercent.toFixed(1) + "%, $" + bestMoney.toFixed(0);
-			setTimeout(function() {
-				simulator.evalMutations("evolution");
-			}, 5000);
+			// created and push children of that half of best sorted population
+			for (let mf = 0; mf < sizeNextGen - sizeTopParents; mf++) {
+				const attempts = 2;
+				let atmp = 0;
+
+				let parent1 = null;
+				let parent2 = null;
+				let child = null;
+
+				do {
+					/*if (mf === 0) {													// breed the best to worst.
+					 parent1 = sortingArray[0][0];
+					 parent2 = sortingArray[sizeTopParentsBreed-1][0];
+					 } else*/
+					if (mf < sizeTopParentsBreed * (ratioOrderedTopBestBreeding)) {	// breed orderly with best
+						parent1 = sortingArray[0][0];
+						parent2 = sortingArray[mf][0];
+					} else if (mf < sizeTopParentsBreed * (ratioEvenTopBestBreeding)) {		// breed all the best with a random.
+						parent1 = sortingArray[mf][0];
+						parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
+					} else {					// fill remaining population by random breeding the best with chaos.
+						parent1 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
+						parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
+					}
+					atmp++;
+				} while ((parent1 === parent2) && (atmp < attempts));
+
+				child = parent1.mate(parent2);
+				nextGeneration.push(child);
+			}
+
+			let bestPercent;
+			let bestMoney;
+			bestPercent = sortingArray[0][1];
+			bestMoney = sortingArray[0][2];
+
+			chrome.storage.local.set({
+				best_chromosome: sortingArray[0][0],
+				chromosomes_v1: nextGeneration,
+			}, function() {
+				roundsOfEvolution += 1;
+				console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + roundsOfEvolution + ", m proc'd w/ CS "
+					+ totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(2) + "%m -> "
+					+ bestPercent.toFixed(1) + "%c, $" + parseInt(sortingArray[0][2], 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "   -----------------\n\n");
+				($("#msgbox")[0] as HTMLInputElement).value = "g(" + roundsOfEvolution + "), best: " + bestPercent.toFixed(1) + "%, $" + bestMoney.toFixed(0);
+				setTimeout(function() {
+					simulator.evalMutations("evolution");
+				}, 5000);
+			});
 		});
 	});
 };

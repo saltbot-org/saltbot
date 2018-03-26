@@ -182,35 +182,37 @@ Updater.prototype.updateCharactersFromMatch = function(mObj: MatchRecord, c1Obj,
 var er = async function() {
 	const lines = [];
 	let matches = [];
-	await chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
+	chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
 		matches = data;
+
+		for (const match of matches) {
+			var record = match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + ",";
+			record += (match.hasOwnProperty("t")) ? match.t : "U";
+			record += ",";
+			record += (match.hasOwnProperty("m")) ? match.m : "U";
+			record += ",";
+			record += (match.hasOwnProperty("o")) ? match.o : "U";
+			record += ",";
+			record += (match.hasOwnProperty("ts")) ? match.ts : 0;
+			record += ",";
+			record += (match.hasOwnProperty("cf")) ? match.cf : 2;
+			record += ",";
+			record += (match.hasOwnProperty("if")) ? match.if : 2;
+			record += ",";
+			record += (match.hasOwnProperty("dt")) ? match.dt : moment().format("DD-MM-YYYY");
+			record += "\n";
+			lines.push(record);
+		}
+
+		const time = new Date();
+		const blobM = new Blob(lines, {
+			type: "text/plain;charset=utf-8",
+		});
+		const timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+		saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
 	});
 
-	for (const match of matches) {
-		var record = match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + ",";
-		record += (match.hasOwnProperty("t")) ? match.t : "U";
-		record += ",";
-		record += (match.hasOwnProperty("m")) ? match.m : "U";
-		record += ",";
-		record += (match.hasOwnProperty("o")) ? match.o : "U";
-		record += ",";
-		record += (match.hasOwnProperty("ts")) ? match.ts : 0;
-		record += ",";
-		record += (match.hasOwnProperty("cf")) ? match.cf : 2;
-		record += ",";
-		record += (match.hasOwnProperty("if")) ? match.if : 2;
-		record += ",";
-		record += (match.hasOwnProperty("dt")) ? match.dt : moment().format("DD-MM-YYYY");
-		record += "\n";
-		lines.push(record);
-	}
-
-	const time = new Date();
-	const blobM = new Blob(lines, {
-		type: "text/plain;charset=utf-8",
-	});
-	const timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
-	saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
+	
 };
 
 var ir = function(f: string) {

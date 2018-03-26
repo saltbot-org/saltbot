@@ -108,7 +108,7 @@ function setRestarted() {
 	}, 5000);
 }
 
-chrome.runtime.onMessage.addListener((details, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(function(details, sender, sendResponse) {
 	if (details.message !== undefined) {
 		handleWaifuMessage(details);
 	}

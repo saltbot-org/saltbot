@@ -139,29 +139,30 @@ Match.prototype.init = function() {
 		self.character2 = (character2Index < 0) ? new Character(self.names[1]) : recs[character2Index];
 
 		let matches = [];
-		await chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
+		chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
 			matches = data;
+			const prediction = self.strategy.execute({
+				character1: self.character1,
+				character2: self.character2,
+				matches,
+			});
+
+			if (prediction != null || self.strategy.lowBet) {
+				setTimeout(function() {
+					self.betAmount(detectTournament());
+
+				}, Math.floor(Math.random() * baseSeconds));
+				setTimeout(function() {
+					if (prediction === self.strategy.p1name) {
+						self.strategy.btnP1.click();
+					} else {
+						self.strategy.btnP2.click();
+					}
+				}, (Math.floor(Math.random() * baseSeconds * 2) + baseSeconds));
+			}
 		});
 
-		const prediction = self.strategy.execute({
-			character1: self.character1,
-			character2: self.character2,
-			matches,
-		});
-
-		if (prediction != null || self.strategy.lowBet) {
-			setTimeout(function() {
-				self.betAmount(detectTournament());
-
-			}, Math.floor(Math.random() * baseSeconds));
-			setTimeout(function() {
-				if (prediction === self.strategy.p1name) {
-					self.strategy.btnP1.click();
-				} else {
-					self.strategy.btnP2.click();
-				}
-			}, (Math.floor(Math.random() * baseSeconds * 2) + baseSeconds));
-		}
+		
 
 	});
 };
