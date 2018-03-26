@@ -23,11 +23,11 @@ var Settings = function() {
 };
 
 var StatusScanner = function() {
-	var self = this;
+	const self = this;
 	this.announcements = [];
 	// find element and create an observer instance
-	var status = $("#betstatus")[0];
-	var observer = new MutationObserver(function(mutations) {
+	const status = $("#betstatus")[0];
+	const observer = new MutationObserver(function(mutations) {
 		self.announcements.push(status.innerHTML);
 		// console.log("- status bar updated: " + status.innerHTML);
 		observer.takeRecords();
@@ -37,17 +37,17 @@ var StatusScanner = function() {
 		childList: true,
 		attributes: true,
 	});
-	var winIndicator = " wins";
+	const winIndicator = " wins";
 
 	this.getAnnouncements = function(preserve) {
-		var copy = self.announcements.slice(0);
+		const copy = self.announcements.slice(0);
 		if (!preserve) {
 			self.announcements = [];
 		}
 		return copy;
 	};
 	this.getWinner = function() {
-		var recent = self.getAnnouncements();
+		const recent = self.getAnnouncements();
 		recent.reverse();
 		for (var i = 0; i < recent.length; i++) {
 			if (recent[i].indexOf(winIndicator) > -1) {
@@ -62,7 +62,7 @@ var Controller = function() {
 	var bettingAvailable = false;
 	var bettingEntered = false;
 	var bettingComplete = true;
-	var matchesBeforeReset = 100;
+	const matchesBeforeReset = 100;
 	var matchesProcessed = 0;
 	this.currentMatch = null;
 	this.statusScanner = new StatusScanner();
@@ -73,8 +73,8 @@ var Controller = function() {
 	this.crowdFavor = 2;
 	this.illumFavor = 2;
 	var attemptsToProcess = 0;
-	var maxAttempts = 3;
-	var timerInterval = 3000;
+	const maxAttempts = 3;
+	const timerInterval = 3000;
 	this.ticksSinceMatchBegan = -999;
 	this.bestChromosome = null;
 	this.nextStrategy = "o";
@@ -87,9 +87,9 @@ var Controller = function() {
 	this.characters_v1 = [];
 	this.bettors_v1 = [];
 
-	var self = this;
+	const self = this;
 
-	var debugMode = true;
+	const debugMode = true;
 
 	setInterval(function() {
 		if (!self.settings) {
@@ -99,8 +99,8 @@ var Controller = function() {
 		self.ticksSinceMatchBegan += 1;
 
 		//check to see if the betting buttons are visible and the footer message already changed
-		var bettingTable = $(".dynamic-view")[0];
-		var styleObj = window.getComputedStyle(bettingTable, null);
+		const bettingTable = $(".dynamic-view")[0];
+		const styleObj = window.getComputedStyle(bettingTable, null);
 		bettingAvailable = styleObj.display !== "none" && $("#footer-alert")[0].innerHTML !== self.lastFooterMessage;
 
 		if (bettingAvailable && bettingComplete) {
@@ -134,10 +134,10 @@ var Controller = function() {
 						ticks: self.ticksSinceMatchBegan,
 						interval: timerInterval,
 					}, self.crowdFavor, self.illumFavor);
-					var records = self.currentMatch.getRecords(winner);
-					var mr = records[0];
-					var c1 = records[1];
-					var c2 = records[2];
+					const records = self.currentMatch.getRecords(winner);
+					const mr = records[0];
+					const c1 = records[1];
+					const c2 = records[2];
 
 					console.log("- match result code: " + "c1:" + mr.c1 + "|c2:" + mr.c2 + "|w:" + mr.w + "|s:" + mr.sn + "|p:" + mr.pw + "|t:" + mr.t + "|m:" + mr.m + "|o:" + mr.o + "|t:" + mr.ts);
 
@@ -256,7 +256,7 @@ var Controller = function() {
 					level = self.currentMatch.strategy.level;
 				} else {
 					// get amount for first match
-					var nullMatch = new Match(new Strategy("nullStrat"));
+					const nullMatch = new Match(new Strategy("nullStrat"));
 					nullMatch.strategy.adjustLevel(nullMatch.getBalance());
 					level = nullMatch.strategy.level;
 				}
@@ -471,7 +471,7 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 	ctrl = new Controller();
 	ctrl.ensureTwitch();
 	chrome.storage.local.get(["settings_v1"], function(results) {
-		var self = ctrl;
+		const self = ctrl;
 		if (results.settings_v1) {
 			self.settings = results.settings_v1;
 			if (!self.settings.video) {
@@ -505,12 +505,12 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 
 	});
 	chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-		var self = ctrl;
+		const self = ctrl;
 		// console.log("-\nmessage from Waifu:\t" + message);
 		if (typeof message === "string") {
-			var winMessageIndicator = " wins";
-			var newMatchIndicator = "Bets are OPEN for ";
-			var betsLockedIndicator = "Bets are locked";
+			const winMessageIndicator = " wins";
+			const newMatchIndicator = "Bets are OPEN for ";
+			const betsLockedIndicator = "Bets are locked";
 
 			//check for new match
 			if (message.indexOf(newMatchIndicator) > -1) {
@@ -519,10 +519,10 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 				// Bets are OPEN for Valdoll vs Adam! (A Tier) tournament bracket
 				//Bets are OPEN for Team RyokoAndHerTrainingPartner vs Team Aliens! (S / S Tier) (Requested by Pendaflex) (exhibitions) www.saltybet.com
 				//Bets are OPEN for Geegus vs Chris! (Requested by Yajirobe) (exhibitions) <a href="http://www.saltybet.com" target="_blank">www.saltybet.com</a>
-				var regex = /(?:Bets are OPEN for )(.*)(?: vs )(.*)(?:! \()(X|S|A|B|P|NEW)(?: Tier\))(.*)/g;
+				const regex = /(?:Bets are OPEN for )(.*)(?: vs )(.*)(?:! \()(X|S|A|B|P|NEW)(?: Tier\))(.*)/g;
 				var matches = regex.exec(message);
 				if (matches === null) {
-					var regexLoose = /(?:Bets are OPEN for )(.*)(?: vs )(.*)!(.*)/g;
+					const regexLoose = /(?:Bets are OPEN for )(.*)(?: vs )(.*)!(.*)/g;
 					matches = regexLoose.exec(message);
 					matches.push(matches[3]);
 
@@ -563,19 +563,19 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 				setTimeout(function() {
 					//save the odds
 					try {
-						var oddsBox = $("#lastbet")[0];
+						const oddsBox = $("#lastbet")[0];
 						// var c1Odds = oddsBox.childNodes[oddsBox.childNodes.length - 3].innerHTML;
-						var c1Odds = (oddsBox.childNodes[oddsBox.childNodes.length - 3] as HTMLElement).innerHTML;
-						var c2Odds = (oddsBox.childNodes[oddsBox.childNodes.length - 1] as HTMLElement).innerHTML;
+						const c1Odds = (oddsBox.childNodes[oddsBox.childNodes.length - 3] as HTMLElement).innerHTML;
+						const c2Odds = (oddsBox.childNodes[oddsBox.childNodes.length - 1] as HTMLElement).innerHTML;
 						self.odds = "" + c1Odds + ":" + c2Odds;
 					} catch (e) {
 						self.odds = null;
 					}
 					//save the betting totals
 					try {
-						var moneyText = $("#odds")[0].innerHTML.replace(/,/g, "");
+						const moneyText = $("#odds")[0].innerHTML.replace(/,/g, "");
 						var mtMatches = null;
-						var regex = /\$([0-9]*)/g;
+						const regex = /\$([0-9]*)/g;
 						if (regex.test(moneyText)) {
 							mtMatches = moneyText.match(regex);
 							self.lastMatchCumulativeBetTotal = parseInt(mtMatches[0].replace("$", "")) + parseInt(mtMatches[1].replace("$", ""));
@@ -587,13 +587,13 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 					}
 
 					// save the crowd favor and the illuminati favor
-					var betsForC1 = $("#sbettors1")[0];
-					var betsForC2 = $("#sbettors2")[0];
+					const betsForC1 = $("#sbettors1")[0];
+					const betsForC2 = $("#sbettors2")[0];
 					try {
-						var crowdSizeC1 = $(betsForC1).find(".bettor-line").length;
-						var crowdSizeC2 = $(betsForC2).find(".bettor-line").length;
-						var illumSizeC1 = $(betsForC1).find(".goldtext").length;
-						var illumSizeC2 = $(betsForC2).find(".goldtext").length;
+						const crowdSizeC1 = $(betsForC1).find(".bettor-line").length;
+						const crowdSizeC2 = $(betsForC2).find(".bettor-line").length;
+						const illumSizeC1 = $(betsForC1).find(".goldtext").length;
+						const illumSizeC2 = $(betsForC2).find(".goldtext").length;
 						if (crowdSizeC1 === crowdSizeC2) {
 							self.crowdFavor = 2;
 						}
@@ -612,16 +612,16 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 					}
 					// save bettor records
 					try {
-						var crowdC1 = $(betsForC1).find(".bettor-line");
-						var crowdC2 = $(betsForC2).find(".bettor-line");
+						const crowdC1 = $(betsForC1).find(".bettor-line");
+						const crowdC2 = $(betsForC2).find(".bettor-line");
 						self.bettorsC1 = [];
 						self.bettorsC2 = [];
 						for (var i = 0; i < crowdC1.length; i++) {
-							var e = $(crowdC1[i]).find("strong")[0];
+							const e = $(crowdC1[i]).find("strong")[0];
 							self.bettorsC1.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 						for (var j = 0; j < crowdC2.length; j++) {
-							var e = $(crowdC2[j]).find("strong")[0];
+							const e = $(crowdC2[j]).find("strong")[0];
 							self.bettorsC2.push([e.innerHTML, e.classList.contains("goldtext")]);
 						}
 					} catch (e) {
@@ -641,11 +641,11 @@ window.addEventListener("beforeunload", function() {
 
 var prepareJQueryDialog = function() {
 	$('link[href="../css/jquery-ui-1.11.min.css"]').prop("disabled", true);
-	var link = '<link rel="stylesheet" type="text/css" href="' + chrome.extension.getURL("css/jquery-ui.css") + '">';
+	const link = '<link rel="stylesheet" type="text/css" href="' + chrome.extension.getURL("css/jquery-ui.css") + '">';
 	$("head").append(link);
 
-	var wrapper = document.getElementById("wrapper");
-	var messageDialogue = document.createElement("div");
+	const wrapper = document.getElementById("wrapper");
+	const messageDialogue = document.createElement("div");
 	messageDialogue.setAttribute("id", "dialog");
 	wrapper.appendChild(messageDialogue);
 
@@ -659,7 +659,7 @@ var prepareJQueryDialog = function() {
 				clearTimeout(dialogTimer);
 			}
 
-			var dia = $(this);
+			const dia = $(this);
 			dialogTimer = setTimeout(function() {
 				dia.dialog("close");
 			}, 5000);
@@ -670,7 +670,7 @@ var prepareJQueryDialog = function() {
 prepareJQueryDialog();
 
 var displayDialogMessage = function(message) {
-	var dialog = $("#dialog");
+	const dialog = $("#dialog");
 	dialog.html(message.replace(/\n/g, "<br />"));
 	dialog.dialog("open");
 };
