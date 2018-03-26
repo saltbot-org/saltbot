@@ -46,7 +46,7 @@ Strategy.prototype.flatBet = function(balance, debug) {
 	var multiplierIndex = 2;
 	var intendedBet = flatAmount * this.levels[this.level][multiplierIndex] * this.confidence;
 
-	if (this.level == 0) {
+	if (this.level ===  0) {
 		return balance;
 	}
 	else {
@@ -68,7 +68,7 @@ Strategy.prototype.adjustLevel = function(balance) {
 		if (this.level + 1 <= maxLv && balance >= this.levels[this.level][peak]) {
 			this.level += 1;
 			changed = true;
-			if (balance == this.levels[this.level][valley]) { return; }
+			if (balance ===  this.levels[this.level][valley]) { return; }
 		} else if (this.level - 1 >= minLv && balance <= this.levels[this.level][valley]) {
 			this.level -= 1;
 			changed = true;
@@ -204,7 +204,7 @@ RatioConfidence.prototype.execute = function(info) {
 		var pChar = (c1.ratio > c2.ratio) ? c1 : c2;
 		var npChar = (c1.ratio < c2.ratio) ? c1 : c2;
 		//confidence score
-		self.confidence = (pChar.name == c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
+		self.confidence = (pChar.name ===  c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
 		self.confidence += 0.5;
 		if (self.confidence > 1) { self.confidence = 1; }
 		if (self.confidence < 0.6) {
@@ -215,7 +215,7 @@ RatioConfidence.prototype.execute = function(info) {
 			self.lowBet = true;
 			return null;
 		}
-		if (pChar.ratio <= 0.5 || (npChar.ratio == 0.5 && (npChar.wins.length + npChar.losses.length == 2))) {
+		if (pChar.ratio <= 0.5 || (npChar.ratio ===  0.5 && (npChar.wins.length + npChar.losses.length ===  2))) {
 			if (this.debug) {
 				console.log("- Cowboy discourages betting on or against <51% (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
 			}
@@ -229,7 +229,7 @@ RatioConfidence.prototype.execute = function(info) {
 		}
 		self.prediction = p;
 		return p;
-	} else if (c1Ratio == c2Ratio) {
+	} else if (c1Ratio ===  c2Ratio) {
 		if (this.debug) {
 			console.log("- Cowboy has insufficient information (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
 		}
@@ -622,7 +622,7 @@ ConfidenceScore.prototype.execute = function(info) {
 	// figure out prediction, confidence
 	this.prediction = (c1Score > c2Score) ? c1.name : c2.name;
 
-	var winnerPoints = (this.prediction == c1.name) ? c1Score : c2Score;
+	var winnerPoints = (this.prediction ===  c1.name) ? c1Score : c2Score;
 	var totalAvailablePoints = c1Score + c2Score;
 	this.confidence = ((winnerPoints / totalAvailablePoints)).toFixed(4);
 
@@ -632,7 +632,7 @@ ConfidenceScore.prototype.execute = function(info) {
 	var nerfPoorScore = 0.66;
 	var nerfAmount = 0;
 	var nerfMsg = "-- PROBLEMS:";
-	if ((c1Score == c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3 || c1.wins.length == 0 || c2.wins.length == 0) {
+	if ((c1Score ===  c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3 || c1.wins.length ===  0 || c2.wins.length ===  0) {
 		nerfAmount += nerfPoorScore;
 		nerfMsg += "\n- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
 	}
