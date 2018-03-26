@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "outDir": "dist/js",
+    "allowJs": true,
+    "moduleResolution": "node"
+  },
+  "include": [
+    "./src/**/*.*s",
+    "./node_modules/moment/moment.d.ts",
+    "./node_modules/idb/lib/idb.d.ts"
+  ]
+}

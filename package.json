@@ -1,0 +1,46 @@
+{
+  "name": "saltbot",
+  "version": "2.5.0",
+  "description": "Bot for betting on saltybet.com",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/synkarius/saltbot.git"
+  },
+  "author": "David Conway",
+  "contributors": [
+    {
+      "name": "Stefan Berger"
+    }
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/synkarius/saltbot/issues"
+  },
+  "homepage": "https://github.com/synkarius/saltbot#readme",
+  "dependencies": {
+    "datatables.net": "1.10.11",
+    "datatables.net-dt": "1.10.11",
+    "idb": "^2.1.1",
+    "jquery": "^3.2.1",
+    "jquery-ui": "^1.12.1",
+    "moment": "^2.19.3",
+    "npm": "^5.8.0",
+    "tsify": "^3.0.4",
+    "uniq": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.63",
+    "@types/datatables.net": "^1.10.8",
+    "@types/jquery": "^3.2.13",
+    "@types/jqueryui": "^1.12.2",
+    "@types/node": "^9.6.0",
+    "ts-loader": "^4.1.0",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.2",
+    "webpack": "^4.2.0"
+  }
+}

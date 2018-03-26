@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+    <title>Recorded match data</title>
+    <script type="text/javascript" src="js/lib/jquery.min.js"></script>
+    <script type="text/javascript" src="js/lib/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="js/lib/idb.js"></script>
+    <script type="text/javascript" src="js/utils.js"></script>
+    <script type="text/javascript" src="js/lib/date.js"></script>
+    <script type="text/javascript" src="js/lib/date-eu.js"></script>
+    <script type="text/javascript" src="js/matchdata.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
+    <style>
+        td.highlight {
+            background-color: lightgreen !important;
+        }
+    </style>
+</head>
+<body>
+<p id="loading">Processing the data, please wait.</p>
+<table id="matches" class="display cell-border" width="100%"></table>
+</body>
+</html>
