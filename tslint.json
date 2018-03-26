@@ -1,11 +1,11 @@
 {
-    "defaultSeverity": "warning",
-    "extends": [
-        "tslint:recommended"
-    ],
-    "jsRules": {},
+  "defaultSeverity": "warning",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "jsRules": {},
   "rules": {
-    "allow-snake-case",
+    "allow-snake-case": true,
     "no-var-keyword": false,
     "no-shadowed-variable": true,
     "indent": [ true, "tabs", 4 ],
@@ -15,7 +15,7 @@
     "one-line": false,
     "eofline": false,
     "max-line-length": false,
-    "no-bitwise":  false
+    "no-bitwise": false
   },
-    "rulesDirectory": []
+  "rulesDirectory": []
 }
