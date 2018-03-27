@@ -8,7 +8,6 @@
     "no-empty": false,
     "require-yield": false,
     "object-literal-sort-keys": false,
-    "let": [true, "allow-snake-case"],
     "allow-snake-case": true,
     "no-shadowed-variable": false,
     "radix": false,
