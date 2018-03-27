@@ -29,7 +29,6 @@
     "jquery-ui": "^1.12.1",
     "moment": "^2.19.3",
     "npm": "^5.8.0",
-    "tsify": "^3.0.4",
     "uniq": "^1.0.1"
   },
   "devDependencies": {
@@ -40,6 +39,7 @@
     "@types/node": "^9.6.0",
     "ts-loader": "^4.1.0",
     "tslint": "^5.9.1",
+    "tslint-eslint-rules": "^5.1.0",
     "typescript": "^2.7.2",
     "webpack": "^4.2.0"
   }
