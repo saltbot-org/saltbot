@@ -7,7 +7,7 @@
   "rules": {
     "no-empty": [true, "allow-empty-catch"],
     "object-literal-sort-keys": false,
-    "let": [true, "allow-snake-case"],
+    "variable-name": [true, "allow-snake-case"],
     "no-shadowed-variable": false,
     "radix": false,
     "no-var-keyword": false,
