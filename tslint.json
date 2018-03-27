@@ -5,7 +5,7 @@
   ],
   "jsRules": {},
   "rules": {
-    "no-empty": [true, "allow-empty-catch"],
+    "no-empty": false,
     "object-literal-sort-keys": false,
     "let": [true, "allow-snake-case"],
     "allow-snake-case": true,
