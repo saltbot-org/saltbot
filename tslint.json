@@ -1,13 +1,17 @@
 {
-    "defaultSeverity": "warning",
-    "extends": [
-        "tslint:recommended"
-    ],
-    "jsRules": {},
+  "defaultSeverity": "warning",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "jsRules": {},
   "rules": {
-    "allow-snake-case",
+    "no-empty": false,
+    "require-yield": false,
+    "object-literal-sort-keys": false,
+    "allow-snake-case": true,
+    "no-shadowed-variable": false,
+    "radix": false,
     "no-var-keyword": false,
-    "no-shadowed-variable": true,
     "indent": [ true, "tabs", 4 ],
     "only-arrow-functions": false,
     "no-console": false,
@@ -15,7 +19,7 @@
     "one-line": false,
     "eofline": false,
     "max-line-length": false,
-    "no-bitwise":  false
+    "no-bitwise": false
   },
-    "rulesDirectory": []
+  "rulesDirectory": []
 }

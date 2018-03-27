@@ -3,7 +3,7 @@ function binaryInsertByProperty(value, array: any[], propertyToSort: string, sta
 	const length: number = array.length;
 	const m: number = start + Math.floor((end - start) / 2);
 
-	if (length == 0) {
+	if (length === 0) {
 		array.push(value);
 		return;
 	}
@@ -40,7 +40,7 @@ function binarySearchByProperty(value, array: any[], propertyToSort: string, sta
 	const length: number = array.length;
 	const m: number = start + Math.floor((end - start) / 2);
 
-	if (length == 0) {
+	if (length === 0) {
 		return -1;
 	}
 
