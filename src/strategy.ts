@@ -446,7 +446,7 @@ var CSStats = function(cObj, chromosome) {
 	this.averageWinTimeRaw = (winTimesTotal !== 0) ? winTimesTotalRaw / timedWonMatchesCount : null;
 
 	for (let k = 0; k < cObj.lossTimes.length; k++) {
-		if (cObj.winTimes[k] !== 0) {
+		if (cObj.lossTimes[k] !== 0) {
 			lossTimesTotal += cObj.lossTimes[k] * chromosome["lt" + cObj.losses[k]];
 			lossTimesTotalRaw += cObj.lossTimes[k];
 			timedLostMatchesCount += 1;
