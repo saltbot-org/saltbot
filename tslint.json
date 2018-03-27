@@ -7,9 +7,9 @@
   "rules": {
     "allow-empty-catch": true,
     "object-literal-sort-keys": false,
-    "allow-snake-case": true,
-    "no-shadowed-variable": true,
-    "radix": true,
+    "let": [true, "allow-snake-case"],
+    "no-shadowed-variable": false,
+    "radix": false,
     "no-var-keyword": false,
     "indent": [ true, "tabs", 4 ],
     "only-arrow-functions": false,
