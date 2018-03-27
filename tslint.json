@@ -6,6 +6,7 @@
   "jsRules": {},
   "rules": {
     "allow-empty-catch": true,
+    "object-literal-sort-keys": false,
     "allow-snake-case": true,
     "no-shadowed-variable": true,
     "radix": true,
