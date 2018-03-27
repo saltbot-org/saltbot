@@ -5,6 +5,7 @@
   ],
   "jsRules": {},
   "rules": {
+    "allow-empty-catch": true,
     "allow-snake-case": true,
     "no-var-keyword": false,
     "no-shadowed-variable": true,

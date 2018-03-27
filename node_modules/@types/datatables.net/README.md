@@ -1,0 +1,16 @@
+# Installation
+> `npm install --save @types/datatables.net`
+
+# Summary
+This package contains type definitions for JQuery DataTables (http://www.datatables.net).
+
+# Details
+Files were exported from https://www.github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/datatables.net
+
+Additional Details
+ * Last updated: Sun, 03 Dec 2017 16:26:41 GMT
+ * Dependencies: jquery
+ * Global values: none
+
+# Credits
+These definitions were written by Kiarash Ghiaseddin <https://github.com/Silver-Connection>, Omid Rad <https://github.com/omidkrad>, Armin Sander <https://github.com/pragmatrix>, Craig Boland <https://github.com/CNBoland>.
