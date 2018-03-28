@@ -465,6 +465,8 @@ document.addEventListener("DOMContentLoaded", function() {
 			($("#limit")[0] as HTMLInputElement).value = result.settings_v1.limit || 10000;
 			($("#ta")[0] as HTMLInputElement).checked = result.settings_v1.talimit_enabled || false;
 			($("#talimit")[0] as HTMLInputElement).value = result.settings_v1.talimit || 10000;
+			($("#tm")[0] as HTMLInputElement).checked = result.settings_v1.tmlimit_enabled || false;
+			($("#tmlimit")[0] as HTMLInputElement).value = result.settings_v1.tmlimit || 10000;
 			($("#multiplierField")[0] as HTMLInputElement).value = result.settings_v1.multiplier || 1;
 			($("#multiplierSlider")[0] as HTMLInputElement).value = result.settings_v1.multiplier || 1;
 
