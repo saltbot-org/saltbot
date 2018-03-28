@@ -1,0 +1,11 @@
+sudo: false
+language: node_js
+node_js:
+  - 'node'
+os:
+  - linux
+cache:
+  directories:
+  - node_modules
+script:
+  - npm install && npm run build
