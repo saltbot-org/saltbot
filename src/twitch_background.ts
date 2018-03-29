@@ -210,8 +210,8 @@ function handleWaifuMessage(details: any) {
 				setRestarted();
 			}
 			else {
-				for (let i = 0; i < queryResult.length; i++) {
-					chrome.tabs.sendMessage(queryResult[i].id, details.message, function(response) {
+				for (const tab of queryResult) {
+					chrome.tabs.sendMessage(tab.id, details.message, function(response) {
 						if (storedObjects.settings_v1.keepAlive && !restartedSaltyBet &&
 							chrome.runtime.lastError !== undefined &&
 							chrome.runtime.lastError.message === "Could not establish connection. Receiving end does not exist.") {
@@ -219,8 +219,8 @@ function handleWaifuMessage(details: any) {
 							chrome.runtime.lastError = undefined;
 							//close saltybet tabs
 							//can't use queryResult[i] because sendMessage is asynchronous
-							for (let j = 0; j < queryResult.length; ++j) {
-								chrome.tabs.remove(queryResult[j].id, function() {
+							for (const tab2 of queryResult) {
+								chrome.tabs.remove(tab2.id, function() {
 									//do nothing
 								});
 							}

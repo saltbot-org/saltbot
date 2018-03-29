@@ -19,6 +19,7 @@
     "eofline": false,
     "max-line-length": false,
     "no-bitwise": false,
+    "max-classes-per-file": false,
     "no-invalid-regexp": true,
     "no-constant-condition": true,
     "no-control-regex": true,

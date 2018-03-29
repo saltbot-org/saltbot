@@ -49,9 +49,9 @@ var StatusScanner = function() {
 	this.getWinner = function() {
 		const recent = self.getAnnouncements();
 		recent.reverse();
-		for (let i = 0; i < recent.length; i++) {
-			if (recent[i].indexOf(winIndicator) > -1) {
-				return recent[i].split(winIndicator)[0];
+		for (const announcement of recent) {
+			if (announcement.indexOf(winIndicator) > -1) {
+				return announcement.split(winIndicator)[0];
 			}
 		}
 		return null;
@@ -231,7 +231,7 @@ var Controller = function() {
 
 			self.lastFooterMessage = $("#footer-alert")[0].innerHTML;
 
-			const tournament = detectTournament();
+			const tournament = $("#tournament-note").length > 0;
 
 			//set up next strategy
 			if (matchesProcessed === 0 && self.bestChromosome === null) {
@@ -281,6 +281,10 @@ var Controller = function() {
 
 				//get the mode from the footer
 				const modeInfo = self.lastFooterMessage;
+
+				//chat messages:
+				//Tournament will start shortly. Thanks for watching! from Saltybet
+
 				if (modeInfo.indexOf("bracket") > -1 || modeInfo.indexOf("FINAL ROUND") > -1 || modeInfo.indexOf("Tournament mode start") > -1) {
 					self.currentMatch.mode = "t";
 				}
@@ -292,7 +296,7 @@ var Controller = function() {
 									}
 				else {
 					self.currentMatch.mode = "U";
-									}
+				}
 
 				//set aggro:
 				if (self.settings.talimit_enabled === true && self.currentMatch.getBalance() <= self.settings.talimit) {
@@ -616,14 +620,14 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 						const crowdC2 = $(betsForC2).find(".bettor-line");
 						self.bettorsC1 = [];
 						self.bettorsC2 = [];
-						for (let i = 0; i < crowdC1.length; i++) {
-							const e = $(crowdC1[i]).find("strong")[0];
+						crowdC1.each(function() {
+							const e = $(this).find("strong")[0];
 							self.bettorsC1.push([e.innerHTML, e.classList.contains("goldtext")]);
-						}
-						for (let j = 0; j < crowdC2.length; j++) {
-							const e = $(crowdC2[j]).find("strong")[0];
+						});
+						crowdC2.each(function() {
+							const e = $(this).find("strong")[0];
 							self.bettorsC2.push([e.innerHTML, e.classList.contains("goldtext")]);
-						}
+						});
 					} catch (e) {
 						self.bettorsC1 = [];
 						self.bettorsC2 = [];

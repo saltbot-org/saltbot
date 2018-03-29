@@ -8,18 +8,31 @@ var Bettor = function(name) {
 	this.type = "U";
 };
 
-var Character = function(name) {
-	this.name = name;
-	this.wins = [];
-	this.losses = [];
-	this.winTimes = [];
-	this.lossTimes = [];
-	this.odds = [];
-	this.crowdFavor = [];
-	this.illumFavor = [];
-	this.tiers = [];
-	this.totalFights = [];
-};
+class Character {
+	public name: string;
+	public wins: any[];
+	public losses: any[];
+	public winTimes: number[];
+	public lossTimes: number[];
+	public odds: number[];
+	public crowdFavor: number[];
+	public illumFavor: number[];
+	public tiers: string[];
+	public totalFights: any[];
+
+	constructor(name: string) {
+		this.name = name;
+		this.wins = [];
+		this.losses = [];
+		this.winTimes = [];
+		this.lossTimes = [];
+		this.odds = [];
+		this.crowdFavor = [];
+		this.illumFavor = [];
+		this.tiers = [];
+		this.totalFights = [];
+	}
+}
 
 class MatchRecord {
 	public c1: string;
@@ -70,9 +83,9 @@ Updater.prototype.getBettor = function(bname, bettorRecords, namesOfBettorsWhoAl
 		bettorRecords.push(bobject);
 		namesOfBettorsWhoAlreadyHaveRecords.push(bname);
 	} else {
-		for (let k = 0; k < bettorRecords.length; k++) {
-			if (bname === bettorRecords[k].name) {
-				bobject = bettorRecords[k];
+		for (const bettor of bettorRecords) {
+			if (bname === bettor.name) {
+				bobject = bettor;
 				break;
 			}
 		}
@@ -81,24 +94,24 @@ Updater.prototype.getBettor = function(bname, bettorRecords, namesOfBettorsWhoAl
 };
 Updater.prototype.updateBettorsFromMatch = function(mObj: MatchRecord, bc1, bc2) {
 	const c1Won = (mObj.w === 0);
-	for (let i = 0; i < bc1.length; i++) {
+	for (const bettorForCharacter1 of bc1) {
 		if (c1Won) {
-			bc1[i].wins += 1;
+			bettorForCharacter1.wins += 1;
 		}
 		else {
-			bc1[i].losses += 1;
+			bettorForCharacter1.losses += 1;
 		}
 	}
-	for (let j = 0; j < bc2.length; j++) {
+	for (const bettorForCharacter2 of bc2) {
 		if (!c1Won) {
-			bc2[j].wins += 1;
+			bettorForCharacter2.wins += 1;
 		}
 		else {
-			bc2[j].losses += 1;
+			bettorForCharacter2.losses += 1;
 		}
 	}
 };
-Updater.prototype.updateCharactersFromMatch = function(mObj: MatchRecord, c1Obj, c2Obj) {
+Updater.prototype.updateCharactersFromMatch = function(mObj: MatchRecord, c1Obj: Character, c2Obj: Character) {
 	const rememberRecordsLast = 15;  // changing this requires re-importing matches.
 	// wins, losses, and times
 	if (mObj.w === 0) {
