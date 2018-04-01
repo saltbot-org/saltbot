@@ -281,7 +281,7 @@ class Simulator {
 				const parents = [];
 				const nextGeneration = [];
 				const money = true;
-				const accuracy = false;
+				const accuracy = true;
 				const unshackle = true;
 				const weightAccToMoney = 0.75; //1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
 
