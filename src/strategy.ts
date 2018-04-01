@@ -284,52 +284,19 @@ var Chromosome = function(): void {
 
 //
 Chromosome.prototype.normalize = function() {
-	const ratioDampen = 0.97;
-	const lowValueControl = 0.000001;
-	// make weights > 0
-	var lowest = 0;
-	for (const e0 in this) {
-		if (this.hasOwnProperty(e0)) {
-			const low = Number(this[e0]);
-			if (low < lowest) {
-				lowest = low;
-			}
-		}
-	}
-	//if (lowest<0){
-	lowest -= lowValueControl;	// extra sum for near zero prevention.
-	//}
-	for (const e01 in this) {
-		if (this.hasOwnProperty(e01)) {
-			this[e01] -= lowest;
-		}
-	}
-	// nerf very highest. A constant dampening.
-	var highest = 0;
-	var highIndex = null;
-	for (const e0 in this) {
-		if (this.hasOwnProperty(e0)) {
-			const high = Number(this[e0]);
-			if (high > highest) {
-				highest = high;
-				highIndex = e0;
-			}
-		}
-	}
-	if (this.hasOwnProperty(highIndex)) {
-		this[highIndex] *= ratioDampen;
-	}
-
 	// normalize
 	var sum = 0;
 	for (const el in this) {
 		if (this.hasOwnProperty(el)) {
+			if (this[el] < 0) {
+				this[el] = 0.01;
+			}
 			sum += Number(this[el]);
 		}
 	}
 	for (const el2 in this) {
 		if (this.hasOwnProperty(el2)) {
-			this[el2] /= sum;
+			this[el2] /= (sum * 0.01);
 		}
 	}
 };
@@ -363,14 +330,14 @@ Chromosome.prototype.toDisplayString = function() {
 Chromosome.prototype.mate = function(other) {
 	const offspring = new Chromosome();
 	const parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
-	const mutationScale = 0.25;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
-	const mutationChance = 0.08;	// range [0,1]
+	const mutationScale = 2;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
+	const mutationChance = 0.1;	// range [0,1]
 	const smallVal = 0.000001;
 	for (const i in offspring) {
 		if (typeof offspring[i] !== "function") {
 			offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
 			const radiation = (Math.random() - 0.5) * 2.0;
-			let change = offspring[i] * radiation * mutationScale;
+			let change = radiation * mutationScale;
 			if (Math.abs(change) < smallVal) {
 				change = smallVal;
 			}

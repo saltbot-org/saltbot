@@ -237,6 +237,7 @@ var ir = function(f: string) {
 	let mObj: MatchRecord = null;
 	const lines = f.split("\n");
 	for (const line of lines) {
+		line.replace("\r", "");
 		const match = line.split(",");
 
 		for (let j = 0; j < match.length; j++) {

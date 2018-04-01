@@ -320,15 +320,9 @@ Simulator.prototype.evalMutations = function() {
 			const parents = [];
 			const nextGeneration = [];
 			const money = true;
-			const accuracy = true;
+			const accuracy = false;
 			const unshackle = true;
 			const weightAccToMoney = 0.75; //1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
-
-			// these ratios controls how critters are breed using the sorted array of critters after the heuristic method. Think of percents as from top best to worst.
-			const ratioTopKeep = 0;				// valid range [0,1], from the sorted listed of last gen, the best retained and reused. Not recommended as it prevents "jitter" in finding solutions.
-			const ratioTopKeptBreeding = 0.5;		// valid range (0,1), Critical value; fills pool after ratioTopKeep. Controls how many critters are kept/dropped.
-			const ratioOrderedTopBestBreeding = 0;	// valid range [0, 1), treat it exclusive to ratioEvenTopBestBreeding. Ratio of controlled breeding onto the best.
-			const ratioEvenTopBestBreeding = Math.ceil(4 / 64);		// valid range [0, 1), treat it exclusive to ratioOrderedTopBestBreeding. Evenly allows the the top list a chance to breed.
 
 			for (let l = 0; l < orders.length; l++) {
 				let penalty = 1;
@@ -350,46 +344,40 @@ Simulator.prototype.evalMutations = function() {
 				}
 			});
 
-			const sizeNextGen = sortingArray.length;
-			const sizeTopParents = Math.floor(sizeNextGen * ratioTopKeep);		// keep part of sorted population
-			const sizeTopParentsBreed = Math.floor(sizeNextGen * ratioTopKeptBreeding);
-			for (let o = 0; o < sizeTopParents; o++) {
+			//add 10 best to next generation
+			for (let o = 0; o < 10; o++) {
 				parents.push(sortingArray[o][0]);
 				//ranking guarantees that we send the best one
 				sortingArray[o][0].rank = o + 1;
 				nextGeneration.push(sortingArray[o][0]);
 			}
 
+			//add 10 mutations of best chromosome to next generation
+			for (let o = 0; o < 10; o++) {
+				parents.push(sortingArray[o][0]);
+				//ranking guarantees that we send the best one
+				sortingArray[o][0].rank = o + 1;
+				nextGeneration.push(parents[0].mate(parents[0]));
+			}
+
 			// i really only need to see the best one
 			console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2], 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 
 			// created and push children of that half of best sorted population
-			for (let mf = 0; mf < sizeNextGen - sizeTopParents; mf++) {
-				const attempts = 2;
-				let atmp = 0;
-
-				let parent1 = null;
-				let parent2 = null;
-				let child = null;
-
-				do {
-					/*if (mf === 0) {													// breed the best to worst.
-					 parent1 = sortingArray[0][0];
-					 parent2 = sortingArray[sizeTopParentsBreed-1][0];
-					 } else*/
-					if (mf < sizeTopParentsBreed * (ratioOrderedTopBestBreeding)) {	// breed orderly with best
-						parent1 = sortingArray[0][0];
-						parent2 = sortingArray[mf][0];
-					} else if (mf < sizeTopParentsBreed * (ratioEvenTopBestBreeding)) {		// breed all the best with a random.
-						parent1 = sortingArray[mf][0];
-						parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
-					} else {					// fill remaining population by random breeding the best with chaos.
-						parent1 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
-						parent2 = sortingArray[Math.floor(Math.random() * (sizeTopParentsBreed))][0];
-					}
-					atmp++;
-				} while ((parent1 === parent2) && (atmp < attempts));
-
+			for (var mf = 0; mf < 10; mf++) {
+				var parent1 = null;
+				var parent2 = null;
+				var child = null;
+				if (mf === 0) {
+					parent1 = parents[0];
+					parent2 = parents[parents.length - 1];
+				} else if (mf <= 4) {
+					parent1 = parents[0];
+					parent2 = parents[mf];
+				} else {
+					parent1 = parents[mf - 1];
+					parent2 = parents[mf];
+				}
 				child = parent1.mate(parent2);
 				nextGeneration.push(child);
 			}
