@@ -1,6 +1,6 @@
 class Match {
 	public names: string[];
-	public strategy: any;
+	public strategy: Strategy;
 	public character1: Character;
 	public character2: Character;
 	public winner: number;
@@ -12,7 +12,7 @@ class Match {
 	public illumFavor: number;
 	public multiplier: number;
 
-	constructor(strat: any) {
+	constructor(strat: Strategy) {
 		this.names = [strat.p1name, strat.p2name];
 		this.strategy = strat;
 		this.character1 = null;

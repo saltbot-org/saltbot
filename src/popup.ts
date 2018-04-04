@@ -178,7 +178,7 @@ class Simulator {
 				const data = [];
 				const correct = [];
 				const totalBettedOn = [];
-				const strategies = [];
+				const strategies: Strategy[] = [];
 				const totalPercentCorrect = [];
 				self.money = [];
 				const updater = new Updater();
@@ -200,7 +200,7 @@ class Simulator {
 
 				// process orders for strategy creation
 				for (const order of orders) {
-					let strategy;
+					let strategy: Strategy;
 					switch (order.type) {
 						case "ct":
 							strategy = new CoinToss();
@@ -418,7 +418,7 @@ class Simulator {
 		}
 	}
 
-	private getBetAmount(strategy, index) {
+	private getBetAmount(strategy: Strategy, index) {
 		var amountToBet;
 		const tournament = false;
 		const debug = true;

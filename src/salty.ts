@@ -119,7 +119,7 @@ class Controller {
 			self.ticksSinceMatchBegan += 1;
 
 			//check to see if the betting buttons are visible and the footer message already changed
-			const bettingTable = $(".dynamic-view")[0];
+			const bettingTable = $("#wager")[0];
 			const styleObj = window.getComputedStyle(bettingTable, null);
 			bettingAvailable = styleObj.display !== "none" && $("#footer-alert")[0].innerHTML !== self.lastFooterMessage;
 
@@ -276,7 +276,7 @@ class Controller {
 						level = self.currentMatch.strategy.level;
 					} else {
 						// get amount for first match
-						const nullMatch = new Match(new Strategy("nullStrat"));
+						const nullMatch = new Match(new Observer());
 						nullMatch.strategy.adjustLevel(nullMatch.getBalance());
 						level = nullMatch.strategy.level;
 					}
