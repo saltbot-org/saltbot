@@ -487,6 +487,9 @@ class Controller {
 var ctrl: Controller = null;
 if (window.location.href === "http://www.saltybet.com/" || window.location.href === "http://mugen.saltybet.com/" ||
 	window.location.href === "https://www.saltybet.com/" || window.location.href === "https://mugen.saltybet.com/") {
+
+	correctChatIFrame();
+
 	ctrl = new Controller();
 	ctrl.ensureTwitch();
 	chrome.storage.local.get(["settings_v1"], function(results) {
@@ -693,3 +696,10 @@ var displayDialogMessage = function(message) {
 	dialog.html(message.replace(/\n/g, "<br />"));
 	dialog.dialog("open");
 };
+
+function correctChatIFrame() {
+	const chatFrame = (document.getElementById("chat-frame-stream") as HTMLIFrameElement);
+	if (chatFrame.src === "http://twitch.tv/saltybet/chat") {
+		chatFrame.src = "http://twitch.tv/embed/saltybet/chat";
+	}
+}
