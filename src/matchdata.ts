@@ -44,9 +44,9 @@ const loadMatches = async function() {
 			matches = matches.concat(matchesMirrored);
 		}
 
+		($.fn.dataTable as any).moment("DD-MM-YYYY");
 		$("#matches").DataTable({
 			columnDefs: [
-				{ type: "date-eu", targets: 11 },
 				{ type: "odds", targets: 7 },
 				{ searchable: false, targets: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
 			],
