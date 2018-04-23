@@ -31,10 +31,11 @@
       ]
 		},
 		{
-			"matches": [
-				"http://www.twitch.tv/saltybet/chat",
-				"https://www.twitch.tv/saltybet/chat"
-			],
+      "matches": [
+        "http://www.twitch.tv/saltybet/chat",
+        "https://www.twitch.tv/saltybet/chat",
+        "https://www.twitch.tv/popout/saltybet/chat"
+      ],
       "js": [
         "js/lib/jquery.min.js",
         "js/lib/moment.min.js",

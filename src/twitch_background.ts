@@ -176,7 +176,8 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 });
 
 function checkForTwitchTab() {
-	chrome.tabs.query({ url: "*://www.twitch.tv/saltybet/chat" }, function(result) {
+	chrome.tabs.query({
+		url: ["*://www.twitch.tv/saltybet/chat", "*://www.twitch.tv/popout/saltybet/chat"] }, function(result) {
 		if (result.length === 0) {
 			//no twitch tab found
 			chrome.tabs.create({
