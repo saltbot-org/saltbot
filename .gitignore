@@ -1,9 +1,8 @@
-archive
-node_modules
-.project
-.idea
-*.iml
-*.pem
-orig/
-*.dropbox
 desktop.ini
+.suo
+bin/
+obj/
+dist/js/*.js
+archive
+*~
+node_modules

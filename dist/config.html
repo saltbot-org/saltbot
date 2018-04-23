@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+	<title>Saltbot Configuration</title>
+	<link rel="stylesheet" href="css/structure.css" type="text/css"/>
+	<link rel="stylesheet" href="css/form.css" type="text/css"/>
+	<link rel="stylesheet" href="css/theme.css" type="text/css"/>
+	<script src="js/lib/jquery.min.js"></script>
+	<script src="js/config.js"></script>
+</head>
+<body id="public">
+<div id="container">
+	<form class="wufoo">
+		<img src="images/48.png" alt="Saltbot icon" id="saltbot-icon"/>
+		<h1>Saltbot Configuration</h1>
+		<h2 title="Bet on exhibition matches, (Team matches are always skipped)">Exhibition betting</h2>
+		<p>
+			<input type="checkbox" id="te"/>Bet on exhibitions
+		</p>
+		<h2 title="Set the max record lookup when betting">Max Record Lookup(WIP)</h2>
+		<p>
+			<input type="checkbox" id="mrq"/>Max Records Quantity<input id="record-max-limit" type="number" min="5"
+			                                                                value="15"/>
+		</p>
+		<h2 title="Turn on upset bet mode to make fast gains by betting underdog">Upset Mode(WIP)</h2>
+		<p>
+			<input type="checkbox" id="upsb"/>Enable Upset Betting
+		</p>
+		<h2 title="Tournament betting settings">Tournament betting</h2>
+		<p>
+			<input type="checkbox" id="ait"/>Go all in at tournaments<br/>
+			<input id="ctl" type="checkbox"/>Stop at tourney balance <input id="tourney-limit" type="number" min="1000"
+			                                                                value="100000"/>
+		</p>
+		<h2 title="Prevent betting failure due to crashed tabs">Keep alive</h2>
+		<p>
+			<input type="checkbox" id="toggleKeepAlive"/>Restore crashed or closed saltybet tabs
+		</p>
+		<h2 title="Show a table of player rankings">Display Player Rankings</h2>
+		<p>
+			<input type="radio" name="rankings" id="bdr"/>Players by %
+			<input type="radio" name="rankings" id="bpr"/>Players by $
+		</p>
+		<details id="details-ranking" open>
+			<summary>Ranking</summary>
+			<div id="ranking"></div>
+		</details>
+
+	</form>
+</div>
+</body>
+</html>
