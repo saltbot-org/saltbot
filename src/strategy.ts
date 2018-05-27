@@ -268,131 +268,150 @@ class RatioConfidence extends Strategy {
 	}
 }
 
-var Chromosome = function(): void {
-	// confidence weights
-	this.oddsWeight = 0.5;
-	this.timeAveWin = 1;	//this.timeWeight  =  1;
-	this.timeAveLose = 1;
-	this.winPercentageWeight = 1;
-	this.crowdFavorWeight = 0.5;
-	this.illumFavorWeight = 0.5;
+class Chromosome {
+	//confidence weights
+	public oddsWeight: number = 0.5;
+	public timeAveWin: number = 1;	//public .timeWeight  =  1;
+	public timeAveLose: number = 1;
+	public winPercentageWeight: number = 1;
+	public crowdFavorWeight: number = 0.5;
+	public illumFavorWeight: number = 0.5;
 	// tier scoring
-	this.wX = 1;
-	this.wS = 1;
-	this.wA = 1;
-	this.wB = 1;
-	this.wP = 1;
-	this.wU = 1;
-	this.lX = 1;
-	this.lS = 1;
-	this.lA = 1;
-	this.lB = 1;
-	this.lP = 1;
-	this.lU = 1;
+	public wX: number = 1;
+	public wS: number = 1;
+	public wA: number = 1;
+	public wB: number = 1;
+	public wP: number = 1;
+	public wU: number = 1;
+	public lX: number = 1;
+	public lS: number = 1;
+	public lA: number = 1;
+	public lB: number = 1;
+	public lP: number = 1;
+	public lU: number = 1;
 	// odds weights
-	this.oX = 1;
-	this.oS = 1;
-	this.oA = 1;
-	this.oB = 1;
-	this.oP = 1;
-	this.oU = 1;
+	public oX: number = 1;
+	public oS: number = 1;
+	public oA: number = 1;
+	public oB: number = 1;
+	public oP: number = 1;
+	public oU: number = 1;
 	// times weights
-	this.wtX = 1;
-	this.wtS = 1;
-	this.wtA = 1;
-	this.wtB = 1;
-	this.wtP = 1;
-	this.wtU = 1;
-	this.ltX = 1;
-	this.ltS = 1;
-	this.ltA = 1;
-	this.ltB = 1;
-	this.ltP = 1;
-	this.ltU = 1;
-};
+	public wtX: number = 1;
+	public wtS: number = 1;
+	public wtA: number = 1;
+	public wtB: number = 1;
+	public wtP: number = 1;
+	public wtU: number = 1;
+	public ltX: number = 1;
+	public ltS: number = 1;
+	public ltA: number = 1;
+	public ltB: number = 1;
+	public ltP: number = 1;
+	public ltU: number = 1;
 
-//
-Chromosome.prototype.normalize = function() {
-	// normalize
-	var sum = 0;
-	for (const el in this) {
-		if (this.hasOwnProperty(el)) {
-			if (this[el] < 0) {
-				this[el] = 0.01;
+	public randomize(): Chromosome {
+		for (const prop in this) {
+			if (this.hasOwnProperty(prop)) {
+				(this[prop] as any) = Math.random();
+				if ((this[prop] as any) < 0.0001) {
+					(this[prop] as any) = 0.01;
+				}
 			}
-			sum += Number(this[el]);
 		}
-	}
-	for (const el2 in this) {
-		if (this.hasOwnProperty(el2)) {
-			this[el2] /= (sum * 0.01);
-		}
-	}
-};
 
-Chromosome.prototype.loadFromJSON = function(json) {
-	const copy = JSON.parse(json);
-	for (const i in copy) {
-		if (this.hasOwnProperty(i)) {
-			this[i] = Number(copy[i]);
-		}
+		this.normalize();
+		return this;
 	}
-	return this;
-};
-Chromosome.prototype.loadFromObject = function(obj) {
-	for (const i in obj) {
-		if (this.hasOwnProperty(i)) {
-			this[i] = Number(obj[i]);
-		}
-	}
-	return this;
-};
-Chromosome.prototype.toDisplayString = function() {
-	var results = "-\nchromosome:";
-	for (const i in this) {
-		if (typeof this[i] !== "function") {
-			results += "\n" + i + " : " + this[i];
-		}
-	}
-	return results;
-};
-Chromosome.prototype.mate = function(other) {
-	const offspring = new Chromosome();
-	const parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
-	const mutationScale = 2;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
-	const mutationChance = 0.1;	// range [0,1]
-	const smallVal = 0.000001;
-	for (const i in offspring) {
-		if (typeof offspring[i] !== "function") {
-			offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
-			const radiation = (Math.random() - 0.5) * 2.0;
-			let change = radiation * mutationScale;
-			if (Math.abs(change) < smallVal) {
-				change = smallVal;
-			}
-			if ((Math.random() < mutationChance) && (offspring[i] != null)) {
-				offspring[i] += change;
-			}
-			if (Math.abs(offspring[i]) < smallVal) {
-				offspring[i] = smallVal;
+
+	public normalize(): Chromosome {
+		var sum = 0;
+		for (const el in this) {
+			if (this.hasOwnProperty(el)) {
+				if (Number(this[el]) < 0) {
+					(this[el] as any) = 0.01;
+				}
+				sum += Number(this[el]);
 			}
 		}
-	}
-	offspring.normalize();
-	return offspring;
-};
-// note, test equals for floats...
-Chromosome.prototype.equals = function(other) {
-	let anyDifference: boolean = false;
-	for (const i in other) {
-		if (typeof other[i] !== "function") {
-			if (this[i] !== other[i]) {
-				anyDifference = true;
+		for (const el in this) {
+			if (this.hasOwnProperty(el)) {
+				(this[el] as any) /= (sum * 0.01);
 			}
 		}
+		return this;
 	}
-	return !anyDifference;
-};
+
+	public loadFromJSON(json: string): Chromosome {
+		const copy = JSON.parse(json);
+		for (const i in copy) {
+			if (this.hasOwnProperty(i)) {
+				this[i] = Number(copy[i]);
+			}
+		}
+		return this;
+	}
+
+	public loadFromObject(obj): Chromosome {
+		for (const i in obj) {
+			if (this.hasOwnProperty(i)) {
+				this[i] = Number(obj[i]);
+			}
+		}
+		return this;
+	}
+
+	public toDisplayString(): string {
+		var results = "-\nchromosome:";
+		for (const i in this) {
+			if (typeof this[i] !== "function") {
+				results += "\n" + i + " : " + this[i];
+			}
+		}
+		return results;
+	}
+
+	public mate(other: Chromosome) {
+		const offspring = new Chromosome();
+		const parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
+		const mutationScale = 2;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
+		const mutationChance = 0.1;	// range [0,1]
+		const smallVal = 0.000001;
+		for (const i in offspring) {
+			if (typeof offspring[i] !== "function") {
+				offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
+				const radiation = (Math.random() - 0.5) * 2.0;
+				let change = radiation * mutationScale;
+				if (Math.abs(change) < smallVal) {
+					change = smallVal;
+				}
+				if ((Math.random() < mutationChance) && (offspring[i] != null)) {
+					offspring[i] += change;
+				}
+				if (Math.abs(offspring[i]) < smallVal) {
+					offspring[i] = smallVal;
+				}
+			}
+		}
+		offspring.normalize();
+		return offspring;
+	}
+
+	// note, test equals for floats...
+	public equals(other) {
+		let anyDifference: boolean = false;
+		for (const i in other) {
+			if (typeof other[i] !== "function") {
+				if (this[i] !== other[i]) {
+					anyDifference = true;
+				}
+			}
+		}
+		return !anyDifference;
+	}
+
+}
+
 // scores character stats by chromosome. Does not score everything, Eg) differances of both characters stats are scored later.
 var CSStats = function(cObj, chromosome) {
 	var oddsSum = 0;

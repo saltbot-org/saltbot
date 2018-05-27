@@ -278,8 +278,8 @@ class Simulator {
 
 				//go through totalPercentCorrect, weed out the top 10, breed them, save them
 				const sortingArray = [];
-				const parents = [];
-				const nextGeneration = [];
+				const parents: Chromosome[] = [];
+				const nextGeneration: Chromosome[] = [];
 				const money = true;
 				const accuracy = true;
 				const unshackle = true;
@@ -305,43 +305,55 @@ class Simulator {
 					}
 				});
 
-				//add 10 best to next generation
-				for (let o = 0; o < 10; o++) {
-					parents.push(sortingArray[o][0]);
-					//ranking guarantees that we send the best one
-					sortingArray[o][0].rank = o + 1;
-					nextGeneration.push(sortingArray[o][0]);
-				}
+				if (sortingArray.length > 1) {
+					//add 10 best to next generation
+					for (let o = 0; o < 10; o++) {
+						parents.push(sortingArray[o][0]);
+						//ranking guarantees that we send the best one
+						sortingArray[o][0].rank = o + 1;
+						nextGeneration.push(sortingArray[o][0]);
+					}
 
-				//add 10 mutations of best chromosome to next generation
-				for (let o = 0; o < 10; o++) {
-					parents.push(sortingArray[o][0]);
-					//ranking guarantees that we send the best one
-					sortingArray[o][0].rank = o + 1;
-					nextGeneration.push(parents[0].mate(parents[0]));
+					//add 10 mutations of best chromosome to next generation
+					for (let o = 0; o < 10; o++) {
+						nextGeneration.push(parents[0].mate(parents[0]));
+					}
+
+					// created and push children of that half of best sorted population
+					for (var mf = 0; mf < 10; mf++) {
+						var parent1 = null;
+						var parent2 = null;
+						var child = null;
+						if (mf === 0) {
+							parent1 = parents[0];
+							parent2 = parents[parents.length - 1];
+						} else if (mf <= 4) {
+							parent1 = parents[0];
+							parent2 = parents[mf];
+						} else {
+							parent1 = parents[mf - 1];
+							parent2 = parents[mf];
+						}
+						child = parent1.mate(parent2);
+						nextGeneration.push(child);
+					}
+
+					//add 10 random ones
+					for (let o = 0; o < 10; o++) {
+						nextGeneration.push(new Chromosome().randomize());
+					}
+				}
+				else {
+					//no other chromosomes are found, create the rest randomly
+					nextGeneration.push(sortingArray[0][0]);
+
+					while (nextGeneration.length < 40) {
+						nextGeneration.push(new Chromosome().randomize());
+					}
 				}
 
 				// i really only need to see the best one
 				console.log(sortingArray[0][0].toDisplayString() + " -> " + sortingArray[0][1].toFixed(4) + "%,  $" + parseInt(sortingArray[0][2], 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-
-				// created and push children of that half of best sorted population
-				for (var mf = 0; mf < 10; mf++) {
-					var parent1 = null;
-					var parent2 = null;
-					var child = null;
-					if (mf === 0) {
-						parent1 = parents[0];
-						parent2 = parents[parents.length - 1];
-					} else if (mf <= 4) {
-						parent1 = parents[0];
-						parent2 = parents[mf];
-					} else {
-						parent1 = parents[mf - 1];
-						parent2 = parents[mf];
-					}
-					child = parent1.mate(parent2);
-					nextGeneration.push(child);
-				}
 
 				let bestPercent;
 				let bestMoney;
@@ -368,26 +380,9 @@ class Simulator {
 	public initializePool() {
 		const populationSize = 32;	// too small, it cannot expanded solve space; too large, not only runtime increases, weights differences between best/worst become dominate.
 		const shortPopulationSize = 16;
-		const pool = [new Chromosome(), new Chromosome()];
+		const pool: Chromosome[] = [];
 		while (pool.length < populationSize) {
-			if (pool.length < shortPopulationSize) {
-				const offspring = pool[0].mate(pool[1]);
-				let foundDuplicate = false;
-				for (const ch of pool) {
-					if (ch.equals(offspring)) {
-						foundDuplicate = true;
-					}
-				}
-				if (!foundDuplicate) {
-					pool.push(offspring);
-				}
-			} else {
-				// offset random, as starting new chromosomes are not normalized.
-				const chromosome1 = pool[2 + Math.floor(Math.random() * (pool.length - 2))];
-				const chromosome2 = pool[2 + Math.floor(Math.random() * (pool.length - 2))];
-				pool.push(chromosome1.mate(chromosome2));
-			}
-
+			pool.push(new Chromosome().randomize());
 		}
 		const newPool = [];
 		for (let i = 0; i < pool.length; i++) {
@@ -469,11 +464,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			($("#multiplierSlider")[0] as HTMLInputElement).value = result.settings_v1.multiplier || 1;
 
 			setButtonActive("#cs_" + result.settings_v1.nextStrategy);
-
-			console.log($("#tl")[0]);
-			console.log(($("#limit")[0] as HTMLInputElement).value);
 		}
-		console.log(result);
 	});
 
 	$("#ber")[0].addEventListener("click", erClick);
