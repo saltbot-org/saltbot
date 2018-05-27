@@ -30,19 +30,20 @@
 }(jQuery));
 
 let addListener = function() {
-	($(".scroll.chat-messages.js-chat-messages") as any).waitUntilExists(function() {
+	($(".chat-list__lines") as any).waitUntilExists(function() {
 		// put a mutation observer on the chat which reports back to the main content script whenever Waifu speaks
-		const chatWindow = $(".scroll.chat-messages.js-chat-messages")[0];
+		const chatWindow = $(".chat-list__lines")[0];
 		const oldWaifuMessages = [];
 		const observer = new MutationObserver(function(mutations) {
 
-			const chatLines = $(chatWindow).find(".chat-line");
+			const chatLines = $(chatWindow).find(".chat-line__message");
 			const Waifu4uLines = [];
 			chatLines.each(function(index, element) {
-				const from = $(this).find(".from")[0].innerText;
+				const from = $(this).find(".chat-author__display-name")[0].innerText;
 
 				if (from.toUpperCase() === "WAIFU4U") {
-					const message = $(this).find(".message")[0].innerText;
+					const message = $(this).find("span[data-a-target='chat-message-text'],a[data-a-target='chat-line__message--link'],a.ffz-tooltip").text();
+
 					if (oldWaifuMessages.indexOf(message) === -1) {
 						oldWaifuMessages.push(message);
 						Waifu4uLines.push(message);
