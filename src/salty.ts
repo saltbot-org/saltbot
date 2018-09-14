@@ -421,7 +421,7 @@ class Controller {
 		}
 
 		if (limit) {
-			this.settings.limit = parseInt(limit);
+			this.settings.limit = parseInt(limit, 10);
 		}
 		this.settings.limit_enabled = enabled;
 		this.saveSettings("- settings updated, limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
