@@ -6,10 +6,10 @@
   ],
   "jsRules": {},
   "rules": {
+    "radix": false,
     "no-empty": false,
     "object-literal-sort-keys": false,
     "no-shadowed-variable": false,
-    "radix": NULL,
     "no-var-keyword": false,
     "indent": [ true, "tabs", 4 ],
     "only-arrow-functions": false,
