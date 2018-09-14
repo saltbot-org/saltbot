@@ -4,5 +4,8 @@ node_js:
   - '9'
 os:
   - linux
+cache:
+  directories:
+  - node_modules
 script:
   - npm install && npm run build
