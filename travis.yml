@@ -1,8 +1,13 @@
+before install:
+  - rm "/home/travis/build/synkarius/saltbot/node_modules"
 sudo: false
 language: node_js
 node_js:
   - "9"
 os:
   - linux
+cache:
+  directories:
+    - node_modules
 script:
   - npm install && npm run build
