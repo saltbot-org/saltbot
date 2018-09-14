@@ -600,7 +600,7 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 						const regex = /\$([0-9]*)/g;
 						if (regex.test(moneyText)) {
 							mtMatches = moneyText.match(regex);
-							self.lastMatchCumulativeBetTotal = parseInt(mtMatches[0].replace("$", "")) + parseInt(mtMatches[1].replace("$", ""));
+							self.lastMatchCumulativeBetTotal = parseInt(mtMatches[0].replace("$", ""), 10) + parseInt(mtMatches[1].replace("$", ""), 10);
 						} else {
 							throw new Error("totals error");
 						}
