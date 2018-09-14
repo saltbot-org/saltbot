@@ -6,6 +6,6 @@ os:
     - linux
 cache:
     directories:
-        - node_modules
+        - $HOME/.npm
 script:
     - 'npm install && npm run build'
