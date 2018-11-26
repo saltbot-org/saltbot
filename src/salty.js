@@ -138,6 +138,7 @@ var Controller = function () {
 					var c2 = records[2];
 
 					console.log("- match result code: " + "c1:" + mr.c1 + "|c2:" + mr.c2 + "|w:" + mr.w + "|s:" + mr.sn + "|p:" + mr.pw + "|t:" + mr.t + "|m:" + mr.m + "|o:" + mr.o + "|t:" + mr.ts);
+					console.log("- match result Readable: " + "Character1:" + mr.c1 + "| Character 2:" + mr.c2 + "| Winner:" + mr.w + "| Strategy:" + mr.sn + "| Prediction:" + mr.pw + "| Tier:" + mr.t + "| Mode:" + mr.m + "| Odds:" + mr.o + "| Time:" + mr.ts);
 
 					var s = self;
 					var updateRecords = function (results) {
@@ -185,7 +186,7 @@ var Controller = function () {
 						}
 						updater.updateBettorsFromMatch(mr, bc1, bc2);
 						if (debugMode)
-							console.log("- number of:: chars: " + characters_v1.length + ", matches: " + matches_v1.length + ", bettors: " + bettors_v1.length);
+							console.log("- number of:: Characters: " + characters_v1.length + ", Matches: " + matches_v1.length + ", Bettors: " + bettors_v1.length);
 
 						//do aliasing for closure
 						var mbr = matchesBeforeReset;
@@ -336,7 +337,7 @@ Controller.prototype.ensureTwitch = function () {
 	chrome.runtime.sendMessage({
 		getTwitch: true
 	}, function (response) {
-		//console.debug("response received in salty");
+//		console.debug("response received in salty");
 	});
 };
 Controller.prototype.removeVideoWindow = function () {

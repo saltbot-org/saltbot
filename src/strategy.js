@@ -14,7 +14,7 @@ var Strategy = function (sn) {
 		[1000000, 5000000, 250],
 		[5000000, 20000000, 500]];
 	this.lowBet = false;
-};
+}; // 10-12-2017
 Strategy.prototype.getBailout = function (tournament) {
 	var nameSpan = $("h2")[0].children[2];
 	var isIlluminati = false;
@@ -374,7 +374,7 @@ var CSStats = function (cObj, chromosome) {
 	}
 };
 var ConfidenceScore = function (chromosome, level, lastMatchCumulativeBetTotal) {
-	Strategy.call(this, "cs");
+	Strategy.call(this, "cs"); ///Scientist Mode
 	this.abstain = false;
 	this.confidence = null;
 	this.chromosome = chromosome;
@@ -435,6 +435,7 @@ ConfidenceScore.prototype.execute = function (info) {
 	var c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
 	var c2WPDisplay = wpTotal > 0 ? c2Stats.wins / wpTotal : 0;
 	if (this.debug) {
+		console.log("\n\xBB Win Percentage (red:blue) -> (" + c1WPDisplay.toString().replace(/,/g, '') + " : " + c2WPDisplay.toString().replace(/,/g, '') + ")");
 		winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> (" + (c1WPDisplay * 100).toFixed(0) + " : " + (c2WPDisplay * 100).toFixed(0) + ")" +
 			"  ::  unweighted (red W:L)(blue W:L) -> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")" +
 			"  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, '') + ":" + c1.losses.toString().replace(/,/g, '') + ")" +

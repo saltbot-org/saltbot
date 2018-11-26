@@ -98,11 +98,13 @@ chrome.extension.onMessage.addListener(function (details, sender, sendResponse) 
 		});
 	}
 	if (details.getTwitch !== undefined) {
-		chrome.tabs.query({url: "*://www.twitch.tv/saltybet/chat"}, function (result) {
+//		chrome.tabs.query({url: "*://www.twitch.tv/saltybet/chat"}, function (result) {
+//		chrome.tabs.query({url: "*://go.twitch.tv/popout/saltybet/chat"}, function (result) {
+		chrome.tabs.query({url: "*://www.twitch.tv/*saltybet/chat"}, function (result) {
 			if (result.length == 0) {
 				//no twitch tab found
 				chrome.tabs.create({
-					url: "http://www.twitch.tv/saltybet/chat"
+					url: "http://www.twitch.tv/saltybet/chat" // https://go.twitch.tv/popout/saltybet/chat // http://www.twitch.tv/saltybet/chat // http://www.twitch.tv/saltybet/chat
 				}, function (tab) {
 					console.log("The new tab has the url '" + tab.url + "'");
 				});

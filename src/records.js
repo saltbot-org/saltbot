@@ -72,6 +72,7 @@ Updater.prototype.updateBettorsFromMatch = function (mObj, bc1, bc2) {
 		else
 			bc2[j].losses += 1;
 	}
+	//console.log("****************************** Red wins" + bc1.wins.length);
 };
 Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 	// wins, losses, and times
@@ -92,7 +93,7 @@ Updater.prototype.updateCharactersFromMatch = function (mObj, c1Obj, c2Obj) {
 		c1Obj.totalFights.push(0);
 		c2Obj.totalFights.push(1);
 	}
-
+	console.log("****************************** Red wins " + c1Obj.wins.length);
 	var limitRecordsTo = function (charObj, limit) {
 		if (charObj.totalFights.length > limit) {
 			if (charObj.totalFights[0] == 0) {
