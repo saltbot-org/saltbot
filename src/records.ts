@@ -110,7 +110,6 @@ Updater.prototype.updateBettorsFromMatch = function(mObj: MatchRecord, bc1, bc2)
 			bettorForCharacter2.losses += 1;
 		}
 	}
-	//console.log("****************************** Red wins" + bc1.wins.length);
 };
 Updater.prototype.updateCharactersFromMatch = function(mObj: MatchRecord, c1Obj: Character, c2Obj: Character) {
 	const rememberRecordsLast = 15;  // changing this requires re-importing matches.
@@ -132,13 +131,8 @@ Updater.prototype.updateCharactersFromMatch = function(mObj: MatchRecord, c1Obj:
 		c1Obj.totalFights.push(0);
 		c2Obj.totalFights.push(1);
 	}
-<<<<<<< HEAD:src/records.ts
 
 	const limitRecordsTo = function(charObj, limit) {
-=======
-	console.log("****************************** Red wins " + c1Obj.wins.length);
-	var limitRecordsTo = function (charObj, limit) {
->>>>>>> master:src/records.js
 		if (charObj.totalFights.length > limit) {
 			if (charObj.totalFights[0] === 0) {
 				charObj.losses.shift();
