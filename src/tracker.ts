@@ -121,7 +121,10 @@ class Match {
 				console.log("- AGGRO multiplier active, increasing bet to " + amountToBet);
 			}
             if (this.strategy.maximum) {
-				amountToBet == amountToBet;
+                amountToBet *= 1;
+				if (amountToBet > balance) {
+					amountToBet = balance;
+				}
 				console.log("- Maximum bet mode active, limiting bet to " + amountToBet);
 			}
 		}
