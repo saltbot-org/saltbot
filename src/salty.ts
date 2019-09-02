@@ -408,7 +408,7 @@ class Controller {
 		this.saveSettings("- settings updated, talimit " + (taenabled ? "enabled" : "disabled") + " limit : " + talimit);
 
 	}
-	public setMax(tmenabled, tmlimit) {
+	public setMaximum(tmenabled, tmlimit) {
 		if (tmlimit === this.settings.tmlimit && tmenabled === this.settings.tmlimit_enabled) {
 			//nothing to do
 			return;
