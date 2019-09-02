@@ -49,6 +49,10 @@ var taChange = function() {
 	const talimit = ($("#talimit")[0] as HTMLInputElement).value;
 	elementChanged("talimit_" + (($("#ta")[0] as HTMLInputElement).checked ? "enable" : "disable"), talimit);
 };
+var tmChange = function() {
+	const tmlimit = ($("#tmlimit")[0] as HTMLInputElement).value;
+	elementChanged("tmlimit_" + (($("#tm")[0] as HTMLInputElement).checked ? "enable" : "disable"), tmlimit);
+};
 var limitChange = function() {
 	const limit = +($("#limit")[0] as HTMLInputElement).value;
 	if (!limit) {
@@ -480,6 +484,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	$("#tv")[0].addEventListener("click", tvClick);
 	$("#ta")[0].addEventListener("change", taChange);
 	$("#talimit").bind("keyup input", taChange);
+	$("#tm")[0].addEventListener("change", taChange);
+	$("#tmlimit").bind("keyup input", taChange);
 	$("#cs_o")[0].addEventListener("click", changeStrategyClickO);
 	$("#cs_cs")[0].addEventListener("click", changeStrategyClickCS);
 	$("#cs_rc")[0].addEventListener("click", changeStrategyClickRC);
