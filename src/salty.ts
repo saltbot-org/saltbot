@@ -325,7 +325,13 @@ class Controller {
 					else {
 						self.currentMatch.setAggro(false);
 					}
-
+                    //set max bet
+                    if (self.settings.tmlimit_enabled === true && self.currentMatch.getBalance() <= self.settings.tmlimit) {
+						self.currentMatch.setMax(true);
+					}
+					else {
+						self.currentMatch.setMax(false);
+					}
 				}
 
 				//skip team matches, mirror matches
@@ -400,6 +406,19 @@ class Controller {
 		}
 		this.settings.talimit_enabled = taenabled;
 		this.saveSettings("- settings updated, talimit " + (taenabled ? "enabled" : "disabled") + " limit : " + talimit);
+
+	}
+	public setMax(tmenabled, tmlimit) {
+		if (tmlimit === this.settings.tmlimit && tmenabled === this.settings.tmlimit_enabled) {
+			//nothing to do
+			return;
+		}
+
+		if (tmlimit) {
+			this.settings.tmlimit = +tmlimit;
+		}
+		this.settings.tmlimit_enabled = tmenabled;
+		this.saveSettings("- settings updated, tmlimit " + (tmenabled ? "enabled" : "disabled") + " limit : " + tmlimit);
 
 	}
 	public setExhibitions(value) {
@@ -501,6 +520,9 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 			}
 			if (self.settings.aggro !== undefined) {
 				console.log("aggro state: " + self.settings.aggro);
+			}
+            if (self.settings.maximum !== undefined) {
+				console.log("maximum state: " + self.settings.maximum);
 			}
 			if (self.settings.level === undefined) {
 				self.settings.level = 0;
