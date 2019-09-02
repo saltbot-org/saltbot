@@ -1,6 +1,6 @@
 //check if the saltybet tab is live.saltybet.com and correct it to saltybet.com if so
 if
-    location = 'https://live.saltybet.com/'
+    location = ('https://live.saltybet.com/')
     window.location.replace('https://www.saltybet.com/')
 
 //enable links
