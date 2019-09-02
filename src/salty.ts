@@ -327,10 +327,10 @@ class Controller {
 					}
                     //set max bet
                     if (self.settings.tmlimit_enabled === true && self.currentMatch.getBalance() <= self.settings.tmlimit) {
-						self.currentMatch.setMax(true);
+						self.currentMatch.setMaximum(true);
 					}
 					else {
-						self.currentMatch.setMax(false);
+						self.currentMatch.setMaximum(false);
 					}
 				}
 
