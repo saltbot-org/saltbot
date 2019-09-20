@@ -325,7 +325,13 @@ class Controller {
 					else {
 						self.currentMatch.setAggro(false);
 					}
-
+                    //set max bet
+                    if (self.settings.tmlimit_enabled === true && self.currentMatch.getBalance() <= self.settings.tmlimit) {
+						self.currentMatch.setMaximum(true);
+					}
+					else {
+						self.currentMatch.setMaximum(false);
+					}
 				}
 
 				//skip team matches, mirror matches
@@ -402,6 +408,19 @@ class Controller {
 		this.saveSettings("- settings updated, talimit " + (taenabled ? "enabled" : "disabled") + " limit : " + talimit);
 
 	}
+	public setMaximum(tmenabled, tmlimit) {
+		if (tmlimit === this.settings.tmlimit && tmenabled === this.settings.tmlimit_enabled) {
+			//nothing to do
+			return;
+		}
+
+		if (tmlimit) {
+			this.settings.tmlimit = +tmlimit;
+		}
+		this.settings.tmlimit_enabled = tmenabled;
+		this.saveSettings("- settings updated, tmlimit " + (tmenabled ? "enabled" : "disabled") + " limit : " + tmlimit);
+
+	}
 	public setExhibitions(value) {
 		this.settings.exhibitions = value;
 		this.saveSettings("- settings updated, exhibition betting: " + (this.settings.exhibitions ? "true" : "false"));
@@ -421,7 +440,7 @@ class Controller {
 		}
 
 		if (limit) {
-			this.settings.limit = parseInt(limit);
+			this.settings.limit = parseInt(limit, 10);
 		}
 		this.settings.limit_enabled = enabled;
 		this.saveSettings("- settings updated, limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
@@ -501,6 +520,9 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 			}
 			if (self.settings.aggro !== undefined) {
 				console.log("aggro state: " + self.settings.aggro);
+			}
+            if (self.settings.maximum !== undefined) {
+				console.log("maximum state: " + self.settings.maximum);
 			}
 			if (self.settings.level === undefined) {
 				self.settings.level = 0;
@@ -600,7 +622,7 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 						const regex = /\$([0-9]*)/g;
 						if (regex.test(moneyText)) {
 							mtMatches = moneyText.match(regex);
-							self.lastMatchCumulativeBetTotal = parseInt(mtMatches[0].replace("$", "")) + parseInt(mtMatches[1].replace("$", ""));
+							self.lastMatchCumulativeBetTotal = parseInt(mtMatches[0].replace("$", ""), 10) + parseInt(mtMatches[1].replace("$", ""), 10);
 						} else {
 							throw new Error("totals error");
 						}

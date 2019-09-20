@@ -120,6 +120,13 @@ class Match {
 				}
 				console.log("- AGGRO multiplier active, increasing bet to " + amountToBet);
 			}
+            if (this.strategy.maximum) {
+                amountToBet *= 1;
+				if (amountToBet > balance) {
+					amountToBet = balance;
+				}
+				console.log("- Maximum bet mode active, limiting bet to " + amountToBet);
+			}
 		}
 
 		if (amountToBet === 0) {
@@ -173,5 +180,8 @@ class Match {
 	}
 	public setAggro(aggro: boolean) {
 		this.strategy.aggro = aggro;
+	}
+    public setMaximum(maximum: boolean) {
+		this.strategy.maximum = maximum;
 	}
 }

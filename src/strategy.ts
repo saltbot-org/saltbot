@@ -12,6 +12,7 @@ abstract class Strategy {
 	public confidence: number;
 	public abstain: boolean;
 	public aggro: boolean;
+	public maximum: boolean;
 
 	constructor(strategyName: string) {
 		this.btnP1 = $("#player1")[0];

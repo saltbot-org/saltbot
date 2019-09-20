@@ -1,11 +1,11 @@
 sudo: false
 language: node_js
 node_js:
-  - 'node'
+    - '9'
 os:
-  - linux
+    - linux
 cache:
-  directories:
-  - node_modules
+    directories:
+        - $HOME/.npm
 script:
-  - npm install && npm run build
+    - 'npm install && npm run build'

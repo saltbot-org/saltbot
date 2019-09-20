@@ -1,6 +1,6 @@
 {
   "name": "saltbot",
-  "version": "2.5.0",
+  "version": "2.5.3git-9-2-19",
   "description": "Bot for betting on saltybet.com",
   "main": "index.js",
   "scripts": {
@@ -13,7 +13,8 @@
   "author": "David Conway",
   "contributors": [
     {
-      "name": "Stefan Berger"
+      "name": "Stefan Berger",
+      "name": "Calexil"
     }
   ],
   "license": "ISC",
