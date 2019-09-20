@@ -292,7 +292,7 @@ class Controller {
 							self.currentMatch = new Match(new ConfidenceScore(self.bestChromosome, level, self.lastMatchCumulativeBetTotal));
 							break;
 						case "ipu":
-							self.currentMatch = new Match(new InternetPotentialUpset(new ChromosomeIPU(), level));
+							self.currentMatch = new Match(new InternetPotentialUpset(level));
 							break;
 						default:
 							self.currentMatch = new Match(new Observer());

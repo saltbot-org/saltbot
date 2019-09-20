@@ -520,7 +520,7 @@ class ConfidenceScore extends Strategy {
 		const totalWeight = oddsWeight + timeAveWinWeight + timeAveLoseWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
 
 		// messages
-		const oddsMessage = null;
+		let oddsMessage = null;
 		let timeMessage = null;
 		let winsMessage = null;
 		let crwdMessage = null;
@@ -569,6 +569,10 @@ class ConfidenceScore extends Strategy {
 			}
 			else if (c1Stats.averageOdds < c2Stats.averageOdds) {
 				c2Score += oddsWeight;
+			}
+
+			if (this.debug) {
+				oddsMessage = "avg odds (red:blue) -> (" + formatString(c1Stats.averageOdds + " : " + c2Stats.averageOdds, messagelength) + ")";
 			}
 		}
 
@@ -682,21 +686,13 @@ class ConfidenceScore extends Strategy {
 	}
 }
 
-var ChromosomeIPU = function() {
-	Strategy.call(this);
-	this.baseBettingTier = 1500;
-};
-ChromosomeIPU.prototype = Object.create(Chromosome.prototype);
-
 class InternetPotentialUpset extends Strategy {
 	private ct: CoinToss;
-	private chromosome;
 
-	constructor(cipu, level = 0) {
+	constructor(level = 0) {
 		super("ipu");
 		this.debug = true;
 		this.ct = new CoinToss();
-		this.chromosome = cipu;
 		// even though it doesn't use it, it needs confidence so as to be marked as new
 		this.confidence = 1;
 		this.level = level;
@@ -704,9 +700,6 @@ class InternetPotentialUpset extends Strategy {
 
 	public execute(info): string {
 		this.prediction = this.ct.execute(info);
-		if (this.debug) {
-			console.log("- Lunatic is 50% confident, bBT: " + this.chromosome.baseBettingTier);
-		}
 		return this.prediction;
 	}
 
