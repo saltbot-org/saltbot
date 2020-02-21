@@ -1,0 +1,3 @@
+Newly updated chromosome and screenshot of its stats.
+
+1727 generations; 63.1% winrate.
