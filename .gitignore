@@ -1,5 +1,7 @@
 desktop.ini
 .suo
+*.njsproj*
+project/
 bin/
 obj/
 dist/js/*.js

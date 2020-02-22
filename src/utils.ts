@@ -1,4 +1,4 @@
-function binaryInsertByProperty(value, array: any[], propertyToSort: string, start: number = 0, end: number = array.length - 1): void {
+export function binaryInsertByProperty<T extends Record<string, any>>(value: T, array: T[], propertyToSort: string, start = 0, end: number = array.length - 1): void {
 
 	const length: number = array.length;
 	const m: number = start + Math.floor((end - start) / 2);
@@ -35,7 +35,7 @@ function binaryInsertByProperty(value, array: any[], propertyToSort: string, sta
 	//we don't insert duplicates
 }
 
-function binarySearchByProperty(value, array: any[], propertyToSort: string, start: number = 0, end: number = array.length - 1): number {
+export function binarySearchByProperty<T extends Record<string, any>>(value: T, array: T[], propertyToSort: string, start = 0, end: number = array.length - 1): number {
 
 	const length: number = array.length;
 	const m: number = start + Math.floor((end - start) / 2);
@@ -59,14 +59,11 @@ function binarySearchByProperty(value, array: any[], propertyToSort: string, sta
 	if (value[propertyToSort] === array[m][propertyToSort]) {
 		return m;
 	}
-
-	if (value[propertyToSort] < array[m][propertyToSort]) {
+	else if (value[propertyToSort] < array[m][propertyToSort]) {
 		return binarySearchByProperty(value, array, propertyToSort, start, m - 1);
 	}
-
-	if (value[propertyToSort] > array[m][propertyToSort]) {
+	else {
+		//value must be greater
 		return binarySearchByProperty(value, array, propertyToSort, m + 1, end);
 	}
-
-	//we don't insert duplicates
 }

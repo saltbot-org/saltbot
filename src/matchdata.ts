@@ -1,32 +1,33 @@
+import { MatchRecord } from "./records";
 jQuery.extend((jQuery.fn as any).dataTableExt.oSort, {
-	"odds-pre"(odds) {
+	"odds-pre"(odds: string) {
 		odds = odds.replace(" ", "");
 
 		if (!odds) {
 			return 0;
 		}
 
-		const oddsSplit = odds.split(":");
-		return Number(oddsSplit[0] / oddsSplit[1]);
+		const oddsSplit: string[] = odds.split(":");
+		return Number(Number(oddsSplit[0]) / Number(oddsSplit[1]));
 	},
 
-	"odds-asc"(a, b) {
+	"odds-asc"(a: number, b: number) {
 		return ((a < b) ? -1 : ((a > b) ? 1 : 0));
 	},
 
-	"odds-desc"(a, b) {
+	"odds-desc"(a: number, b: number) {
 		return ((a < b) ? 1 : ((a > b) ? -1 : 0));
 	},
 });
 
-const loadMatches = async function() {
+const loadMatches = function(): void {
 	let matches = [];
 	chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
 		matches = data;
 
 		if (matches) {
 			const matchesMirrored = $.extend(true, [], matches);
-			matchesMirrored.forEach(function(element, index, array) {
+			matchesMirrored.forEach(function(element) {
 				//switch characters around
 				const temp = element.c1;
 				element.c1 = element.c2;
@@ -64,13 +65,13 @@ const loadMatches = async function() {
 				{ data: "if", title: "Illum favor" },
 				{ data: "dt", title: "Date" },
 			],
-			createdRow(row, data, index) {
+			createdRow(row, data) {
 				$("td", row).eq((data as any).w).addClass("highlight");
 			},
 			data: matches,
 			deferRender: true,
 			lengthMenu: [15, 25, 50, 100],
-			initComplete(settings, json) {
+			initComplete() {
 				$("#loading").hide();
 			},
 		});
