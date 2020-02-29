@@ -1,7 +1,7 @@
 desktop.ini
 .suo
-bin/
-obj/
+*.njsproj*
+project/
 dist/js/*.js
 archive
 *~

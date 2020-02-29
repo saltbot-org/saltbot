@@ -1,16 +1,24 @@
-class Match {
-	public names: string[];
-	public strategy: Strategy;
-	public character1: Character;
-	public character2: Character;
-	public winner: number;
-	public tier: string;
-	public mode: string;
-	public odds: string;
-	public time: number;
-	public crowdFavor: number;
-	public illumFavor: number;
-	public multiplier: number;
+import * as moment from 'moment';
+
+import { Character, Updater, MatchRecord } from './records';
+import { Strategy } from './strategy';
+import { Settings, isTournament } from './salty';
+import { binarySearchByProperty } from './utils';
+
+export class Match {
+	names: string[];
+	strategy: Strategy;
+	character1: Character;
+	character2: Character;
+	winner: number;
+	tier: string;
+	mode: string;
+	odds: string;
+	time: number;
+	crowdFavor: number;
+	illumFavor: number;
+	multiplier: number;
+	upsetMode: boolean;
 
 	constructor(strat: Strategy) {
 		this.names = [strat.p1name, strat.p2name];
@@ -26,9 +34,10 @@ class Match {
 		this.crowdFavor = 2;
 		this.illumFavor = 2;
 		this.multiplier = 1;
+		this.upsetMode = false;
 	}
 
-	public update(infoFromWaifu, odds: string, timeInfo, crowdFavor: number, illumFavor: number) {
+	update(infoFromWaifu: { c1: string; c2: string; tier: string; mode: string }[], odds: string, timeInfo: { ticks: number; interval: number }, crowdFavor: number, illumFavor: number) {
 		for (const ifw of infoFromWaifu) {
 			if (this.names[0] === ifw.c1 && this.names[1] === ifw.c2) {
 				this.tier = ifw.tier;
@@ -55,10 +64,10 @@ class Match {
 		this.crowdFavor = crowdFavor;
 		this.illumFavor = illumFavor;
 	}
-	public getRecords(w) {//in the event of a draw, pass in the string "draw"
-		if (this.names.indexOf(w) > -1) {
+	getRecords(winner: string) {//in the event of a draw, pass in the string "draw"
+		if (this.names.includes(winner)) {
 			const updater = new Updater();
-			this.winner = (w === this.character1.name) ? 0 : 1;
+			this.winner = (winner === this.character1.name) ? 0 : 1;
 			let pw = null;
 			if (this.strategy.abstain) {
 				pw = "a";
@@ -84,25 +93,25 @@ class Match {
 			updater.updateCharactersFromMatch(mr, this.character1, this.character2);
 			return [mr, this.character1, this.character2];
 		} else {
-			console.log("-\nsalt robot error : name not in list : " + w + " names: " + this.names[0] + ", " + this.names[1]);
+			console.log("-\nsalt robot error : name not in list : " + winner + " names: " + this.names[0] + ", " + this.names[1]);
 			return null;
 		}
 	}
-	public getBalance(): number {
-		const balanceBox = $("#balance")[0];
-		const balance = parseInt(balanceBox.innerHTML.replace(/,/g, ""), 10);
+	getBalance(): number {
+		const balanceBox = document.querySelector("#balance");
+		const balance = parseInt(balanceBox.textContent.replace(/,/g, ""), 10);
 		return balance;
 	}
 
-	public betAmount() {
+	betAmount() {
 		const balance: number = this.getBalance();
-		const wagerBox: HTMLInputElement = $("#wager")[0] as HTMLInputElement;
+		const wagerBox = document.querySelector <HTMLInputElement>("#wager");
 
 		let amountToBet: number;
 		const strategy = this.strategy;
-		const debug: boolean = true;
+		const debug = true;
 
-		const tournament: boolean = $("#tournament-note").length > 0;
+		const tournament: boolean = isTournament();
 
 		strategy.adjustLevel(balance);
 		amountToBet = strategy.getBetAmount(balance, tournament, debug);
@@ -120,12 +129,9 @@ class Match {
 				}
 				console.log("- AGGRO multiplier active, increasing bet to " + amountToBet);
 			}
-            if (this.strategy.maximum) {
-                amountToBet *= 1;
-				if (amountToBet > balance) {
-					amountToBet = balance;
-				}
-				console.log("- Maximum bet mode active, limiting bet to " + amountToBet);
+			if (this.strategy.maximum) {
+				amountToBet = balance;
+				console.log("- Maximum bet mode active, going all in with " + amountToBet);
 			}
 		}
 
@@ -137,40 +143,43 @@ class Match {
 		wagerBox.value = amountToBet.toString();
 	}
 
-	public init() {
-		const s = this;
-
+	init() {
 		//Attempt to get character objects from storage, if they don't exist create them
-		chrome.storage.local.get(["characters_v1", "settings_v1"], async function(result) {
-			const self = s;
+		chrome.storage.local.get(["characters_v1", "settings_v1"], (result: { "characters_v1": Character[]; "settings_v1": Settings }) => {
 			const baseSeconds = 2000;
 			const recs = result.characters_v1 || [];
-			self.multiplier = result.settings_v1.multiplier;
+			this.multiplier = result.settings_v1.multiplier;
 
-			const character1Index = binarySearchByProperty({ name: self.names[0] }, recs, "name");
-			const character2Index = binarySearchByProperty({ name: self.names[1] }, recs, "name");
+			const character1Index = binarySearchByProperty(new Character(this.names[0]), recs, "name");
+			const character2Index = binarySearchByProperty(new Character(this.names[1]), recs, "name");
 
-			self.character1 = (character1Index < 0) ? new Character(self.names[0]) : recs[character1Index];
-			self.character2 = (character2Index < 0) ? new Character(self.names[1]) : recs[character2Index];
+			this.character1 = (character1Index < 0) ? new Character(this.names[0]) : recs[character1Index];
+			this.character2 = (character2Index < 0) ? new Character(this.names[1]) : recs[character2Index];
 
 			let matches = [];
-			chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
+			chrome.runtime.sendMessage({ query: "getMatchRecords" }, (data: MatchRecord[]) => {
 				matches = data;
-				const prediction = self.strategy.execute({
-					character1: self.character1,
-					character2: self.character2,
+				const prediction = this.strategy.execute({
+					character1: this.character1,
+					character2: this.character2,
 					matches,
 				});
 
-				if (prediction != null || self.strategy.lowBet) {
-					setTimeout(function() {
-						self.betAmount();
+				if (prediction != null || this.strategy.lowBet) {
+					setTimeout(() => {
+						this.betAmount();
 
-						setTimeout(function() {
-							if (prediction === self.strategy.p1name) {
-								self.strategy.btnP1.click();
+						setTimeout(() => {
+							let predictedCharacter1 = prediction === this.strategy.p1name;
+							if (this.upsetMode) {
+								console.log("- Inverting betting decision because of upset mode");
+								predictedCharacter1 = !predictedCharacter1;
+							}
+
+							if (predictedCharacter1) {
+								this.strategy.btnP1.click();
 							} else {
-								self.strategy.btnP2.click();
+								this.strategy.btnP2.click();
 							}
 						}, (2 * baseSeconds));
 					}, Math.floor(baseSeconds));
@@ -178,10 +187,10 @@ class Match {
 			});
 		});
 	}
-	public setAggro(aggro: boolean) {
+	setAggro(aggro: boolean) {
 		this.strategy.aggro = aggro;
 	}
-    public setMaximum(maximum: boolean) {
+	setMaximum(maximum: boolean) {
 		this.strategy.maximum = maximum;
 	}
 }

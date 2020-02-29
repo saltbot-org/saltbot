@@ -1,25 +1,28 @@
-var btnClicked = function(clicktype: string, data = null) {
+import { Settings } from "./salty";
+import { Bettor, Character } from "./records";
+
+function btnClicked (clicktype: string, data: any = null) {
 	chrome.tabs.query({
 		active: true,
 		currentWindow: true,
-	}, function() {
+	}, function () {
 		chrome.runtime.sendMessage({
 			text: data,
 			type: clicktype,
-		}, function(response) {
+		}, function (response) {
 			console.debug(response);
 		});
 	});
-};
-var elementChanged = function(changetype, data) {
+}
+function elementChanged (changetype: string, data: any) {
 	btnClicked(changetype, data);
-};
+}
 
-let dr = function(sortByMoney) {
-	const rankingElement = $("#ranking")[0];
+function dr (sortByMoney: boolean) {
+	const rankingElement = document.querySelector("#ranking");
 	rankingElement.innerHTML = "Loading...";
-	chrome.storage.local.get(["characters_v1", "bettors_v1"], function(results) {
-		const bw10 = [];
+	chrome.storage.local.get(["characters_v1", "bettors_v1"], function (results: { bettors_v1: Bettor[]; characters_v1: Character[] }) {
+		const bw10: Bettor[] = [];
 		const accTypeI: number[] = [];
 		const accTypeC: number[] = [];
 		for (const a of results.bettors_v1) {
@@ -37,9 +40,9 @@ let dr = function(sortByMoney) {
 				accTypeC.push(a.accuracy);
 			}
 		}
-		const sbm = sortByMoney;
-		bw10.sort(function(a, b) {
-			if (sbm) {
+
+		bw10.sort(function (a, b) {
+			if (sortByMoney) {
 				return (b.accuracy * b.total) - (a.accuracy * a.total);
 			}
 			return (b.accuracy) - (a.accuracy);
@@ -52,70 +55,82 @@ let dr = function(sortByMoney) {
 				" (" + b.type + ")(" + b.total + ") " + b.name + "\n";
 		}
 
-		let iSum = 0;
-		for (const i of accTypeI) {
-			iSum += i;
-		}
-		let cSum = 0;
-		for (const c of accTypeC) {
-			cSum += c;
-		}
+		const sumOfArray = (previous: number, current: number) => previous + current;
+		const iSum = accTypeI.reduce(sumOfArray);
+		const cSum = accTypeC.reduce(sumOfArray);
 
-		$("#details-ranking")[0].style.display = "block";
+		document.querySelector<HTMLElement>("#details-ranking").style.display = "block";
 
 		//fill ranking div with text
-		rankingElement.innerHTML = blist;
-		rankingElement.innerHTML += ("Avg I: " + (iSum / accTypeI.length).toFixed(2) + "% (" + accTypeI.length + ")");
-		rankingElement.innerHTML += ("Avg C: " + (cSum / accTypeC.length).toFixed(2) + "% (" + accTypeC.length + ")");
+		rankingElement.innerHTML = ("Avg I: " + (iSum / accTypeI.length).toFixed(2) + "% (" + accTypeI.length + ")\n");
+		rankingElement.innerHTML += ("Avg C: " + (cSum / accTypeC.length).toFixed(2) + "% (" + accTypeC.length + ")\n");
+		rankingElement.innerHTML += blist;
 		rankingElement.innerHTML = rankingElement.innerHTML.split("\n").join("<br />");
 	});
-};
+}
 
-let drClick = function() {
+function drClick () {
 	dr(false);
 	//btnClicked("dr");
-};
-let prClick = function() {
+}
+function prClick () {
 	dr(true);
 	//btnClicked("pr");
-};
+}
 
-let teChange = function() {
-	elementChanged("te", ($("#te")[0] as HTMLInputElement).checked);
-};
+function teChange () {
+	elementChanged("te", document.querySelector<HTMLInputElement>("#te").checked);
+}
 
-let aitChange = function() {
-	elementChanged("ait", ($("#ait")[0] as HTMLInputElement).checked);
-};
+function aitChange () {
+	elementChanged("ait", document.querySelector<HTMLInputElement>("#ait").checked);
+}
 
-let tLimitChange = function(ev) {
-	const tLimit = +($("#tourney-limit")[0] as HTMLInputElement).value;
+function tLimitChange () {
+	const tLimit = +document.querySelector<HTMLInputElement>("#tourney-limit").value;
 
 	if (tLimit < 1000) {
 		return;
 	}
 
-	elementChanged("tourney_limit_" + ((($("#ctl")[0] as HTMLInputElement).checked) ? "enable" : "disable"), tLimit);
-};
+	elementChanged("tourney_limit_" + ((document.querySelector<HTMLInputElement>("#ctl").checked) ? "enable" : "disable"), tLimit);
+}
 
-let keepAliveChange = function() {
-	elementChanged("keepAlive", ($("#toggleKeepAlive")[0] as HTMLInputElement).checked);
-};
+function keepAliveChange () {
+	elementChanged("keepAlive", document.querySelector<HTMLInputElement>("#toggleKeepAlive").checked);
+}
 
-document.addEventListener("DOMContentLoaded", function() {
-	chrome.storage.local.get(["settings_v1"], function(results) {
-		$("#te").prop("checked", results.settings_v1.exhibitions);
-		$("#ait").prop("checked", results.settings_v1.allInTourney);
-		$("#ctl").prop("checked", results.settings_v1.tourneyLimit_enabled);
-  ($("#tourney-limit")[0] as HTMLInputElement).value = results.settings_v1.tourneyLimit;
-		$("#toggleKeepAlive").prop("checked", results.settings_v1.keepAlive);
+function upsetBettingChange () {
+	const upsetLimit = +document.querySelector<HTMLInputElement>("#limitUpsetBetting").value;
+	const upsetEnabled = document.querySelector<HTMLInputElement>("#checkUpsetBetting").checked;
+	elementChanged("upset_betting_" + (upsetEnabled ? "enable" : "disable"), upsetLimit);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+	chrome.storage.local.get(["settings_v1"], function (results: { settings_v1: Settings }) {
+		document.querySelector<HTMLInputElement>("#te").checked = results.settings_v1.betOnExhibitions;
+		document.querySelector<HTMLInputElement>("#ait").checked = results.settings_v1.allInTourney;
+		document.querySelector<HTMLInputElement>("#ctl").checked = results.settings_v1.tourneyLimit_enabled;
+		document.querySelector<HTMLInputElement>("#tourney-limit").value = String(results.settings_v1.tourneyLimit);
+		document.querySelector<HTMLInputElement>("#toggleKeepAlive").checked = results.settings_v1.keepAlive;
+		document.querySelector<HTMLInputElement>("#checkUpsetBetting").checked = results.settings_v1.upsetBetting_enabled;
+		document.querySelector<HTMLInputElement>("#limitUpsetBetting").value = String(results.settings_v1.upsetBetting_limit);
 	});
 
-	$("#bdr")[0].addEventListener("click", drClick);
-	$("#bpr")[0].addEventListener("click", prClick);
-	$("#te")[0].addEventListener("change", teChange);
-	$("#ait")[0].addEventListener("change", aitChange);
-	$("#ctl")[0].addEventListener("change", tLimitChange);
-	$("#toggleKeepAlive")[0].addEventListener("change", keepAliveChange);
-	$("#tourney-limit").bind("keyup input", tLimitChange);
+	document.querySelector("#bdr").addEventListener("click", drClick);
+	document.querySelector("#bpr").addEventListener("click", prClick);
+	document.querySelector("#te").addEventListener("change", teChange);
+	document.querySelector("#ait").addEventListener("change", aitChange);
+	
+	document.querySelector("#toggleKeepAlive").addEventListener("change", keepAliveChange);
+
+	//tourney limit listeners
+	document.querySelector("#ctl").addEventListener("change", tLimitChange);
+	document.querySelector("#tourney-limit").addEventListener("keyup", tLimitChange);
+	document.querySelector("#tourney-limit").addEventListener("input", tLimitChange);
+
+	//upset betting listeners
+	document.querySelector("#checkUpsetBetting").addEventListener("change", upsetBettingChange);
+	document.querySelector("#limitUpsetBetting").addEventListener("keyup", upsetBettingChange);
+	document.querySelector("#limitUpsetBetting").addEventListener("input", upsetBettingChange);
 });

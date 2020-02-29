@@ -1,6 +1,9 @@
+import { MatchRecord, Updater, Character } from "./records";
+import { Chromosome } from "./strategy";
+import { openDB } from 'idb';
 async function getMatchRecords() {
-	const db = await idb.open("saltbot", 1);
-	const tx = await db.transaction("matches", "readonly");
+	const db = await openDB("saltbot", 1);
+	const tx = db.transaction("matches", "readonly");
 	const store = tx.objectStore("matches");
 
 	const matches = await store.getAll();
@@ -8,8 +11,8 @@ async function getMatchRecords() {
 }
 
 async function setMatchRecords(matches: MatchRecord[]) {
-	const db = await idb.open("saltbot", 1);
-	const tx = await db.transaction("matches", "readwrite");
+	const db = await openDB("saltbot", 1);
+	const tx = db.transaction("matches", "readwrite");
 	const store = tx.objectStore("matches");
 
 	if (matches) {
@@ -23,7 +26,7 @@ async function setMatchRecords(matches: MatchRecord[]) {
 function addMatchRecord(match: MatchRecord): void {
 	const open = indexedDB.open("saltbot", 1);
 
-	open.onsuccess = function() {
+	open.onsuccess = function () {
 		const db = open.result;
 		const tx = db.transaction("matches", "readwrite");
 		const store = tx.objectStore("matches");
@@ -32,14 +35,14 @@ function addMatchRecord(match: MatchRecord): void {
 	};
 }
 
-let reimportMatches = function() {
+function reimportMatches() {
 	const open = indexedDB.open("saltbot", 1);
 
-	const updateCharacters = function(matches: any[]) {
+	function updateCharacters(matches: MatchRecord[]) {
 		const updater = new Updater();
 
-		const characterRecords = [];
-		const namesOfCharactersWhoAlreadyHaveRecords = [];
+		const characterRecords: Character[] = [];
+		const namesOfCharactersWhoAlreadyHaveRecords: string[] = [];
 
 		for (const match of matches) {
 			const c1Obj = updater.getCharacter(match.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
@@ -52,23 +55,23 @@ let reimportMatches = function() {
 
 		chrome.storage.local.set({
 			characters_v1: characterRecords,
-		}, function() {
+		}, function () {
 			console.log("-\nrecords reimported:\n" + nmr + " match records\n" + ncr + " character records");
 		});
-	};
+	}
 
-	open.onupgradeneeded = function() {
+	open.onupgradeneeded = function () {
 		const db = open.result;
-		var store = db.createObjectStore("matches", { autoIncrement: true });
+		let store = db.createObjectStore("matches", { autoIncrement: true });
 
-		chrome.storage.local.get(["matches_v1"], function(results) {
+		chrome.storage.local.get(["matches_v1"], function (results) {
 			if (results.matches_v1) {
 				const tx = db.transaction("matches", "readwrite");
 				store = tx.objectStore("matches");
 				for (const match of results.matches_v1) {
 					store.put(match);
 				}
-				tx.oncomplete = function() {
+				tx.oncomplete = function () {
 					db.close();
 					updateCharacters(results.matches_v1);
 				};
@@ -76,39 +79,100 @@ let reimportMatches = function() {
 		});
 	};
 
-	open.onsuccess = function() {
+	open.onsuccess = function () {
 		const db = open.result;
 		const tx = db.transaction("matches", "readonly");
 		const store = tx.objectStore("matches");
 
 		const getAllRequest = store.getAll();
-		getAllRequest.onsuccess = function() {
+		getAllRequest.onsuccess = function () {
 			updateCharacters(getAllRequest.result);
 		};
 	};
-};
+}
 
-chrome.runtime.onInstalled.addListener(function() {
-	(chrome as any).declarativeContent.onPageChanged.removeRules(undefined, function() {
+chrome.runtime.onInstalled.addListener(function () {
+	(chrome as any).declarativeContent.onPageChanged.removeRules(undefined, function () {
 		//do nothing
 	});
 
 	reimportMatches();
 });
 
-//letiable used so the tabs aren't closed and reopened multiple times
+//variable used so the tabs aren't closed and reopened multiple times
 let restartedSaltyBet = false;
 
 function setRestarted() {
 	//set restarted to true and then to false in 5 seconds
 	//this is done to ensure that multiple messages in a short amount of time do not create multiple tabs
 	restartedSaltyBet = true;
-	setTimeout(function() {
+	setTimeout(function () {
 		restartedSaltyBet = false;
 	}, 5000);
 }
 
-chrome.runtime.onMessage.addListener(function(details, sender, sendResponse) {
+function checkForTwitchTab() {
+	chrome.tabs.query({
+		url: ["*://www.twitch.tv/saltybet/chat", "*://www.twitch.tv/popout/saltybet/chat"]
+	}, function (result) {
+		if (result.length === 0) {
+			//no twitch tab found
+			chrome.tabs.create({
+				url: "http://www.twitch.tv/saltybet/chat",
+			}, function (tab) {
+				console.log("The new tab has the url '" + tab.url + "'");
+			});
+			chrome.tabs.query({}, function (r) {
+				const urls = r.map(function (t) {
+					return t.url;
+				});
+				console.log(urls);
+			});
+		}
+	});
+}
+
+function handleWaifuMessage(details: any) {
+	let queryResult: chrome.tabs.Tab[] = null;
+	//Receive message from Waifu, pass it on to salty tab
+	chrome.tabs.query({
+		title: "Salty Bet",
+		url: "*://*.saltybet.com/",
+	}, function (result) {
+		queryResult = result;
+		chrome.storage.local.get(["settings_v1"], function (storedObjects) {
+			if (result.length === 0 && storedObjects.settings_v1.keepAlive && !restartedSaltyBet) {
+				chrome.tabs.create({
+					url: "http://www.saltybet.com",
+				});
+				setRestarted();
+			}
+			else {
+				for (const tab of queryResult) {
+					chrome.tabs.sendMessage(tab.id, details.message, function () {
+						if (storedObjects.settings_v1.keepAlive && !restartedSaltyBet &&
+							chrome.runtime.lastError !== undefined &&
+							chrome.runtime.lastError.message === "Could not establish connection. Receiving end does not exist.") {
+							//an error happened while sending the message to the tab, create a new tab
+							chrome.runtime.lastError = undefined;
+							//close saltybet tabs
+							//can't use variable tab because sendMessage is asynchronous
+							for (const tab2 of queryResult) {
+								chrome.tabs.remove(tab2.id);
+							}
+							chrome.tabs.create({
+								url: "http://www.saltybet.com",
+							});
+							setRestarted();
+						}
+					});
+				}
+			}
+		});
+	});
+}
+
+chrome.runtime.onMessage.addListener(function (details, sender, sendResponse) {
 	if (details.message !== undefined) {
 		handleWaifuMessage(details);
 	}
@@ -124,7 +188,7 @@ chrome.runtime.onMessage.addListener(function(details, sender, sendResponse) {
 		chrome.tabs.query({
 			title: "Salty Bet",
 			url: "*://*.saltybet.com/",
-		}, function(result) {
+		}, function (result) {
 			// result is an array of tab.Tabs
 			for (const tab of result) {
 				chrome.tabs.sendMessage(tab.id, details);
@@ -144,23 +208,29 @@ chrome.runtime.onMessage.addListener(function(details, sender, sendResponse) {
 			addMatchRecord(details.data);
 		}
 	}
+
+	if (sendResponse !== undefined) {
+		sendResponse(null);
+	}
+	return false;
 });
-let sendUpdatedChromosome = function() {
-	chrome.storage.local.get(["chromosomes_v1"], function(results) {
+function sendUpdatedChromosome() {
+	chrome.storage.local.get(["chromosomes_v1"], function (results: { chromosomes_v1: Chromosome[] }) {
 		if (results.chromosomes_v1) {
-			for (const i in results.chromosomes_v1) {
-				if (!results.chromosomes_v1[i].rank) {
-					results.chromosomes_v1[i].rank = 100;
+			results.chromosomes_v1.forEach((chromosome: Chromosome) => {
+				if (!chromosome.rank) {
+					chromosome.rank = 100;
 				}
-			}
-			results.chromosomes_v1.sort(function(a, b) {
+			});
+
+			results.chromosomes_v1.sort(function (a, b) {
 				return a.rank - b.rank;
 			});
 			const data = JSON.stringify(results.chromosomes_v1[0]);
 			chrome.tabs.query({
 				title: "Salty Bet",
 				url: "*://*.saltybet.com/",
-			}, function(result) {
+			}, function (result) {
 				if (result.length > 0) {
 					chrome.tabs.sendMessage(result[0].id, {
 						text: data,
@@ -170,73 +240,7 @@ let sendUpdatedChromosome = function() {
 			});
 		}
 	});
-};
-chrome.alarms.onAlarm.addListener(function(alarm) {
+}
+chrome.alarms.onAlarm.addListener(function () {
 	sendUpdatedChromosome();
 });
-
-function checkForTwitchTab() {
-	chrome.tabs.query({
-		url: ["*://www.twitch.tv/saltybet/chat", "*://www.twitch.tv/popout/saltybet/chat"] }, function(result) {
-		if (result.length === 0) {
-			//no twitch tab found
-			chrome.tabs.create({
-				url: "http://www.twitch.tv/saltybet/chat",
-			}, function(tab) {
-				console.log("The new tab has the url '" + tab.url + "'");
-			});
-			chrome.tabs.query({}, function(r) {
-				const urls = r.map(function(t) {
-					return t.url;
-				});
-				console.log(urls);
-			});
-		}
-	});
-}
-
-function handleWaifuMessage(details: any) {
-	let queryResult = null;
-	//Receive message from Waifu, pass it on to salty tab
-	chrome.tabs.query({
-		title: "Salty Bet",
-		url: "*://*.saltybet.com/",
-	}, function(result) {
-		queryResult = result;
-		chrome.storage.local.get(["settings_v1"], function(storedObjects) {
-			if (result.length === 0 && storedObjects.settings_v1.keepAlive && !restartedSaltyBet) {
-				chrome.tabs.create({
-					url: "http://www.saltybet.com",
-				});
-				setRestarted();
-			}
-			else {
-				for (const tab of queryResult) {
-					chrome.tabs.sendMessage(tab.id, details.message, function(response) {
-						if (storedObjects.settings_v1.keepAlive && !restartedSaltyBet &&
-							chrome.runtime.lastError !== undefined &&
-							chrome.runtime.lastError.message === "Could not establish connection. Receiving end does not exist.") {
-							//an error happened while sending the message to the tab, create a new tab
-							chrome.runtime.lastError = undefined;
-							//close saltybet tabs
-							//can't use queryResult[i] because sendMessage is asynchronous
-							for (const tab2 of queryResult) {
-								chrome.tabs.remove(tab2.id, function() {
-									//do nothing
-								});
-							}
-							chrome.tabs.create({
-								url: "http://www.saltybet.com",
-							});
-							setRestarted();
-						}
-					});
-				}
-			}
-		});
-	});
-}
-//To reload
-//chrome.tabs.reload(myTabs[i].id)
-// or if that doesn't work
-//chrome.tabs.executeScript(myTabs[i].id, {code:"document.location.reload(true);"});

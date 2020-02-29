@@ -1,47 +1,53 @@
-abstract class Strategy {
-	public btnP1;
-	public btnP2;
-	public p1name: string;
-	public p2name: string;
-	public strategyName: string;
-	public prediction;
-	public debug: boolean;
-	public levels: number[][];
-	public lowBet: boolean;
-	public level: number;
-	public confidence: number;
-	public abstain: boolean;
-	public aggro: boolean;
-	public maximum: boolean;
+import { Character, MatchRecord } from './records';
+import { Globals } from './globals';
+
+export abstract class Strategy {
+	btnP1: HTMLButtonElement;
+	btnP2: HTMLButtonElement;
+	p1name: string;
+	p2name: string;
+	strategyName: string;
+	prediction: string;
+	debug: boolean;
+	levels: number[][];
+	lowBet: boolean;
+	level: number;
+	confidence: number;
+	abstain: boolean;
+	aggro: boolean;
+	maximum: boolean;
 
 	constructor(strategyName: string) {
-		this.btnP1 = $("#player1")[0];
-		this.btnP2 = $("#player2")[0];
+		this.btnP1 = document.querySelector("#player1") as HTMLButtonElement;
+		this.btnP2 = document.querySelector("#player2") as HTMLButtonElement;
 		this.p1name = this.btnP1.getAttribute("value").replace(/,/g, "_");
 		this.p2name = this.btnP2.getAttribute("value").replace(/,/g, "_");
 		this.strategyName = strategyName;
 		this.prediction = null;
 		this.debug = true;
-		this.levels = [[0, 1000, 0],
-		[1000, 10000, 1],
-		[10000, 100000, 10],
-		[100000, 500000, 25],
-		[500000, 1000000, 100],
-		[1000000, 5000000, 250],
-		[5000000, 20000000, 500]];
+		this.levels = [
+			[0, 1000, 0],
+			[1000, 10000, 1],
+			[10000, 100000, 10],
+			[100000, 500000, 25],
+			[500000, 1000000, 100],
+			[1000000, 5000000, 250],
+			[5000000, 20000000, 500]
+		];
 		this.lowBet = false;
+		this.abstain = false;
 	}
 
-	public getBailout(tournament: boolean): number {
-		const nameSpan = $("h2")[0].children[2];
-		var isIlluminati = false;
+	getBailout(tournament: boolean): number {
+		const nameSpan = document.querySelector("h2").children[2];
+		let isIlluminati = false;
 		try { // the html is different for illuminati??
 			isIlluminati = nameSpan && nameSpan.children[0].classList && nameSpan.children[0].classList.contains("goldtext");
 		} catch (e) { // this is how it is for non-illums:
 			isIlluminati = nameSpan && nameSpan.classList && nameSpan.classList.contains("goldtext");
 		}
-		var level = 0;
-		const rank = $("#rank")[0];
+		let level = 0;
+		const rank = document.querySelector("#rank");
 		if (rank != null && rank.childNodes.length !== 0) {
 			const re = /rank([0-9]{1,2})\.png/g;
 			const match = re.exec((rank.childNodes[0] as HTMLImageElement).src);
@@ -59,7 +65,7 @@ abstract class Strategy {
 		}
 	}
 
-	public flatBet(balance: number): number {
+	flatBet(balance: number): number {
 		const flatAmount = 100;
 		const multiplierIndex = 2;
 		const intendedBet = flatAmount * this.levels[this.level][multiplierIndex] * this.confidence;
@@ -72,7 +78,7 @@ abstract class Strategy {
 		}
 	}
 
-	public adjustLevel(balance: number) {
+	adjustLevel(balance: number) {
 		if (!this.level) {
 			this.level = 0;
 		}
@@ -95,11 +101,7 @@ abstract class Strategy {
 		} while (changed);
 	}
 
-	public getWinner(ss) {
-		return ss.getWinner();
-	}
-
-	public getBetAmount(balance, tournament, debug) {
+	getBetAmount(balance: number, tournament: boolean, debug: boolean) {
 		const simBettingLimitScale = 0.1;
 		const lowBettingScale = 0.01;
 		const allowConfRescale = true;
@@ -113,7 +115,7 @@ abstract class Strategy {
 		const bailout = this.getBailout(tournament);
 
 		if (tournament) {
-			const allIn = ctrl.settings.allInTourney;
+			const allIn = Globals.ctrl.settings.allInTourney;
 			/* ||
 			 balance <= 2 * bailout ||
 			 this.confidence > 0.9 ||
@@ -129,7 +131,7 @@ abstract class Strategy {
 			}
 			amountToBet = allIn ? balance : Math.round(balance * (conf));
 
-			var bailoutMessage = 0;
+			let bailoutMessage = 0;
 			if (amountToBet < bailout) {
 				bailoutMessage = amountToBet;
 				amountToBet = bailout;
@@ -151,7 +153,7 @@ abstract class Strategy {
 					console.log("- betting: " + balance + " x  50%) = " + amountToBet);
 				}
 			}
-		} else if (!(this.lowBet && this instanceof RatioConfidence)) {
+		} else if (!this.lowBet) {
 			amountToBet = Math.round(balance * simBettingLimitScale * this.confidence);
 			if (amountToBet > balance * simBettingLimitScale) {
 				amountToBet = Math.round(balance * simBettingLimitScale);
@@ -178,16 +180,15 @@ abstract class Strategy {
 		return amountToBet;
 	}
 
-	public abstract execute(info): string;
+	abstract execute(info: { character1: Character; character2: Character; matches: MatchRecord[] }): string;
 }
 
-class CoinToss extends Strategy {
+export class CoinToss extends Strategy {
 	constructor() {
 		super("ct");
-		this.abstain = false;
 	}
 
-	public execute(info): string {
+	execute(info: { character1: Character; character2: Character; matches: MatchRecord[] }): string {
 		const c1 = info.character1;
 		const c2 = info.character2;
 		this.prediction = (Math.random() > .5) ? c1.name : c2.name;
@@ -195,21 +196,12 @@ class CoinToss extends Strategy {
 	}
 }
 
-var formatString = function(s, len) {
-	while (s.length < len) {
-		s += " ";
-	}
-	return s.substring(0, len);
-};
-
-class RatioConfidence extends Strategy {
+export class Cowboy extends Strategy {
 	constructor() {
 		super("rc");
-		this.abstain = false;
 	}
 
-	public execute(info): string {
-		const self = this;
+	execute(info: { character1: Character; character2: Character; matches: MatchRecord[] }): string {
 		const c1 = info.character1;
 		const c2 = info.character2;
 		const c1TotalMatches = c1.wins.length + c1.losses.length;
@@ -220,101 +212,106 @@ class RatioConfidence extends Strategy {
 			if (this.debug) {
 				console.log("- Cowboy has insufficient information, W:L(P1)(P2)->  (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
 			}
-			self.abstain = true;
-			self.lowBet = true;
+			this.abstain = true;
+			this.lowBet = true;
 			return null;
 		}
 		const c1Ratio = (c1TotalMatches) ? c1.wins.length / c1TotalMatches : 0;
 		const c2Ratio = (c2TotalMatches) ? c2.wins.length / c2TotalMatches : 0;
 
-		if (c1Ratio !== c2Ratio) {
+		if (c1Ratio !== c2Ratio && c1Ratio > 0 && c2Ratio > 0) {
 			c1.ratio = c1Ratio;
 			c2.ratio = c2Ratio;
 			const pChar = (c1.ratio > c2.ratio) ? c1 : c2;
 			const npChar = (c1.ratio < c2.ratio) ? c1 : c2;
 			//confidence score
-			self.confidence = (pChar.name === c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
-			self.confidence += 0.5;
-			if (self.confidence > 1) { self.confidence = 1; }
-			if (self.confidence < 0.6) {
+			this.confidence = (pChar.name === c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
+			this.confidence += 0.5;
+			if (this.confidence > 1) { this.confidence = 1; }
+			if (this.confidence < 0.6) {
 				if (this.debug) {
-					console.log("- Cowboy has insufficient confidence (confidence: " + self.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+					console.log("- Cowboy has insufficient confidence (confidence: " + this.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
 				}
-				self.abstain = true;
-				self.lowBet = true;
+				this.abstain = true;
+				this.lowBet = true;
 				return null;
 			}
 			if (pChar.ratio <= 0.5 || (npChar.ratio === 0.5 && (npChar.wins.length + npChar.losses.length === 2))) {
 				if (this.debug) {
 					console.log("- Cowboy discourages betting on or against <51% (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
 				}
-				self.abstain = true;
-				self.lowBet = true;
+				this.abstain = true;
+				this.lowBet = true;
 				return null;
 			}
 			p = pChar.name;
 			if (this.debug) {
-				console.log("- " + p + " has a better win percentage (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%); RB betting " + p + " confidence: " + self.confidence.toFixed(2));
+				console.log("- " + p + " has a better win percentage (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
+				console.log("- Betting on " + p + " confidence: " + this.confidence.toFixed(2));
 			}
-			self.prediction = p;
+
+			this.prediction = p;
 			return p;
-		} else if (c1Ratio === c2Ratio) {
+		} else {
 			if (this.debug) {
 				console.log("- Cowboy has insufficient information (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
 			}
-			self.abstain = true;
-			self.lowBet = true;
+			this.abstain = true;
+			this.lowBet = true;
 			return null;
 		}
 	}
 }
 
-class Chromosome {
-	//confidence weights
-	public oddsWeight: number = 0.5;
-	public timeAveWin: number = 1;	//public .timeWeight  =  1;
-	public timeAveLose: number = 1;
-	public winPercentageWeight: number = 1;
-	public crowdFavorWeight: number = 0.5;
-	public illumFavorWeight: number = 0.5;
-	// tier scoring
-	public wX: number = 1;
-	public wS: number = 1;
-	public wA: number = 1;
-	public wB: number = 1;
-	public wP: number = 1;
-	public wU: number = 1;
-	public lX: number = 1;
-	public lS: number = 1;
-	public lA: number = 1;
-	public lB: number = 1;
-	public lP: number = 1;
-	public lU: number = 1;
-	// odds weights
-	public oX: number = 1;
-	public oS: number = 1;
-	public oA: number = 1;
-	public oB: number = 1;
-	public oP: number = 1;
-	public oU: number = 1;
-	// times weights
-	public wtX: number = 1;
-	public wtS: number = 1;
-	public wtA: number = 1;
-	public wtB: number = 1;
-	public wtP: number = 1;
-	public wtU: number = 1;
-	public ltX: number = 1;
-	public ltS: number = 1;
-	public ltA: number = 1;
-	public ltB: number = 1;
-	public ltP: number = 1;
-	public ltU: number = 1;
+export class Chromosome {
+	[key: string]: any;
 
-	public randomize(): Chromosome {
+	//confidence weights
+	oddsWeight = 0.5;
+	timeAveWin = 1;	//.timeWeight  =  1;
+	timeAveLose = 1;
+	winPercentageWeight = 1;
+	crowdFavorWeight = 0.5;
+	illumFavorWeight = 0.5;
+	// tier scoring
+	wX = 1;
+	wS = 1;
+	wA = 1;
+	wB = 1;
+	wP = 1;
+	wU = 1;
+	lX = 1;
+	lS = 1;
+	lA = 1;
+	lB = 1;
+	lP = 1;
+	lU = 1;
+	// odds weights
+	oX = 1;
+	oS = 1;
+	oA = 1;
+	oB = 1;
+	oP = 1;
+	oU = 1;
+	// times weights
+	wtX = 1;
+	wtS = 1;
+	wtA = 1;
+	wtB = 1;
+	wtP = 1;
+	wtU = 1;
+	ltX = 1;
+	ltS = 1;
+	ltA = 1;
+	ltB = 1;
+	ltP = 1;
+	ltU = 1;
+	rank: number;
+
+	randomize(): Chromosome {
 		for (const prop in this) {
-			if (this.hasOwnProperty(prop)) {
-				(this[prop] as any) = Math.random();
+			if (this.hasOwnProperty(prop) && prop !== "rank") {
+				(this[prop] as number) = Math.random();
 				if ((this[prop] as any) < 0.0001) {
 					(this[prop] as any) = 0.01;
 				}
@@ -322,11 +319,12 @@ class Chromosome {
 		}
 
 		this.normalize();
+		this.rank = null;
 		return this;
 	}
 
-	public normalize(): Chromosome {
-		var sum = 0;
+	normalize(): Chromosome {
+		let sum = 0;
 		for (const el in this) {
 			if (this.hasOwnProperty(el)) {
 				if (Number(this[el]) < 0) {
@@ -343,7 +341,7 @@ class Chromosome {
 		return this;
 	}
 
-	public loadFromJSON(json: string): Chromosome {
+	loadFromJSON(json: string): Chromosome {
 		const copy = JSON.parse(json);
 		for (const i in copy) {
 			if (this.hasOwnProperty(i)) {
@@ -353,7 +351,7 @@ class Chromosome {
 		return this;
 	}
 
-	public loadFromObject(obj): Chromosome {
+	loadFromObject(obj: Chromosome): Chromosome {
 		for (const i in obj) {
 			if (this.hasOwnProperty(i)) {
 				this[i] = Number(obj[i]);
@@ -362,8 +360,8 @@ class Chromosome {
 		return this;
 	}
 
-	public toDisplayString(): string {
-		var results = "-\nchromosome:";
+	toDisplayString(): string {
+		let results = "-\nchromosome:";
 		for (const i in this) {
 			if (typeof this[i] !== "function") {
 				results += "\n" + i + " : " + this[i];
@@ -372,14 +370,14 @@ class Chromosome {
 		return results;
 	}
 
-	public mate(other: Chromosome) {
+	mate(other: Chromosome) {
 		const offspring = new Chromosome();
 		const parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
 		const mutationScale = 2;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
 		const mutationChance = 0.1;	// range [0,1]
 		const smallVal = 0.000001;
 		for (const i in offspring) {
-			if (typeof offspring[i] !== "function") {
+			if (typeof offspring[i] !== "function" && i !== "rank") {
 				offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
 				const radiation = (Math.random() - 0.5) * 2.0;
 				let change = radiation * mutationScale;
@@ -399,8 +397,8 @@ class Chromosome {
 	}
 
 	// note, test equals for floats...
-	public equals(other) {
-		let anyDifference: boolean = false;
+	equals(other: Chromosome) {
+		let anyDifference = false;
 		for (const i in other) {
 			if (typeof other[i] !== "function") {
 				if (this[i] !== other[i]) {
@@ -414,111 +412,111 @@ class Chromosome {
 }
 
 // scores character stats by chromosome. Does not score everything, Eg) differances of both characters stats are scored later.
-var CSStats = function(cObj, chromosome) {
-	var oddsSum = 0;
-	var oddsCount = 0;
-	var winTimesTotal = 0;
-	var winTimesTotalRaw = 0; // "Raw" for display message, unweighted
-	var lossTimesTotal = 0;
-	var lossTimesTotalRaw = 0;
-	var timedWonMatchesCount = 0;
-	var timedLostMatchesCount = 0;
-	this.wins = 0;
-	this.losses = 0;
-	this.averageOdds = null;
-	this.averageWinTime = null;
-	this.averageWinTimeRaw = null;
-	this.averageLossTime = null;
-	this.averageLossTimeRaw = null;
-	this.cfPercent = null;
-	this.ifPercent = null;
+class CSStats {
+	oddsSum = 0;
+	oddsCount = 0;
+	winTimesTotal = 0;
+	winTimesTotalRaw = 0; // "Raw" for display message, unweighted
+	lossTimesTotal = 0;
+	lossTimesTotalRaw = 0;
+	timedWonMatchesCount = 0;
+	timedLostMatchesCount = 0;
+	wins = 0;
+	losses = 0;
+	averageOdds: number = null;
+	averageWinTime: number = null;
+	averageWinTimeRaw: number = null;
+	averageLossTime: number = null;
+	averageLossTimeRaw: number = null;
+	cfPercent: number = null;
+	ifPercent: number = null;
+	totalFights: number;
 
-	this.totalFights = cObj.totalFights.length;
+	constructor(cObj: Character, chromosome: Chromosome) {
 
-	for (const win of cObj.wins) {
-		this.wins += chromosome["w" + win];
-	}
+		this.totalFights = cObj.totalFights.length;
 
-	for (const loss of cObj.losses) {
-		this.losses += chromosome["l" + loss];
-	}
+		for (const win of cObj.wins) {
+			this.wins += chromosome["w" + win];
+		}
 
-	for (let i = 0; i < cObj.odds.length; i++) {
-		if (cObj.odds[i] >= 0) {
-			oddsSum += cObj.odds[i] * chromosome["o" + cObj.tiers[i]];
-			oddsCount += 1;
+		for (const loss of cObj.losses) {
+			this.losses += chromosome["l" + loss];
+		}
+
+		for (let i = 0; i < cObj.odds.length; i++) {
+			if (cObj.odds[i] >= 0) {
+				this.oddsSum += cObj.odds[i] * chromosome["o" + cObj.tiers[i]];
+				this.oddsCount += 1;
+			}
+		}
+		this.averageOdds = (this.oddsCount !== 0) ? this.oddsSum / this.oddsCount : null;
+		//
+		for (let j = 0; j < cObj.winTimes.length; j++) {
+			if (cObj.winTimes[j] !== 0) {
+				this.winTimesTotal += cObj.winTimes[j] * chromosome["wt" + cObj.wins[j]];
+				this.winTimesTotalRaw += cObj.winTimes[j];
+				this.timedWonMatchesCount += 1;
+			}
+		}
+		this.averageWinTime = (this.winTimesTotal !== 0) ? this.winTimesTotal / this.timedWonMatchesCount : null;
+		this.averageWinTimeRaw = (this.winTimesTotal !== 0) ? this.winTimesTotalRaw / this.timedWonMatchesCount : null;
+
+		for (let k = 0; k < cObj.lossTimes.length; k++) {
+			if (cObj.lossTimes[k] !== 0) {
+				this.lossTimesTotal += cObj.lossTimes[k] * chromosome["lt" + cObj.losses[k]];
+				this.lossTimesTotalRaw += cObj.lossTimes[k];
+				this.timedLostMatchesCount += 1;
+			}
+		}
+		this.averageLossTime = (this.lossTimesTotal !== 0) ? this.lossTimesTotal / this.timedLostMatchesCount : null;
+		this.averageLossTimeRaw = (this.lossTimesTotal !== 0) ? this.lossTimesTotalRaw / this.timedLostMatchesCount : null;
+
+		// expert opinion section
+		if (cObj.crowdFavor.length > 0) {
+			let cfSum = 0;
+			for (const cf of cObj.crowdFavor) {
+				cfSum += cf;
+			}
+			this.cfPercent = cfSum / cObj.crowdFavor.length;
+		}
+		if (cObj.illumFavor.length > 0) {
+			let ifSum = 0;
+			for (const illumF of cObj.illumFavor) {
+				ifSum += illumF;
+			}
+			this.ifPercent = ifSum / cObj.illumFavor.length;
 		}
 	}
-	this.averageOdds = (oddsCount !== 0) ? oddsSum / oddsCount : null;
-	//
-	for (let j = 0; j < cObj.winTimes.length; j++) {
-		if (cObj.winTimes[j] !== 0) {
-			winTimesTotal += cObj.winTimes[j] * chromosome["wt" + cObj.wins[j]];
-			winTimesTotalRaw += cObj.winTimes[j];
-			timedWonMatchesCount += 1;
-		}
-	}
-	this.averageWinTime = (winTimesTotal !== 0) ? winTimesTotal / timedWonMatchesCount : null;
-	this.averageWinTimeRaw = (winTimesTotal !== 0) ? winTimesTotalRaw / timedWonMatchesCount : null;
+}
 
-	for (let k = 0; k < cObj.lossTimes.length; k++) {
-		if (cObj.lossTimes[k] !== 0) {
-			lossTimesTotal += cObj.lossTimes[k] * chromosome["lt" + cObj.losses[k]];
-			lossTimesTotalRaw += cObj.lossTimes[k];
-			timedLostMatchesCount += 1;
-		}
-	}
-	this.averageLossTime = (lossTimesTotal !== 0) ? lossTimesTotal / timedLostMatchesCount : null;
-	this.averageLossTimeRaw = (lossTimesTotal !== 0) ? lossTimesTotalRaw / timedLostMatchesCount : null;
+export class Scientist extends Strategy {
+	private chromosome: Chromosome;
 
-	// expert opinion section
-	if (cObj.crowdFavor.length > 0) {
-		var cfSum = 0;
-		for (const cf of cObj.crowdFavor) {
-			cfSum += cf;
-		}
-		this.cfPercent = cfSum / cObj.crowdFavor.length;
-	}
-	if (cObj.illumFavor.length > 0) {
-		var ifSum = 0;
-		for (const illumF of cObj.illumFavor) {
-			ifSum += illumF;
-		}
-		this.ifPercent = ifSum / cObj.illumFavor.length;
-	}
-};
-
-class ConfidenceScore extends Strategy {
-	private chromosome;
-	private lastMatchCumulativeBetTotal;
-
-	constructor(chromosome, level = 0, lastMatchCumulativeBetTotal = 0) {
+	constructor(chromosome: Chromosome, level = 0) {
 		super("cs");
-		this.abstain = false;
 		this.confidence = null;
 		this.chromosome = chromosome;
 		this.level = level;
-		this.lastMatchCumulativeBetTotal = lastMatchCumulativeBetTotal;
 	}
 
-	public getBetAmount(balance, tournament, debug) {
+	getBetAmount(balance: number, tournament: boolean, debug: boolean) {
 		if (tournament) {
 			return super.getBetAmount(balance, tournament, debug);
 		}
 		return super.flatBet(balance);
 	}
 
-	public execute(info): string {
+	execute(info: { character1: Character; character2: Character; matches: MatchRecord[] }): string {
 		const c1 = info.character1;
 		const c2 = info.character2;
-		//
+
 		const oddsWeight = this.chromosome.oddsWeight;
 		const timeAveWinWeight = this.chromosome.timeAveWin;
 		const timeAveLoseWeight = this.chromosome.timeAveLose;
 		const winPercentageWeight = this.chromosome.winPercentageWeight;
 		const crowdFavorWeight = this.chromosome.crowdFavorWeight;
 		const illumFavorWeight = this.chromosome.illumFavorWeight;
-		const totalWeight = oddsWeight + timeAveWinWeight + timeAveLoseWeight + winPercentageWeight + crowdFavorWeight + illumFavorWeight;
 
 		// messages
 		let oddsMessage = null;
@@ -526,7 +524,6 @@ class ConfidenceScore extends Strategy {
 		let winsMessage = null;
 		let crwdMessage = null;
 		let ilumMessage = null;
-		const messagelength = 15;
 
 		// the weights come in from the chromosome
 		const scoreBase = 0.001;      // range (0,0.5], prevents over-confidence.
@@ -538,7 +535,6 @@ class ConfidenceScore extends Strategy {
 		const c2Stats = new CSStats(c2, this.chromosome);
 
 		// wins
-		const winsPTemper = 0.5;
 		const c1WT = c1Stats.wins + c1Stats.losses;
 		const c2WT = c2Stats.wins + c2Stats.losses;
 		const c1WP = (c1WT !== 0) ? c1Stats.wins / c1WT : 0;
@@ -548,9 +544,10 @@ class ConfidenceScore extends Strategy {
 		const c1WPDisplay = wpTotal > 0 ? c1Stats.wins / wpTotal : 0;
 		const c2WPDisplay = wpTotal > 0 ? c2Stats.wins / wpTotal : 0;
 		if (this.debug) {
-			winsMessage = "\xBB WINS/LOSSES:     weighted totals as % (red:blue) -> (" + (c1WPDisplay * 100).toFixed(0) + " : " + (c2WPDisplay * 100).toFixed(0) + ")" +
-				"  ::  unweighted (red W:L)(blue W:L) -> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")" +
-				"  ::  details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, "") + ":" + c1.losses.toString().replace(/,/g, "") + ")" +
+			winsMessage = "\xBB WINS/LOSSES:\n" +
+				"weighted totals as % (red: blue) -> (" + (c1WPDisplay * 100).toFixed(0) + " : " + (c2WPDisplay * 100).toFixed(0) + ")\n" +
+				"unweighted (red W:L)(blue W:L) -> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")\n" +
+				"details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, "") + ":" + c1.losses.toString().replace(/,/g, "") + ")" +
 				"(" + c2.wins.toString().replace(/,/g, "") + ":" + c2.losses.toString().replace(/,/g, "") + ")";
 		}
 		// weight in win percent
@@ -573,7 +570,7 @@ class ConfidenceScore extends Strategy {
 			}
 
 			if (this.debug) {
-				oddsMessage = "avg odds (red:blue) -> (" + formatString(c1Stats.averageOdds + " : " + c2Stats.averageOdds, messagelength) + ")";
+				oddsMessage = "avg odds (red:blue) -> (" + c1Stats.averageOdds + " : " + c2Stats.averageOdds + ")";
 			}
 		}
 
@@ -584,7 +581,9 @@ class ConfidenceScore extends Strategy {
 			else if (c1Stats.averageWinTime > c2Stats.averageWinTime) {
 				c2Score += timeAveWinWeight / 2;
 			}
-			if (this.debug) { timeMessage = "avg win time (red:blue) -> (" + formatString(c1Stats.averageWinTimeRaw.toFixed(0) + " : " + c2Stats.averageWinTimeRaw.toFixed(0), messagelength) + ")"; }
+			if (this.debug) {
+				timeMessage = "avg win time (red:blue) -> (" + c1Stats.averageWinTimeRaw.toFixed(0) + " : " + c2Stats.averageWinTimeRaw.toFixed(0) + ")";
+			}
 		}
 
 		if (c1Stats.averageLossTime != null && c2Stats.averageLossTime != null) {
@@ -595,7 +594,7 @@ class ConfidenceScore extends Strategy {
 				c2Score += timeAveLoseWeight / 2;
 			}
 			if (this.debug) {
-				const msg = "  ::  avg loss time (red:blue) -> (" + formatString(c1Stats.averageLossTimeRaw.toFixed(0) + " : " + c2Stats.averageLossTimeRaw.toFixed(0), messagelength) + ")";
+				const msg = "  ::  avg loss time (red:blue) -> (" + c1Stats.averageLossTimeRaw.toFixed(0) + " : " + c2Stats.averageLossTimeRaw.toFixed(0) + ")";
 				if (timeMessage) {
 					timeMessage += msg;
 				}
@@ -614,8 +613,8 @@ class ConfidenceScore extends Strategy {
 			}
 			const cfPercentTotal = c1Stats.cfPercent + c2Stats.cfPercent;
 			if (this.debug) {
-				crwdMessage = "crowd favor (red:blue) -> (" + formatString((c1Stats.cfPercent / cfPercentTotal * 100).toFixed(0) +
-					" : " + (c2Stats.cfPercent / cfPercentTotal * 100).toFixed(0), messagelength) + ")";
+				crwdMessage = "crowd favor (red:blue) -> (" + (c1Stats.cfPercent / cfPercentTotal * 100).toFixed(0) +
+					" : " + (c2Stats.cfPercent / cfPercentTotal * 100).toFixed(0) + ")";
 			}
 		}
 
@@ -628,8 +627,8 @@ class ConfidenceScore extends Strategy {
 			}
 			const ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
 			if (this.debug) {
-				ilumMessage = "illuminati favor (red:blue) -> (" + formatString((c1Stats.ifPercent / ifPercentTotal * 100).toFixed(0) +
-					" : " + (c2Stats.ifPercent / ifPercentTotal * 100).toFixed(0), messagelength) + ")";
+				ilumMessage = "illuminati favor (red:blue) -> (" + (c1Stats.ifPercent / ifPercentTotal * 100).toFixed(0) +
+					" : " + (c2Stats.ifPercent / ifPercentTotal * 100).toFixed(0) + ")";
 			}
 		}
 
@@ -687,7 +686,7 @@ class ConfidenceScore extends Strategy {
 	}
 }
 
-class InternetPotentialUpset extends Strategy {
+export class Lunatic extends Strategy {
 	private ct: CoinToss;
 
 	constructor(level = 0) {
@@ -699,12 +698,12 @@ class InternetPotentialUpset extends Strategy {
 		this.level = level;
 	}
 
-	public execute(info): string {
+	execute(info: { character1: Character; character2: Character; matches: MatchRecord[] }): string {
 		this.prediction = this.ct.execute(info);
 		return this.prediction;
 	}
 
-	public getBetAmount(balance, tournament, debug) {
+	getBetAmount(balance: number, tournament: boolean, debug: boolean) {
 		if (tournament) {
 			return super.getBetAmount(balance, tournament, debug);
 		}
@@ -712,13 +711,12 @@ class InternetPotentialUpset extends Strategy {
 	}
 }
 
-class Observer extends Strategy {
+export class Observer extends Strategy {
 	constructor() {
 		super("obs");
-		this.abstain = true;
 	}
 
-	public execute(info): string {
+	execute(_info: { character1: Character; character2: Character; matches: MatchRecord[] }): string {
 		if (this.debug) {
 			console.log("- Monk does not bet");
 		}
