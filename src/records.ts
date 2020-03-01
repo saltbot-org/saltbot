@@ -284,7 +284,8 @@ function ir(f: string) {
 					mObj.if = +match[j];
 					break;
 				case 11: {
-					mObj.dt = match[j];
+					//trim to get rid of linebreaks at the end
+					mObj.dt = match[j].trim();
 					matchRecords.push(mObj);
 					const c1Obj = updater.getCharacter(mObj.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
 					const c2Obj = updater.getCharacter(mObj.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);

@@ -17,7 +17,7 @@ jQuery.extend((jQuery.fn as any).dataTableExt.oSort, {
 
 	"odds-desc"(a: number, b: number) {
 		return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-	},
+	}
 });
 
 const loadMatches = function(): void {
@@ -49,6 +49,7 @@ const loadMatches = function(): void {
 		$("#matches").DataTable({
 			columnDefs: [
 				{ type: "odds", targets: 7 },
+				{ type: "moment-DD-MM-YYYY", targets: 11 },
 				{ searchable: false, targets: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
 			],
 			columns: [
