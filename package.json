@@ -39,7 +39,7 @@
     "@types/file-saver": "^2.0.1",
     "@types/jquery": "^3.2.13",
     "@types/jqueryui": "^1.12.2",
-    "@types/node": "^13.9.0",
+    "@types/node": "^13.9.1",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
     "@typescript-eslint/eslint-plugin-tslint": "^2.23.0",
     "@typescript-eslint/parser": "^2.23.0",
