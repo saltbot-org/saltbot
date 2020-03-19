@@ -653,7 +653,7 @@ export class Scientist extends Strategy {
 
 		const winnerPoints = (this.prediction === c1.name) ? c1Score : c2Score;
 		const totalAvailablePoints = c1Score + c2Score;
-		this.confidence = ((winnerPoints / totalAvailablePoints));
+		this.confidence = winnerPoints / totalAvailablePoints;
 
 		/*---------------------------------------------------------------------------------------------------*/
 		// CONFIDENCE ADJUSTMENT SECTION
