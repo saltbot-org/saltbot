@@ -1,6 +1,6 @@
 # SaltBot [![Build Status](https://travis-ci.org/saltbot-org/saltbot.svg?branch=master)](https://travis-ci.org/saltbot-org/saltbot)  [![CodeFactor](https://www.codefactor.io/repository/github/saltbot-org/saltbot/badge)](https://www.codefactor.io/repository/github/saltbot-org/saltbot)  [![GitHub issues](https://img.shields.io/github/issues/saltbot-org/saltbot.svg)](https://github.com/saltbot-org/saltbot/issues)  [![GitHub stars](https://img.shields.io/github/stars/saltbot-org/saltbot.svg)](https://github.com/saltbot-org/saltbot/stargazers)  [![GitHub forks](https://img.shields.io/github/forks/saltbot-org/saltbot.svg)](https://github.com/saltbot-org/saltbot/network)
 
-A betting bot for [SaltyBet.com](http://saltybet.com)
+A betting bot for [SaltyBet.com](http://saltybet.com) 
 
 * Read about it [**here**](http://explosionduck.com/wp/story-of-a-betting-bot/) and learn how to use it [**here**](http://explosionduck.com/wp/so-you-want-to-use-saltbot/). 
 * Download sample data(match record and chromosome) above or [**click here.**](https://github.com/saltbot-org/saltbot/tree/master/data/4-23-2018)
