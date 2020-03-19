@@ -35,8 +35,8 @@ To install the git version of this extension:
 # Updating
 
 To keep your version up to date simply:
-* Re-clone the git periodically
-* Run "npm install" and then "npm run build"
+* Run `git pull`
+* Run `npm install && npm run build`
 * Open Chrome Extension settings and click "reload" on Saltbot
 * Reload saltybet.com and the twitch chat tab
 
