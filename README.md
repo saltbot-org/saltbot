@@ -1,9 +1,9 @@
-# SaltBot [![Build Status](https://travis-ci.org/synkarius/saltbot.svg?branch=master)](https://travis-ci.org/synkarius/saltbot)  [![CodeFactor](https://www.codefactor.io/repository/github/synkarius/saltbot/badge)](https://www.codefactor.io/repository/github/synkarius/saltbot)  [![GitHub issues](https://img.shields.io/github/issues/synkarius/saltbot.svg)](https://github.com/synkarius/saltbot/issues)  [![GitHub stars](https://img.shields.io/github/stars/synkarius/saltbot.svg)](https://github.com/synkarius/saltbot/stargazers)  [![GitHub forks](https://img.shields.io/github/forks/synkarius/saltbot.svg)](https://github.com/synkarius/saltbot/network)
+# SaltBot [![Build Status](https://travis-ci.org/saltbot-org/saltbot.svg?branch=master)](https://travis-ci.org/saltbot-org/saltbot)  [![CodeFactor](https://www.codefactor.io/repository/github/saltbot-org/saltbot/badge)](https://www.codefactor.io/repository/github/saltbot-org/saltbot)  [![GitHub issues](https://img.shields.io/github/issues/saltbot-org/saltbot.svg)](https://github.com/saltbot-org/saltbot/issues)  [![GitHub stars](https://img.shields.io/github/stars/saltbot-org/saltbot.svg)](https://github.com/saltbot-org/saltbot/stargazers)  [![GitHub forks](https://img.shields.io/github/forks/saltbot-org/saltbot.svg)](https://github.com/saltbot-org/saltbot/network)
 
 A betting bot for [SaltyBet.com](http://saltybet.com)
 
 * Read about it [**here**](http://explosionduck.com/wp/story-of-a-betting-bot/) and learn how to use it [**here**](http://explosionduck.com/wp/so-you-want-to-use-saltbot/). 
-* Download sample data(match record and chromosome) above or [**click here.**](https://github.com/synkarius/saltbot/tree/master/data/4-23-2018)
+* Download sample data(match record and chromosome) above or [**click here.**](https://github.com/saltbot-org/saltbot/tree/master/data/4-23-2018)
 * Download the app from the Chrome Store [**here**](https://chrome.google.com/webstore/detail/saltbot/bholoegapebhflljekancpcnajigaiih).
 
 # System Requirements
@@ -19,7 +19,7 @@ A betting bot for [SaltyBet.com](http://saltybet.com)
 
 To install the git version of this extension:
 * Clone the repo:  
-`git clone https://github.com/synkarius/saltbot.git`
+`git clone https://github.com/saltbot-org/saltbot.git`
 * Make sure you have Node.js installed. It is available at https://nodejs.org/en/download/
 * For Ubuntu/Linux Mint Users [Follow this guide to install Nodejs ver. 8.x](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04) and be sure npm is installed  
 `sudo apt install npm`
@@ -42,7 +42,7 @@ To keep your version up to date simply:
 
 # Bug Reports
 
-Please be sure to [**Read the bug reporting guide**](https://github.com/synkarius/saltbot/blob/master/bugreports.md) before you [**submit a bug report!**](https://github.com/synkarius/saltbot/issues/new)
+Please be sure to [**Read the bug reporting guide**](https://github.com/saltbot-org/saltbot/blob/master/bugreports.md) before you [**submit a bug report!**](https://github.com/saltbot-org/saltbot/issues/new)
 
 The more info you provide, the better we can diagnose the issue and remedy it. 
 
@@ -56,4 +56,4 @@ The more info you provide, the better we can diagnose the issue and remedy it.
 
 # Contributors & Members
 
-[**Click here for the current list of Contributors and Members**](https://github.com/synkarius/saltbot/network/members)
+[**Click here for the current list of Contributors and Members**](https://github.com/saltbot-org/saltbot/network/members)
