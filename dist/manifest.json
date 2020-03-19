@@ -21,7 +21,6 @@
         "js/lib/jquery.min.js",
         "js/lib/jquery-ui.min.js",
         "js/lib/moment.min.js",
-        "js/lib/date.js",
         "js/contentscript.js"
       ]
     },
