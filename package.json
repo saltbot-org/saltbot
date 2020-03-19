@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/synkarius/saltbot.git"
+    "url": "git+https://github.com/saltbot-org/saltbot.git"
   },
   "author": "David Conway",
   "contributors": [
@@ -20,9 +20,9 @@
   ],
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/synkarius/saltbot/issues"
+    "url": "https://github.com/saltbot-org/saltbot/issues"
   },
-  "homepage": "https://github.com/synkarius/saltbot#readme",
+  "homepage": "https://github.com/saltbot-org/saltbot#readme",
   "dependencies": {
     "datatables.net": "^1.10.20",
     "datatables.net-dt": "^1.10.20",
