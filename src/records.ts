@@ -228,7 +228,7 @@ const er = function () {
 			type: "text/plain;charset=utf-8",
 		});
 		const timeStr = moment().format("YYYY-MM-DD-HH.mm");
-		window.saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
+		saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
 	});
 };
 
