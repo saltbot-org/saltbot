@@ -1,4 +1,3 @@
-const { CheckerPlugin } = require('awesome-typescript-loader');
 const { join } = require('path');
 
 module.exports = {
@@ -22,15 +21,12 @@ module.exports = {
                 exclude: /node_modules/,
                 test: /\.ts?$/,
                 use: [
-                    'awesome-typescript-loader?{configFileName: "tsconfig.json"}',
+                    'ts-loader',
                     'eslint-loader'
                 ]
             }
         ],
     },
-    plugins: [
-        new CheckerPlugin()
-    ],
     resolve: {
         extensions: ['.ts', '.js'],
     },
