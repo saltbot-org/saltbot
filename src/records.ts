@@ -224,11 +224,10 @@ const er = function () {
 			lines.push(record);
 		}
 
-		const time = new Date();
 		const blobM = new Blob(lines, {
 			type: "text/plain;charset=utf-8",
 		});
-		const timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+		const timeStr = moment().format("YYYY-MM-DD-HH.mm");
 		window.saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
 	});
 };
@@ -319,11 +318,10 @@ function ec() {
 				lines[i] += "\n";
 			}
 
-			const time = new Date();
 			const blobM = new Blob(lines, {
 				type: "text/plain;charset=utf-8",
 			});
-			const timeStr = "" + time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "-" + time.getHours() + "." + time.getMinutes();
+			const timeStr = moment().format("YYYY-MM-DD-HH.mm");
 			saveAs(blobM, "chromosome--" + timeStr + ".txt");
 		}
 		else {
