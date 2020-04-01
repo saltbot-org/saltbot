@@ -27,7 +27,7 @@
     "datatables.net": "^1.10.20",
     "datatables.net-dt": "^1.10.20",
     "file-saver": "^2.0.2",
-    "idb": "^5.0.1",
+    "idb": "^5.0.2",
     "jquery": "^3.4.0",
     "jquery-ui": "^1.12.1",
     "moment": "^2.19.3",
