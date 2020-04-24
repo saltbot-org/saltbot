@@ -17,5 +17,6 @@ module.exports = {
         "@typescript-eslint/no-unnecessary-type-assertion": "off",
         "indent": ["error", "tab", { "SwitchCase": 1 }],
         "no-prototype-builtins": "off",
+        "no-console": "off",
     }
 };
