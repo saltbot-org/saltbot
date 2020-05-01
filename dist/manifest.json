@@ -52,7 +52,6 @@
   },
   "web_accessible_resources": [
     "images/ui-icons*.png",
-    "css/jquery-ui.css",
-    "js/*.js"
+    "css/jquery-ui.css"
   ]
 }
