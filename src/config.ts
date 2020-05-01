@@ -1,27 +1,27 @@
 import { Settings } from "./salty";
 import { Bettor, Character } from "./records";
 
-function btnClicked (clicktype: string, data: any = null) {
+function btnClicked(clicktype: string, data: number | boolean | string = null): void {
 	chrome.tabs.query({
 		active: true,
 		currentWindow: true,
-	}, function () {
+	}, function() {
 		chrome.runtime.sendMessage({
 			text: data,
 			type: clicktype,
-		}, function (response) {
+		}, function(response) {
 			console.debug(response);
 		});
 	});
 }
-function elementChanged (changetype: string, data: any) {
+function elementChanged(changetype: string, data: number | boolean | string): void {
 	btnClicked(changetype, data);
 }
 
-function dr (sortByMoney: boolean) {
+function dr(sortByMoney: boolean): void {
 	const rankingElement = document.querySelector("#ranking");
 	rankingElement.innerHTML = "Loading...";
-	chrome.storage.local.get(["characters_v1", "bettors_v1"], function (results: { bettors_v1: Bettor[]; characters_v1: Character[] }) {
+	chrome.storage.local.get(["characters_v1", "bettors_v1"], function(results: { bettors_v1: Bettor[]; characters_v1: Character[] }) {
 		const bw10: Bettor[] = [];
 		const accTypeI: number[] = [];
 		const accTypeC: number[] = [];
@@ -41,7 +41,7 @@ function dr (sortByMoney: boolean) {
 			}
 		}
 
-		bw10.sort(function (a, b) {
+		bw10.sort(function(a, b) {
 			if (sortByMoney) {
 				return (b.accuracy * b.total) - (a.accuracy * a.total);
 			}
@@ -55,7 +55,7 @@ function dr (sortByMoney: boolean) {
 				" (" + b.type + ")(" + b.total + ") " + b.name + "\n";
 		}
 
-		const sumOfArray = (previous: number, current: number) => previous + current;
+		const sumOfArray = (previous: number, current: number): number => previous + current;
 		const iSum = accTypeI.reduce(sumOfArray);
 		const cSum = accTypeC.reduce(sumOfArray);
 
@@ -69,24 +69,24 @@ function dr (sortByMoney: boolean) {
 	});
 }
 
-function drClick () {
+function drClick(): void {
 	dr(false);
 	//btnClicked("dr");
 }
-function prClick () {
+function prClick(): void {
 	dr(true);
 	//btnClicked("pr");
 }
 
-function teChange () {
+function teChange(): void {
 	elementChanged("te", document.querySelector<HTMLInputElement>("#te").checked);
 }
 
-function aitChange () {
+function aitChange(): void {
 	elementChanged("ait", document.querySelector<HTMLInputElement>("#ait").checked);
 }
 
-function tLimitChange () {
+function tLimitChange(): void {
 	const tLimit = +document.querySelector<HTMLInputElement>("#tourney-limit").value;
 
 	if (tLimit < 1000) {
@@ -96,18 +96,18 @@ function tLimitChange () {
 	elementChanged("tourney_limit_" + ((document.querySelector<HTMLInputElement>("#ctl").checked) ? "enable" : "disable"), tLimit);
 }
 
-function keepAliveChange () {
+function keepAliveChange(): void {
 	elementChanged("keepAlive", document.querySelector<HTMLInputElement>("#toggleKeepAlive").checked);
 }
 
-function upsetBettingChange () {
+function upsetBettingChange(): void {
 	const upsetLimit = +document.querySelector<HTMLInputElement>("#limitUpsetBetting").value;
 	const upsetEnabled = document.querySelector<HTMLInputElement>("#checkUpsetBetting").checked;
 	elementChanged("upset_betting_" + (upsetEnabled ? "enable" : "disable"), upsetLimit);
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-	chrome.storage.local.get(["settings_v1"], function (results: { settings_v1: Settings }) {
+document.addEventListener("DOMContentLoaded", function() {
+	chrome.storage.local.get(["settings_v1"], function(results: { settings_v1: Settings }) {
 		document.querySelector<HTMLInputElement>("#te").checked = results.settings_v1.betOnExhibitions;
 		document.querySelector<HTMLInputElement>("#ait").checked = results.settings_v1.allInTourney;
 		document.querySelector<HTMLInputElement>("#ctl").checked = results.settings_v1.tourneyLimit_enabled;
@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelector("#bpr").addEventListener("click", prClick);
 	document.querySelector("#te").addEventListener("change", teChange);
 	document.querySelector("#ait").addEventListener("change", aitChange);
-	
+
 	document.querySelector("#toggleKeepAlive").addEventListener("change", keepAliveChange);
 
 	//tourney limit listeners

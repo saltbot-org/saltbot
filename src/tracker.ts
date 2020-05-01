@@ -37,7 +37,7 @@ export class Match {
 		this.upsetMode = false;
 	}
 
-	update(infoFromWaifu: { c1: string; c2: string; tier: string; mode: string }[], odds: string, timeInfo: { ticks: number; interval: number }, crowdFavor: number, illumFavor: number) {
+	update(infoFromWaifu: { c1: string; c2: string; tier: string; mode: string }[], odds: string, timeInfo: { ticks: number; interval: number }, crowdFavor: number, illumFavor: number): void {
 		for (const ifw of infoFromWaifu) {
 			if (this.names[0] === ifw.c1 && this.names[1] === ifw.c2) {
 				this.tier = ifw.tier;
@@ -64,7 +64,7 @@ export class Match {
 		this.crowdFavor = crowdFavor;
 		this.illumFavor = illumFavor;
 	}
-	getRecords(winner: string) {//in the event of a draw, pass in the string "draw"
+	getRecords(winner: string): [MatchRecord, Character, Character] {//in the event of a draw, pass in the string "draw"
 		if (this.names.includes(winner)) {
 			const updater = new Updater();
 			this.winner = (winner === this.character1.name) ? 0 : 1;
@@ -103,9 +103,9 @@ export class Match {
 		return balance;
 	}
 
-	betAmount() {
+	betAmount(): void {
 		const balance: number = this.getBalance();
-		const wagerBox = document.querySelector <HTMLInputElement>("#wager");
+		const wagerBox = document.querySelector<HTMLInputElement>("#wager");
 
 		let amountToBet: number;
 		const strategy = this.strategy;
@@ -143,7 +143,7 @@ export class Match {
 		wagerBox.value = amountToBet.toString();
 	}
 
-	init() {
+	init(): void {
 		//Attempt to get character objects from storage, if they don't exist create them
 		chrome.storage.local.get(["characters_v1", "settings_v1"], (result: { "characters_v1": Character[]; "settings_v1": Settings }) => {
 			const baseSeconds = 2000;
@@ -187,10 +187,10 @@ export class Match {
 			});
 		});
 	}
-	setAggro(aggro: boolean) {
+	setAggro(aggro: boolean): void {
 		this.strategy.aggro = aggro;
 	}
-	setMaximum(maximum: boolean) {
+	setMaximum(maximum: boolean): void {
 		this.strategy.maximum = maximum;
 	}
 }

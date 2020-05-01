@@ -3,32 +3,32 @@ import { Strategy, Lunatic, CoinToss, Chromosome, Scientist, Cowboy } from './st
 import { Settings } from './salty';
 
 //enable links
-$(document).ready(function () {
-	$("body").on("click", "a", function () {
+$(document).ready(function() {
+	$("body").on("click", "a", function() {
 		chrome.tabs.create({ url: $(this).attr("href") });
 		return false;
 	});
 });
 
-$(document).ready(function () {
-	document.querySelector<HTMLElement>("#bic").onclick = function () {
+$(document).ready(function() {
+	document.querySelector<HTMLElement>("#bic").onclick = function(): void {
 		document.querySelector<HTMLElement>("#upload_c").click();
 	};
-	document.querySelector<HTMLElement>("#bir").onclick = function () {
+	document.querySelector<HTMLElement>("#bir").onclick = function(): void {
 		document.querySelector<HTMLElement>("#upload_r").click();
 	};
 });
 
-function btnClicked (clicktype: string, data: any = null) {
+function btnClicked(clicktype: string, data: number | boolean | string | ArrayBuffer = null): void {
 	data = data || null;
 	chrome.tabs.query({
 		active: true,
 		currentWindow: true,
-	}, function (tabs) {
+	}, function(tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, {
 			text: data,
 			type: clicktype,
-		}, function (response) {
+		}, function(response) {
 			if (response && response.farewell) {
 				console.log(response.farewell);
 			}
@@ -36,28 +36,28 @@ function btnClicked (clicktype: string, data: any = null) {
 	});
 }
 
-function elementChanged(changetype: string, data: any) {
+function elementChanged(changetype: string, data: number | boolean | string): void {
 	btnClicked(changetype, data);
 }
 
-function erClick () {
+function erClick(): void {
 	btnClicked("er");
 }
-function ecClick () {
+function ecClick(): void {
 	btnClicked("ec");
 }
-function tvClick () {
+function tvClick(): void {
 	btnClicked("tv");
 }
-function taChange () {
+function taChange(): void {
 	const talimit = document.querySelector<HTMLInputElement>("#talimit").value;
 	elementChanged("talimit_" + (document.querySelector<HTMLInputElement>("#ta").checked ? "enable" : "disable"), talimit);
 }
-function tmChange () {
+function tmChange(): void {
 	const tmlimit = document.querySelector<HTMLInputElement>("#tmlimit").value;
 	elementChanged("maximumBetAmount_" + (document.querySelector<HTMLInputElement>("#tm").checked ? "enable" : "disable"), tmlimit);
 }
-function limitChange () {
+function limitChange(): void {
 	const limit = +document.querySelector<HTMLInputElement>("#limit").value;
 	if (!limit) {
 		return;
@@ -70,12 +70,12 @@ function limitChange () {
 	elementChanged("limit_" + ((document.querySelector<HTMLInputElement>("#tl").checked) ? "enable" : "disable"), limit);
 }
 
-function multiplierChange () {
+function multiplierChange(): void {
 	const multiplierValue = document.querySelector<HTMLInputElement>("#multiplierSlider").value;
 	elementChanged("multiplier", multiplierValue);
 }
 
-function setButtonActive(identifier: string) {
+function setButtonActive(identifier: string): void {
 	document.querySelector("#cs_o").classList.remove("active");
 	document.querySelector("#cs_rc").classList.remove("active");
 	document.querySelector("#cs_cs").classList.remove("active");
@@ -84,12 +84,12 @@ function setButtonActive(identifier: string) {
 	$(identifier).addClass("active");
 }
 
-function changeStrategyClickO () {
+function changeStrategyClickO(): void {
 	btnClicked("cs_o");
 	setButtonActive("#cs_o");
 }
-function changeStrategyClickCS () {
-	chrome.storage.local.get(["chromosomes_v1"], function (results) {
+function changeStrategyClickCS(): void {
+	chrome.storage.local.get(["chromosomes_v1"], function(results) {
 		console.log(results);
 		if (Object.keys(results).length === 0) {
 			displayDialogMessage("Cannot change mode to Scientist without initializing chromosome pool\nPlease click 'Reset Pool'");
@@ -100,26 +100,26 @@ function changeStrategyClickCS () {
 		}
 	});
 }
-function changeStrategyClickRC () {
+function changeStrategyClickRC(): void {
 	btnClicked("cs_rc");
 	setButtonActive("#cs_rc");
 }
-function changeStrategyClickIPU () {
+function changeStrategyClickIPU(): void {
 	btnClicked("cs_ipu");
 	setButtonActive("#cs_ipu");
 }
 
-function onFileReadRecord (e: ProgressEvent<FileReader>) {
+function onFileReadRecord(e: ProgressEvent<FileReader>): void {
 	console.log("File read successful.");
 	const t = e.target.result;
 	btnClicked("ir", t);
 }
-function onFileReadChromosome (e: ProgressEvent<FileReader>) {
+function onFileReadChromosome(e: ProgressEvent<FileReader>): void {
 	console.log("File read successful.");
 	const t = e.target.result;
 	btnClicked("ic", t);
 }
-function irClick () {
+function irClick(): void {
 	console.log("Attempting records import...");
 	const files = document.querySelector<HTMLInputElement>("#upload_r").files;
 	if (files.length > 0) {
@@ -136,7 +136,7 @@ function irClick () {
 	reader.onload = onFileReadRecord;
 	reader.readAsText(file);
 }
-function icClick () {
+function icClick(): void {
 	console.log("Attempting chromosome import...");
 	const files = document.querySelector<HTMLInputElement>("#upload_c").files;
 	if (files.length > 0) {
@@ -171,7 +171,7 @@ class Simulator {
 	money: number[] = [];
 	minimum = 100; // absolute lowest bailout
 
-	public evalMutations() {
+	public evalMutations(): void {
 		chrome.storage.local.get(["characters_v1", "chromosomes_v1"], (results: { "characters_v1": Character[]; "chromosomes_v1": Chromosome[] }) => {
 			let matches = [];
 			chrome.runtime.sendMessage({ query: "getMatchRecords" }, (queryResult: MatchRecord[]) => {
@@ -300,7 +300,7 @@ class Simulator {
 					sortingArray.push([orders[l].chromosome, totalPercentCorrect[l], this.money[l], penalty]);
 				}
 				//	sort the the best in order.
-				sortingArray.sort(function (a, b) {
+				sortingArray.sort(function(a, b) {
 					if (!money && accuracy) {
 						return (b[1] * b[3]) - (a[1] * a[3]);
 					}
@@ -382,7 +382,7 @@ class Simulator {
 		});
 	}
 
-	public initializePool() {
+	public initializePool(): void {
 		const populationSize = 32;	// too small, it cannot expanded solve space; too large, not only runtime increases, weights differences between best/worst become dominate.
 		//const shortPopulationSize = 16;
 		const pool: Chromosome[] = [];
@@ -399,13 +399,13 @@ class Simulator {
 		}
 		chrome.storage.local.set({
 			chromosomes_v1: newPool,
-		}, function () {
+		}, function() {
 			const msgBox: HTMLInputElement = document.querySelector("#msgbox");
 			msgBox.value = "initial pool population complete";
 		});
 	}
 
-	private updateMoney(index: number, odds: string, selection: number, amount: number, correct: boolean) {
+	private updateMoney(index: number, odds: string, selection: number, amount: number, correct: boolean): void {
 		const oddsArr = odds.split(":");
 		if (!correct) {
 			this.money[index] -= amount;
@@ -419,7 +419,7 @@ class Simulator {
 		}
 	}
 
-	private getBetAmount(strategy: Strategy) {
+	private getBetAmount(strategy: Strategy): number {
 		let amountToBet;
 		const tournament = false;
 		const debug = true;
@@ -436,7 +436,7 @@ class Simulator {
 	}
 
 	// currently unsupported with the time weights splitting.
-	private applyPenalties(_c: Chromosome) {
+	private applyPenalties(_c: Chromosome): number {
 		//###
 		console.log("called: applyPenalties. Is undefined.");
 		return 1;
@@ -456,8 +456,8 @@ class Simulator {
 
 const simulator = new Simulator();
 
-document.addEventListener("DOMContentLoaded", function () {
-	chrome.storage.local.get("settings_v1", function (result: { settings_v1: Settings }) {
+document.addEventListener("DOMContentLoaded", function() {
+	chrome.storage.local.get("settings_v1", function(result: { settings_v1: Settings }) {
 		if (result.settings_v1) {
 			document.querySelector<HTMLInputElement>("#tl").checked = result.settings_v1.limit_enabled || false;
 			document.querySelector<HTMLInputElement>("#limit").value = String(result.settings_v1.limit || 10000);
@@ -476,10 +476,10 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelector("#upload_r").addEventListener("change", irClick);
 	document.querySelector("#bec").addEventListener("click", ecClick);
 	document.querySelector("#upload_c").addEventListener("change", icClick);
-	document.querySelector("#ugw").addEventListener("click", function () {
+	document.querySelector("#ugw").addEventListener("click", function() {
 		simulator.evalMutations();
 	});
-	document.querySelector("#rgw").addEventListener("click", function () {
+	document.querySelector("#rgw").addEventListener("click", function() {
 		simulator.initializePool();
 	});
 	document.querySelector("#tv").addEventListener("click", tvClick);
@@ -496,9 +496,9 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelector("#tl").addEventListener("change", limitChange);
 	document.querySelector("#limit").addEventListener("keyup", limitChange);
 	document.querySelector("#limit").addEventListener("input", limitChange);
-	const multiplierSlider = document.querySelector <HTMLInputElement>("#multiplierSlider");
+	const multiplierSlider = document.querySelector<HTMLInputElement>("#multiplierSlider");
 	multiplierSlider.onchange = multiplierChange;
-	multiplierSlider.oninput = function () {
+	multiplierSlider.oninput = function(): void {
 		document.querySelector<HTMLInputElement>("#multiplierField").value = multiplierSlider.value;
 	};
 

@@ -31,8 +31,8 @@ export class Settings {
 	//settings for always going all in
 	upsetBetting_limit = 100000;
 	upsetBetting_enabled = false;
-    maximumBetAmount_limit = 10000;
-    maximumBetAmount_enabled = false;
+	maximumBetAmount_limit = 10000;
+	maximumBetAmount_enabled = false;
 }
 
 class StatusScanner {
@@ -61,7 +61,7 @@ class StatusScanner {
 		}
 		return copy;
 	}
-	getWinner() {
+	getWinner(): string {
 		const recent = this.getAnnouncements();
 		recent.reverse();
 		for (const announcement of recent) {
@@ -137,7 +137,7 @@ export class Controller {
 		setInterval(() => this.run(), this.timerInterval);
 	}
 
-	run() {
+	run(): void {
 		if (!this.settings) {
 			return;
 		}
@@ -344,7 +344,7 @@ export class Controller {
 
 	}
 
-	updateRecords(results: { bettors_v1: Bettor[]; characters_v1: Character[] }, mr: MatchRecord, c1: Character, c2: Character) {
+	updateRecords(results: { bettors_v1: Bettor[]; characters_v1: Character[] }, mr: MatchRecord, c1: Character, c2: Character): void {
 		let characters: Character[] = [];
 		let bettors: Bettor[] = [];
 
@@ -408,20 +408,20 @@ export class Controller {
 		});
 	}
 
-	ensureTwitch() {
+	ensureTwitch(): void {
 		chrome.runtime.sendMessage(chrome.runtime.id, {
 			getTwitch: true,
-		}, function () {
+		}, function(): void {
 			//console.debug("response received in salty");
 		});
 	}
-	removeVideoWindow() {
+	removeVideoWindow(): void {
 		const parent = $("#video-embed");
 		this.savedVideo = parent.clone(true);
 		parent.empty();
 	}
 
-	enableVideoWindow() {
+	enableVideoWindow(): void {
 		const embeddedVideo = $("#video-embed");
 		if (this.savedVideo && embeddedVideo[0].childNodes.length === 0) {
 			embeddedVideo.remove();
@@ -430,7 +430,7 @@ export class Controller {
 		}
 	}
 
-	toggleVideoWindow() {
+	toggleVideoWindow(): void {
 		this.settings.video = !this.settings.video;
 		if (!this.settings.video) {
 			this.removeVideoWindow();
@@ -440,7 +440,7 @@ export class Controller {
 		}
 		this.saveSettings("- settings updated, video: " + (this.settings.video ? "true" : "false"));
 	}
-	setAggro(aggro_enabled: boolean, aggro_limit: number) {
+	setAggro(aggro_enabled: boolean, aggro_limit: number): void {
 		if (aggro_limit === this.settings.aggro_limit && aggro_enabled === this.settings.aggro_enabled) {
 			//nothing to do
 			return;
@@ -453,19 +453,19 @@ export class Controller {
 		this.saveSettings("- settings updated, talimit " + (aggro_enabled ? "enabled" : "disabled") + " limit : " + aggro_limit);
 
 	}
-	setExhibitions(value: boolean) {
+	setExhibitions(value: boolean): void {
 		this.settings.betOnExhibitions = value;
 		this.saveSettings("- settings updated, exhibition betting: " + (this.settings.betOnExhibitions ? "true" : "false"));
 	}
-	setAllInTournament(value: boolean) {
+	setAllInTournament(value: boolean): void {
 		this.settings.allInTourney = value;
 		this.saveSettings("- settings updated, go all in at tournaments: " + (this.settings.allInTourney ? "true" : "false"));
 	}
-	setMultiplier(value: number) {
+	setMultiplier(value: number): void {
 		this.settings.multiplier = value;
 		this.saveSettings("- settings updated, multiplier: " + value);
 	}
-	setLimit(enabled: boolean, limit: number) {
+	setLimit(enabled: boolean, limit: number): void {
 		if (limit === this.settings.limit && enabled === this.settings.limit_enabled) {
 			//nothing to do
 			return;
@@ -478,7 +478,7 @@ export class Controller {
 		this.saveSettings("- settings updated, limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
 	}
 
-	setTourneyLimit(enabled: boolean, limit?: number) {
+	setTourneyLimit(enabled: boolean, limit?: number): void {
 		if (limit === this.settings.tourneyLimit && enabled === this.settings.tourneyLimit_enabled) {
 			//nothing to do
 			return;
@@ -491,7 +491,7 @@ export class Controller {
 		this.saveSettings("- settings updated, tourney limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
 	}
 
-	setUpsetBetting(upsetBetting_enabled: boolean, upsetBetting_limit: number) {
+	setUpsetBetting(upsetBetting_enabled: boolean, upsetBetting_limit: number): void {
 		if (upsetBetting_limit === this.settings.upsetBetting_limit && upsetBetting_enabled === this.settings.upsetBetting_enabled) {
 			//nothing to do
 			return;
@@ -505,7 +505,7 @@ export class Controller {
 
 	}
 
-	setMaximumBetAmount(enabled: boolean, limit: number) {
+	setMaximumBetAmount(enabled: boolean, limit: number): void {
 		if (limit === this.settings.maximumBetAmount_limit && enabled === this.settings.maximumBetAmount_enabled) {
 			//nothing to do
 			return;
@@ -516,7 +516,7 @@ export class Controller {
 		this.saveSettings("- settings updated, maximum bet amount " + (enabled ? "enabled" : "disabled") + " limit: " + limit);
 	}
 
-	changeStrategy(sn: string, data?: any) {
+	changeStrategy(sn: string, data?: any): void {
 		let t = "";
 		switch (sn) {
 			case "cs_o":
@@ -540,23 +540,23 @@ export class Controller {
 		console.log("- changing strategy to " + t);
 		this.saveSettings("- settings saved");
 	}
-	receiveBestChromosome(data: string) {
+	receiveBestChromosome(data: string): void {
 		this.bestChromosome = new Chromosome().loadFromJSON(data);
 	}
-	setKeepAlive(value: boolean) {
+	setKeepAlive(value: boolean): void {
 		this.settings.keepAlive = value;
 		this.saveSettings("- settings updated, always keep saltybet tab alive: " + (this.settings.keepAlive ? "true" : "false"));
 	}
-	saveSettings(msg: string) {
+	saveSettings(msg: string): void {
 		chrome.storage.local.set({
 			settings_v1: this.settings,
-		}, function () {
+		}, function(): void {
 			console.log(msg);
 		});
 	}
 }
 
-function prepareJQueryDialog () {
+function prepareJQueryDialog(): void {
 	$('link[href="../css/jquery-ui-1.11.min.css"]').prop("disabled", true);
 	const link = '<link rel="stylesheet" type="text/css" href="' + chrome.extension.getURL("css/jquery-ui.css") + '">';
 	$("head").append(link);
@@ -577,14 +577,14 @@ function prepareJQueryDialog () {
 			}
 
 			const dia = $(this);
-			dialogTimer = setTimeout(function () {
+			dialogTimer = setTimeout(function() {
 				dia.dialog("close");
 			}, 5000);
 		},
 	});
 }
 
-function correctChatIFrame() {
+function correctChatIFrame(): void {
 	const chatFrame = (document.getElementById("chat-frame-stream") as HTMLIFrameElement);
 	if (chatFrame.src === "http://twitch.tv/saltybet/chat") {
 		chatFrame.src = "http://twitch.tv/embed/saltybet/chat";
@@ -593,7 +593,7 @@ function correctChatIFrame() {
 
 chrome.runtime.sendMessage({
 	browserAction: true,
-}, function () {
+}, function(): void {
 	console.debug("Activated browser action");
 });
 if (window.location.href === "http://www.saltybet.com/" || window.location.href === "http://mugen.saltybet.com/" ||
@@ -604,7 +604,7 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 	Globals.ctrl = new Controller();
 	const ctrl = Globals.ctrl;
 	ctrl.ensureTwitch();
-	chrome.storage.local.get(["settings_v1"], function (results) {
+	chrome.storage.local.get(["settings_v1"], function(results) {
 		if (results.settings_v1) {
 			ctrl.settings = results.settings_v1;
 
@@ -631,7 +631,7 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 		console.log("- settings applied");
 
 	});
-	chrome.runtime.onMessage.addListener(function (message) {
+	chrome.runtime.onMessage.addListener(function(message) {
 		// console.log("-\nmessage from Waifu:\t" + message);
 		if (typeof message === "string") {
 			const winMessageIndicator = " wins";
@@ -686,7 +686,7 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 			} else if (message.includes(betsLockedIndicator)) {
 				//reset timer
 				ctrl.ticksSinceMatchBegan = 0;
-				setTimeout(function () {
+				setTimeout(function() {
 					//save the odds
 					try {
 						const oddsBox = document.querySelector("#lastbet");
@@ -742,11 +742,11 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 						const crowdC2 = $(betsForC2).find(".bettor-line");
 						ctrl.bettorsC1 = [];
 						ctrl.bettorsC2 = [];
-						crowdC1.each(function () {
+						crowdC1.each(function() {
 							const e = $(this).find("strong")[0];
 							ctrl.bettorsC1.push([e.innerHTML, e.classList.contains("goldtext")]);
 						});
-						crowdC2.each(function () {
+						crowdC2.each(function() {
 							const e = $(this).find("strong")[0];
 							ctrl.bettorsC2.push([e.innerHTML, e.classList.contains("goldtext")]);
 						});
@@ -761,13 +761,13 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 	setInterval(() => { ctrl.ensureTwitch() }, 60000);
 }
 
-window.addEventListener("beforeunload", function () {
+window.addEventListener("beforeunload", function() {
 	Globals.ctrl.enableVideoWindow();
 });
 
 prepareJQueryDialog();
 
-export function displayDialogMessage(message: string) {
+export function displayDialogMessage(message: string): void {
 	const dialog = $("#dialog");
 	dialog.html(message.replace(/\n/g, "<br />"));
 	dialog.dialog("open");

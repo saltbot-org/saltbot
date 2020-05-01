@@ -67,6 +67,7 @@ const loadMatches = function(): void {
 				{ data: "dt", title: "Date" },
 			],
 			createdRow(row, data) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				$("td", row).eq((data as any).w).addClass("highlight");
 			},
 			data: matches,

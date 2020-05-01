@@ -4,7 +4,7 @@ import { Chromosome } from './strategy';
 import { binarySearchByProperty, binaryInsertByProperty } from './utils';
 import { Globals } from './globals';
 
-export function displayDialogMessage(message: string) {
+export function displayDialogMessage(message: string): void {
 	const dialog = $("#dialog");
 	dialog.html(message.replace(/\n/g, "<br />"));
 	dialog.dialog("open");
@@ -61,7 +61,7 @@ export class MatchRecord {
 }
 
 export class Updater {
-	getCharAvgOdds(c: Character) {
+	getCharAvgOdds(c: Character): number {
 		let o = 0;
 		let i;
 		for (i = 0; i < c.odds.length; i++) {
@@ -70,7 +70,7 @@ export class Updater {
 		i = (i > 0) ? i : 1;
 		return o / i;
 	}
-	getCharacter(cname: string, characterRecords: Character[], namesOfCharactersWhoAlreadyHaveRecords: string[]) {
+	getCharacter(cname: string, characterRecords: Character[], namesOfCharactersWhoAlreadyHaveRecords: string[]): Character {
 		let cobject: Character = null;
 		if (!namesOfCharactersWhoAlreadyHaveRecords.includes(cname)) {
 			cobject = new Character(cname);
@@ -97,7 +97,7 @@ export class Updater {
 		}
 		return bobject;
 	}
-	updateBettorsFromMatch(mObj: MatchRecord, bc1: Bettor[], bc2: Bettor[]) {
+	updateBettorsFromMatch(mObj: MatchRecord, bc1: Bettor[], bc2: Bettor[]): void {
 		const c1Won = (mObj.w === 0);
 		for (const bettorForCharacter1 of bc1) {
 			if (c1Won) {
@@ -116,7 +116,7 @@ export class Updater {
 			}
 		}
 	}
-	updateCharactersFromMatch(mObj: MatchRecord, c1Obj: Character, c2Obj: Character) {
+	updateCharactersFromMatch(mObj: MatchRecord, c1Obj: Character, c2Obj: Character): void {
 		const rememberRecordsLast = 15;  // changing this requires re-importing matches.
 		// wins, losses, and times
 		if (mObj.w === 0) {
@@ -137,7 +137,7 @@ export class Updater {
 			c2Obj.totalFights.push(1);
 		}
 
-		function limitRecordsTo(charObj: Character, limit: number) {
+		function limitRecordsTo(charObj: Character, limit: number): void {
 			if (charObj.totalFights.length > limit) {
 				if (charObj.totalFights[0] === 0) {
 					charObj.losses.shift();
@@ -199,10 +199,10 @@ export class Updater {
 }
 
 
-const er = function () {
+function er(): void {
 	const lines: string[] = [];
 	let matches = [];
-	chrome.runtime.sendMessage({ query: "getMatchRecords" }, function (data: MatchRecord[]) {
+	chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
 		matches = data;
 
 		for (const match of matches) {
@@ -230,9 +230,9 @@ const er = function () {
 		const timeStr = moment().format("YYYY-MM-DD-HH.mm");
 		saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
 	});
-};
+}
 
-function ir(f: string) {
+function ir(f: string): void {
 	const updater = new Updater();
 	const matchRecords = [];
 	const characterRecords: Character[] = [];
@@ -301,15 +301,15 @@ function ir(f: string) {
 	chrome.runtime.sendMessage({ data: matchRecords, query: "setMatchRecords" });
 	chrome.storage.local.set({
 		characters_v1: characterRecords,
-	}, function () {
+	}, function() {
 		console.log("-\nrecords imported:\n" + nmr + " match records\n" + ncr + " character records");
 		displayDialogMessage("Records imported:\n" + nmr + " match records\n" + ncr + " character records");
 		Globals.dirtyRecords = true;
 	});
 }
 
-function ec() {
-	chrome.storage.local.get(["chromosomes_v1"], function (results) {
+function ec(): void {
+	chrome.storage.local.get(["chromosomes_v1"], function(results) {
 		if (results.chromosomes_v1 && results.chromosomes_v1.length > 0) {
 			let chromosome = new Chromosome();
 			chromosome = chromosome.loadFromObject(results.chromosomes_v1[0]);
@@ -330,7 +330,7 @@ function ec() {
 	});
 }
 
-function ic(jsonString: string) {
+function ic(jsonString: string): void {
 	const chromosome = new Chromosome();
 	try {
 		chromosome.loadFromJSON(jsonString);
@@ -341,7 +341,7 @@ function ic(jsonString: string) {
 	}
 
 	//get the chromosomes currently saved in the list
-	chrome.storage.local.get(["chromosomes_v1"], function (results) {
+	chrome.storage.local.get(["chromosomes_v1"], function(results) {
 		let chromosomes = results.chromosomes_v1;
 		if (chromosomes) {
 			chromosomes[0] = chromosome;
@@ -351,7 +351,7 @@ function ic(jsonString: string) {
 		}
 		chrome.storage.local.set({
 			chromosomes_v1: chromosomes,
-		}, function () {
+		}, function() {
 			console.log("- Chromosome imported successfully.");
 			displayDialogMessage("Chromosome imported successfully.");
 		});
@@ -361,7 +361,8 @@ function ic(jsonString: string) {
 
 if (window.location.href === "http://www.saltybet.com/" || window.location.href === "http://mugen.saltybet.com/" ||
 	window.location.href === "https://www.saltybet.com/" || window.location.href === "https://mugen.saltybet.com/") {
-	chrome.runtime.onMessage.addListener(function (request: { type: string; text: string }, _sender: chrome.runtime.MessageSender, sendResponse: (response: any) => void): boolean {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	chrome.runtime.onMessage.addListener(function(request: { type: string; text: string }, _sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void): boolean {
 		const ctrl = Globals.ctrl;
 		switch (request.type) {
 			case "er":
