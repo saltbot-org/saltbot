@@ -1,5 +1,4 @@
 import { MatchRecord, Updater, Character } from "./records";
-import { Chromosome } from "./strategy";
 import { openDB } from 'idb';
 async function getMatchRecords() {
 	const db = await openDB("saltbot", 1);
@@ -210,30 +209,3 @@ chrome.runtime.onMessage.addListener(function (details, sender, sendResponse) {
 	}
 	return false;
 });
-function sendUpdatedChromosome() {
-	chrome.storage.local.get(["chromosomes_v1"], function (results: { chromosomes_v1: Chromosome[] }) {
-		if (results.chromosomes_v1) {
-			results.chromosomes_v1.forEach((chromosome: Chromosome) => {
-				if (!chromosome.rank) {
-					chromosome.rank = 100;
-				}
-			});
-
-			results.chromosomes_v1.sort(function (a, b) {
-				return a.rank - b.rank;
-			});
-			const data = JSON.stringify(results.chromosomes_v1[0]);
-			chrome.tabs.query({
-				title: "Salty Bet",
-				url: "*://*.saltybet.com/",
-			}, function (result) {
-				if (result.length > 0) {
-					chrome.tabs.sendMessage(result[0].id, {
-						text: data,
-						type: "suc",
-					});
-				}
-			});
-		}
-	});
-}
