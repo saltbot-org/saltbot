@@ -1,7 +1,7 @@
 import { elementReady } from "./es6-element-ready";
 
 function addListener(): void {
-	elementReady(".chat-list__lines").then((element: Element) => {
+	elementReady(".chat-list").then((element: Element) => {
 		// put a mutation observer on the chat which reports back to the main content script whenever Waifu speaks
 		const chatWindow = element;
 		const oldWaifuMessages: string[] = [];
