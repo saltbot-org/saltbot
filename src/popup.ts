@@ -501,10 +501,4 @@ document.addEventListener("DOMContentLoaded", function() {
 	multiplierSlider.oninput = function(): void {
 		document.querySelector<HTMLInputElement>("#multiplierField").value = multiplierSlider.value;
 	};
-
-	chrome.alarms.create("chromosome update", {
-		delayInMinutes: 0.1,
-		periodInMinutes: 1.0,
-	});
-
 });

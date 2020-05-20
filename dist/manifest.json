@@ -6,9 +6,7 @@
   "permissions": [
     "storage",
     "unlimitedStorage",
-    "declarativeContent",
-    "tabs",
-    "alarms"
+    "tabs"
   ],
   "content_scripts": [
     {

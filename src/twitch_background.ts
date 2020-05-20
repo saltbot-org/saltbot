@@ -92,10 +92,6 @@ function reimportMatches() {
 }
 
 chrome.runtime.onInstalled.addListener(function () {
-	(chrome as any).declarativeContent.onPageChanged.removeRules(undefined, function () {
-		//do nothing
-	});
-
 	reimportMatches();
 });
 
@@ -241,6 +237,3 @@ function sendUpdatedChromosome() {
 		}
 	});
 }
-chrome.alarms.onAlarm.addListener(function () {
-	sendUpdatedChromosome();
-});
