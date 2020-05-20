@@ -30,7 +30,7 @@
     "idb": "^5.0.2",
     "jquery": "^3.5.0",
     "jquery-ui": "^1.12.1",
-    "moment": "^2.19.3",
+    "moment": "^2.25.0",
     "npm": "^6.14.4"
   },
   "devDependencies": {
