@@ -370,7 +370,7 @@ export class Chromosome {
 		return results;
 	}
 
-	mate(other: Chromosome) {
+	mate(other: Chromosome): Chromosome {
 		const offspring = new Chromosome();
 		const parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
 		const mutationScale = 2;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
@@ -397,7 +397,7 @@ export class Chromosome {
 	}
 
 	// note, test equals for floats...
-	equals(other: Chromosome) {
+	equals(other: Chromosome): boolean {
 		let anyDifference = false;
 		for (const i in other) {
 			if (typeof other[i] !== "function") {
