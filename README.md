@@ -3,7 +3,7 @@
 A betting bot for [SaltyBet.com](http://saltybet.com)
 
 * Read about it [**here**](http://explosionduck.com/wp/story-of-a-betting-bot/) and learn how to use it [**here**](http://explosionduck.com/wp/so-you-want-to-use-saltbot/). 
-* Download sample data(match record and chromosome) above or [**click here.**](https://github.com/saltbot-org/saltbot/tree/master/data/4-23-2018)
+* Download sample data(match record and chromosome) above or [**click here.**](https://github.com/saltbot-org/saltbot/tree/master/data/2020-01-27)
 * Download the app from the Chrome Store [**here**](https://chrome.google.com/webstore/detail/saltbot/bholoegapebhflljekancpcnajigaiih).
 
 # System Requirements
