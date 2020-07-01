@@ -34,7 +34,7 @@
     "npm": "^6.14.5"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.114",
+    "@types/chrome": "^0.0.117",
     "@types/datatables.net": "^1.10.19",
     "@types/file-saver": "^2.0.1",
     "@types/jquery": "^3.3.38",
