@@ -46,7 +46,7 @@
     "eslint": "^6.8.0",
     "eslint-loader": "^4.0.2",
     "rimraf": "^3.0.2",
-    "ts-loader": "^7.0.5",
+    "ts-loader": "^8.0.1",
     "tslint": "^5.9.1",
     "tslint-eslint-rules": "^5.1.0",
     "typescript": "^3.9.5",
