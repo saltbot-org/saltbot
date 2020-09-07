@@ -21,13 +21,13 @@ jQuery.extend((jQuery.fn as any).dataTableExt.oSort, {
 });
 
 const loadMatches = function(): void {
-	let matches = [];
+	let matches: MatchRecord[] = [];
 	chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
 		matches = data;
 
 		if (matches) {
 			const matchesMirrored = $.extend(true, [], matches);
-			matchesMirrored.forEach(function(element) {
+			matchesMirrored.forEach(function(element: MatchRecord) {
 				//switch characters around
 				const temp = element.c1;
 				element.c1 = element.c2;
@@ -45,6 +45,7 @@ const loadMatches = function(): void {
 			matches = matches.concat(matchesMirrored);
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
 		($.fn.dataTable as any).moment("DD-MM-YYYY");
 		$("#matches").DataTable({
 			columnDefs: [

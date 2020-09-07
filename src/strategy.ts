@@ -111,7 +111,7 @@ export abstract class Strategy {
 			this.confidence = 1;
 		}
 
-		let amountToBet;
+		let amountToBet: number;
 		const bailout = this.getBailout(tournament);
 
 		if (tournament) {
@@ -141,16 +141,16 @@ export abstract class Strategy {
 			}
 			if (debug) {
 				if (allIn) {
-					console.log("- ALL IN: " + balance);
+					console.log(`- ALL IN: ${balance}`);
 				}
 				else if (bailoutMessage !== 0) {
-					console.log("- amount is less than bailout (" + bailoutMessage + "), betting bailout: " + amountToBet);
+					console.log(`- amount is less than bailout (${bailoutMessage}), betting bailout: ${amountToBet}`);
 				}
 				else if (this.confidence) {
-					console.log("- betting: " + balance + " x (cf(" + (confPrint * 100).toFixed(2) + ")=" + (conf * 100).toFixed(2) + "%) = " + amountToBet);
+					console.log(`- betting: ${balance} x(cf(${(confPrint * 100).toFixed(2)})=${(conf * 100).toFixed(2)}%) = ${amountToBet}`);
 				}
 				else {
-					console.log("- betting: " + balance + " x  50%) = " + amountToBet);
+					console.log(`- betting: ${balance} x  50%) = ${amountToBet}`);
 				}
 			}
 		} else if (!this.lowBet) {
@@ -160,11 +160,11 @@ export abstract class Strategy {
 			}
 			if (amountToBet < bailout) {
 				if (debug) {
-					console.log("- amount is less than bailout (" + amountToBet + "), betting bailout: " + bailout);
+					console.log(`- amount is less than bailout (${amountToBet}), betting bailout: ${bailout}`);
 				}
 				amountToBet = bailout;
 			} else if (debug) {
-				console.log("- betting: " + balance + " x .10 =(" + (balance * simBettingLimitScale) + ") x cf(" + (this.confidence * 100).toFixed(2) + "%) = " + amountToBet);
+				console.log(`- betting: ${balance} x .10 =(${(balance * simBettingLimitScale)}) x cf(${(this.confidence * 100).toFixed(2)}%) = ${amountToBet}`);
 			}
 		} else {
 			const p05 = Math.ceil(balance * lowBettingScale);
@@ -174,7 +174,7 @@ export abstract class Strategy {
 				amountToBet = bailout;
 			}
 			if (debug) {
-				console.log("- betting without confidence: " + amountToBet);
+				console.log(`- betting without confidence: ${amountToBet}`);
 			}
 		}
 		return amountToBet;
@@ -206,11 +206,11 @@ export class Cowboy extends Strategy {
 		const c2 = info.character2;
 		const c1TotalMatches = c1.wins.length + c1.losses.length;
 		const c2TotalMatches = c2.wins.length + c2.losses.length;
-		let p;
+		let p: string;
 
 		if (c1TotalMatches < 3 || c2TotalMatches < 3) {
 			if (this.debug) {
-				console.log("- Cowboy has insufficient information, W:L(P1)(P2)->  (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+				console.log(`- Cowboy has insufficient information, W:L(P1)(P2)->  (${c1.wins.length}:${c1.losses.length})(${c2.wins.length}:${c2.losses.length})`);
 			}
 			this.abstain = true;
 			this.lowBet = true;
@@ -230,7 +230,7 @@ export class Cowboy extends Strategy {
 			if (this.confidence > 1) { this.confidence = 1; }
 			if (this.confidence < 0.6) {
 				if (this.debug) {
-					console.log("- Cowboy has insufficient confidence (confidence: " + this.confidence.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")");
+					console.log(`- Cowboy has insufficient confidence (confidence: ${this.confidence.toFixed(2)}), W:L(P1)(P2)-> (${c1.wins.length}:${c1.losses.length})(${c2.wins.length}:${c2.losses.length})`);
 				}
 				this.abstain = true;
 				this.lowBet = true;
@@ -238,7 +238,7 @@ export class Cowboy extends Strategy {
 			}
 			if (pChar.ratio <= 0.5 || (npChar.ratio === 0.5 && (npChar.wins.length + npChar.losses.length === 2))) {
 				if (this.debug) {
-					console.log("- Cowboy discourages betting on or against <51% (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
+					console.log(`- Cowboy discourages betting on or against <51% (${(c1Ratio * 100).toFixed(2)}% : ${(c2Ratio * 100).toFixed(2)}%)`);
 				}
 				this.abstain = true;
 				this.lowBet = true;
@@ -246,15 +246,15 @@ export class Cowboy extends Strategy {
 			}
 			p = pChar.name;
 			if (this.debug) {
-				console.log("- " + p + " has a better win percentage (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
-				console.log("- Betting on " + p + " confidence: " + this.confidence.toFixed(2));
+				console.log(`- ${p} has a better win percentage (${(c1Ratio * 100).toFixed(2)}% : ${(c2Ratio * 100).toFixed(2)}%)`);
+				console.log(`- Betting on ${p} confidence: ${this.confidence.toFixed(2)}`);
 			}
 
 			this.prediction = p;
 			return p;
 		} else {
 			if (this.debug) {
-				console.log("- Cowboy has insufficient information (" + (c1Ratio * 100).toFixed(2) + "% : " + (c2Ratio * 100).toFixed(2) + "%)");
+				console.log(`- Cowboy has insufficient information (${(c1Ratio * 100).toFixed(2)}% : ${(c2Ratio * 100).toFixed(2)}%)`);
 			}
 			this.abstain = true;
 			this.lowBet = true;
@@ -264,6 +264,7 @@ export class Cowboy extends Strategy {
 }
 
 export class Chromosome {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	[key: string]: any;
 
 	//confidence weights
@@ -364,7 +365,8 @@ export class Chromosome {
 		let results = "-\nchromosome:";
 		for (const i in this) {
 			if (typeof this[i] !== "function") {
-				results += "\n" + i + " : " + this[i];
+				// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+				results += `\n${i} : ${this[i]}`;
 			}
 		}
 		return results;
@@ -377,7 +379,7 @@ export class Chromosome {
 		const mutationChance = 0.1;	// range [0,1]
 		const smallVal = 0.000001;
 		for (const i in offspring) {
-			if (typeof offspring[i] !== "function" && i !== "rank") {
+			if (typeof offspring[i] === "number" && i !== "rank") {
 				offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
 				const radiation = (Math.random() - 0.5) * 2.0;
 				let change = radiation * mutationScale;
@@ -437,16 +439,16 @@ class CSStats {
 		this.totalFights = cObj.totalFights.length;
 
 		for (const win of cObj.wins) {
-			this.wins += chromosome["w" + win];
+			this.wins += chromosome[`w${win}`];
 		}
 
 		for (const loss of cObj.losses) {
-			this.losses += chromosome["l" + loss];
+			this.losses += chromosome[`l${loss}`];
 		}
 
 		for (let i = 0; i < cObj.odds.length; i++) {
 			if (cObj.odds[i] >= 0) {
-				this.oddsSum += cObj.odds[i] * chromosome["o" + cObj.tiers[i]];
+				this.oddsSum += cObj.odds[i] * chromosome[`o${cObj.tiers[i]}`];
 				this.oddsCount += 1;
 			}
 		}
@@ -454,7 +456,7 @@ class CSStats {
 		//
 		for (let j = 0; j < cObj.winTimes.length; j++) {
 			if (cObj.winTimes[j] !== 0) {
-				this.winTimesTotal += cObj.winTimes[j] * chromosome["wt" + cObj.wins[j]];
+				this.winTimesTotal += cObj.winTimes[j] * chromosome[`wt${cObj.wins[j]}`];
 				this.winTimesTotalRaw += cObj.winTimes[j];
 				this.timedWonMatchesCount += 1;
 			}
@@ -464,7 +466,7 @@ class CSStats {
 
 		for (let k = 0; k < cObj.lossTimes.length; k++) {
 			if (cObj.lossTimes[k] !== 0) {
-				this.lossTimesTotal += cObj.lossTimes[k] * chromosome["lt" + cObj.losses[k]];
+				this.lossTimesTotal += cObj.lossTimes[k] * chromosome[`lt${cObj.losses[k]}`];
 				this.lossTimesTotalRaw += cObj.lossTimes[k];
 				this.timedLostMatchesCount += 1;
 			}
@@ -519,11 +521,11 @@ export class Scientist extends Strategy {
 		const illumFavorWeight = this.chromosome.illumFavorWeight;
 
 		// messages
-		let oddsMessage = null;
-		let timeMessage = null;
-		let winsMessage = null;
-		let crwdMessage = null;
-		let ilumMessage = null;
+		let oddsMessage: string = null;
+		let timeMessage: string = null;
+		let winsMessage: string = null;
+		let crwdMessage: string = null;
+		let ilumMessage: string = null;
 
 		// the weights come in from the chromosome
 		const scoreBase = 0.001;      // range (0,0.5], prevents over-confidence.
@@ -545,10 +547,10 @@ export class Scientist extends Strategy {
 		const c2WPDisplay = wpTotal > 0 ? c2Stats.wins / wpTotal : 0;
 		if (this.debug) {
 			winsMessage = "\xBB WINS/LOSSES:\n" +
-				"weighted totals as % (red: blue) -> (" + (c1WPDisplay * 100).toFixed(0) + " : " + (c2WPDisplay * 100).toFixed(0) + ")\n" +
-				"unweighted (red W:L)(blue W:L) -> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + ")\n" +
-				"details (red W:L)(blue W:L) -> (" + c1.wins.toString().replace(/,/g, "") + ":" + c1.losses.toString().replace(/,/g, "") + ")" +
-				"(" + c2.wins.toString().replace(/,/g, "") + ":" + c2.losses.toString().replace(/,/g, "") + ")";
+				`weighted totals as % (red: blue) -> (${(c1WPDisplay * 100).toFixed(0)} : ${(c2WPDisplay * 100).toFixed(0)})\n` +
+				`unweighted (red W:L)(blue W:L) -> (${c1.wins.length}:${c1.losses.length})(${c2.wins.length}:${c2.losses.length})\n` +
+				`details (red W:L)(blue W:L) -> (${c1.wins.toString().replace(/,/g, "")}:${c1.losses.toString().replace(/,/g, "")})` +
+				`(${c2.wins.toString().replace(/,/g, "")}:${c2.losses.toString().replace(/,/g, "")})`;
 		}
 		// weight in win percent
 		const WPSum = c1WP + c2WP;
@@ -570,7 +572,7 @@ export class Scientist extends Strategy {
 			}
 
 			if (this.debug) {
-				oddsMessage = "avg odds (red:blue) -> (" + c1Stats.averageOdds + " : " + c2Stats.averageOdds + ")";
+				oddsMessage = "avg odds (red:blue) -> (${c1Stats.averageOdds} : ${c2Stats.averageOdds})";
 			}
 		}
 
@@ -582,7 +584,7 @@ export class Scientist extends Strategy {
 				c2Score += timeAveWinWeight / 2;
 			}
 			if (this.debug) {
-				timeMessage = "avg win time (red:blue) -> (" + c1Stats.averageWinTimeRaw.toFixed(0) + " : " + c2Stats.averageWinTimeRaw.toFixed(0) + ")";
+				timeMessage = "avg win time (red:blue) -> (${c1Stats.averageWinTimeRaw.toFixed(0)} : ${c2Stats.averageWinTimeRaw.toFixed(0)})";
 			}
 		}
 
@@ -594,7 +596,7 @@ export class Scientist extends Strategy {
 				c2Score += timeAveLoseWeight / 2;
 			}
 			if (this.debug) {
-				const msg = "  ::  avg loss time (red:blue) -> (" + c1Stats.averageLossTimeRaw.toFixed(0) + " : " + c2Stats.averageLossTimeRaw.toFixed(0) + ")";
+				const msg = "  ::  avg loss time (red:blue) -> (${c1Stats.averageLossTimeRaw.toFixed(0)} : ${c2Stats.averageLossTimeRaw.toFixed(0)})";
 				if (timeMessage) {
 					timeMessage += msg;
 				}
@@ -613,8 +615,8 @@ export class Scientist extends Strategy {
 			}
 			const cfPercentTotal = c1Stats.cfPercent + c2Stats.cfPercent;
 			if (this.debug) {
-				crwdMessage = "crowd favor (red:blue) -> (" + (c1Stats.cfPercent / cfPercentTotal * 100).toFixed(0) +
-					" : " + (c2Stats.cfPercent / cfPercentTotal * 100).toFixed(0) + ")";
+				crwdMessage = `crowd favor (red:blue) -> (${(c1Stats.cfPercent / cfPercentTotal * 100).toFixed(0)}` +
+					` : ${(c2Stats.cfPercent / cfPercentTotal * 100).toFixed(0)})`;
 			}
 		}
 
@@ -627,14 +629,14 @@ export class Scientist extends Strategy {
 			}
 			const ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
 			if (this.debug) {
-				ilumMessage = "illuminati favor (red:blue) -> (" + (c1Stats.ifPercent / ifPercentTotal * 100).toFixed(0) +
-					" : " + (c2Stats.ifPercent / ifPercentTotal * 100).toFixed(0) + ")";
+				ilumMessage = `illuminati favor (red:blue) -> (${(c1Stats.ifPercent / ifPercentTotal * 100).toFixed(0)}` +
+					` : ${(c2Stats.ifPercent / ifPercentTotal * 100).toFixed(0)})`;
 			}
 		}
 
 		if (this.debug) {
 			console.log("\n");
-			console.log("\xBB PREDICTION STATS for (" + c1.name + " VS " + c2.name + ") \xBB");
+			console.log(`\xBB PREDICTION STATS for (${c1.name} VS ${c2.name}) \xBB`);
 			console.log(winsMessage);
 			let line2 = "\xBB ";
 			if (oddsMessage) { line2 += oddsMessage; }
@@ -663,13 +665,13 @@ export class Scientist extends Strategy {
 		let nerfMsg = "-- PROBLEMS:";
 		if ((c1Score === c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3 || c1.wins.length === 0 || c2.wins.length === 0) {
 			nerfAmount += nerfPoorScore;
-			nerfMsg += "\n- insufficient information (scores: " + c1Score.toFixed(2) + ":" + c2Score.toFixed(2) + "), W:L(P1)(P2)-> (" + c1.wins.length + ":" + c1.losses.length + ")(" + c2.wins.length + ":" + c2.losses.length + "), ";
+			nerfMsg += "\n- insufficient information (scores: ${c1Score.toFixed(2)}:${c2Score.toFixed(2)}), W:L(P1)(P2)-> (${c1.wins.length}:${c1.losses.length})(${c2.wins.length}:${c2.losses.length}), ";
 		}
 
 		// nerf the confidence if there is a reason
 		if (nerfAmount !== 0) {
 			if (this.debug) {
-				console.log(nerfMsg + "\n--> dropping confidence by " + (nerfAmount * 100).toFixed(0) + "%");
+				console.log(`${nerfMsg}\n--> dropping confidence by ${(nerfAmount * 100).toFixed(0)}%`);
 			}
 			this.confidence *= 1 - nerfAmount;
 		}
@@ -680,7 +682,7 @@ export class Scientist extends Strategy {
 		}
 
 		if (this.debug) {
-			console.log("::Predicting: " + this.prediction + "\n::confidence: " + this.confidence.toFixed(4) + "\n");
+			console.log(`::Predicting: ${this.prediction}\n::confidence: ${this.confidence.toFixed(4)}\n`);
 		}
 		return this.prediction;
 	}

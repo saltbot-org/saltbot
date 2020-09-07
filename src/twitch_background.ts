@@ -1,13 +1,14 @@
+import { openDB } from 'idb';
+
 import { MatchRecord, Updater, Character } from "./records";
 import { Chromosome } from "./strategy";
-import { openDB } from 'idb';
+import { Settings } from "./settings";
 async function getMatchRecords() {
 	const db = await openDB("saltbot", 1);
 	const tx = db.transaction("matches", "readonly");
 	const store = tx.objectStore("matches");
 
-	const matches = await store.getAll();
-	return matches;
+	return await store.getAll() as MatchRecord[];
 }
 
 async function setMatchRecords(matches: MatchRecord[]) {
@@ -55,8 +56,8 @@ function reimportMatches() {
 
 		chrome.storage.local.set({
 			characters_v1: characterRecords,
-		}, function () {
-			console.log("-\nrecords reimported:\n" + nmr + " match records\n" + ncr + " character records");
+		}, function() {
+			console.log(`-\nrecords reimported:\n${nmr} match records\n${ncr} character records`);
 		});
 	}
 
@@ -128,6 +129,7 @@ function checkForTwitchTab() {
 	});
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleWaifuMessage(details: any) {
 	let queryResult: chrome.tabs.Tab[] = null;
 	//Receive message from Waifu, pass it on to salty tab
@@ -136,7 +138,7 @@ function handleWaifuMessage(details: any) {
 		url: "*://*.saltybet.com/",
 	}, function (result) {
 		queryResult = result;
-		chrome.storage.local.get(["settings_v1"], function (storedObjects) {
+		chrome.storage.local.get(["settings_v1"], function (storedObjects: { settings_v1: Settings }) {
 			if (result.length === 0 && storedObjects.settings_v1.keepAlive && !restartedSaltyBet) {
 				chrome.tabs.create({
 					url: "http://www.saltybet.com",
@@ -168,7 +170,8 @@ function handleWaifuMessage(details: any) {
 	});
 }
 
-chrome.runtime.onMessage.addListener(function (details, sender, sendResponse) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+chrome.runtime.onMessage.addListener(function(details: any, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) {
 	if (details.message !== undefined) {
 		handleWaifuMessage(details);
 	}

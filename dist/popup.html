@@ -61,30 +61,30 @@
 <span id="player2" value="1337">with records.js.</span>
 
 <h2 class="subheading">Change Mode</h2>
-<div id="cs_o" class="btn btn-inline btn-small btn-success">
+<div id="cs_o" class="btn btn-inline btn-small btn-success" data-bind="click: changeStrategyClickO">
 	Monk
 </div>
-<div id="cs_cs" class="btn btn-inline btn-small btn-success">
+<div id="cs_cs" class="btn btn-inline btn-small btn-success" data-bind="click: changeStrategyClickCS">
 	Scientist
 </div>
-<div id="cs_rc" class="btn btn-inline btn-small btn-success">
+<div id="cs_rc" class="btn btn-inline btn-small btn-success" data-bind="click: changeStrategyClickRC">
 	Cowboy
 </div>
-<div id="cs_ipu" class="btn btn-inline btn-small btn-success">
+<div id="cs_ipu" class="btn btn-inline btn-small btn-success" data-bind="click: changeStrategyClickIPU">
 	Lunatic
 </div>
 <h2 class="subheading">Chromosomes Management</h2>
-<div id="ugw" class="btn btn-inline btn-small btn-success">
+<div id="ugw" class="btn btn-inline btn-small btn-success" data-bind="click: updateGeneticWeightsClick">
 	Update Genetic Weights
 </div>
-<div id="rgw" class="btn btn-inline btn-small btn-success">
+<div id="rgw" class="btn btn-inline btn-small btn-success" data-bind="click: resetPoolClick">
 	Reset Pool
 </div>
 <br/>
-<div id="bec" class="btn btn-inline btn-small btn-success">
+<div id="bec" class="btn btn-inline btn-small btn-success" data-bind="click: ecClick">
 	Export
 </div>
-<div id="bic" class="btn btn-inline btn-small btn-success" style="position: relative; width: 45px">
+<div id="bic" class="btn btn-inline btn-small btn-success" style="position: relative; width: 45px" data-bind="click: icClick">
 	<span style="top: 5px; left:3px ;">Import</span>
 </div>
 <input type="file" id="upload_c" style="display: none">
@@ -93,41 +93,41 @@
 	<input type="text" name="msgbox" id="msgbox" size="40"/>
 </label>
 <h2 class="subheading">Records Management</h2>
-<div id="ber" class="btn btn-inline btn-small btn-success">
+<div id="ber" class="btn btn-inline btn-small btn-success" data-bind="click: erClick">
 	Export
 </div>
 <div id="bir" class="btn btn-inline btn-small btn-success" style="position: relative; width: 45px;">
 	<span id="text_upload_r" style="top: 5px; left:3px ;">Import</span>
 </div>
-<input type="file" id="upload_r" style="display: none">
+<input type="file" id="upload_r" style="display: none" data-bind="click: irClick">
 
 <h2 class="subheading">Options</h2>
-<div id="tv" class="btn btn-inline btn-small btn-success">
+<div id="tv" class="btn btn-inline btn-small btn-success" data-bind="click: tvClick">
 	Toggle Video
 </div>
 <h2 class="subheading">Betting Controls</h2>
 <table>
 	<tr>
-		<td><input id="ta" type="checkbox"/></td>
+		<td><input id="ta" type="checkbox" data-bind="checked: aggro_enabled || false, valueUpdate: 'input', event: { change: taChange }"/></td>
 		<td> Aggressive betting up to</td>
-		<td><input id="talimit" type="number" min="1000" value="10000"/></td>
+		<td><input id="talimit" type="number" min="1000" data-bind="value: aggro_limit || 10000, valueUpdate: 'input', event: { keyup: taChange, input: taChange }"/></td>
 	</tr>
 	<tr>
-		<td><input id="tm" type="checkbox"/></td>
+		<td><input id="tm" type="checkbox" data-bind="checked: maximumBetAmount_enabled || false, valueUpdate: 'input', event: { change: tmChange }"/></td>
 		<td> Max bet amount(WIP)</td>
-		<td><input id="tmlimit" type="number" min="1" value="10000"/></td>
+		<td><input id="tmlimit" type="number" min="1" data-bind="value: maximumBetAmount_limit || 10000, valueUpdate: 'input', event: { keyup: tmChange, input: tmChange }"/></td>
 	</tr>
 	<tr>
-		<td><input id="tl" type="checkbox"/></td>
+		<td><input id="tl" type="checkbox" data-bind="checked: limit_enabled || false, valueUpdate: 'input', event: { change: limitChange }"/></td>
 		<td> Stop betting at</td>
-		<td><input id="limit" type="number" min="1000" value="10000"/></td>
+		<td><input id="limit" type="number" min="1000" value="10000" data-bind="value: limit || 10000, valueUpdate: 'input', event: { keyup: limitChange, input: limitChange }"/></td>
 	</tr>
 	<tr>
 		<td/>
-		<td><input type="range" id="multiplierSlider" value="1.0" min="0.1" max="10" step="0.1"><br/>
+		<td><input type="range" id="multiplierSlider" min="0.1" max="10" step="0.1" data-bind="value: multiplier || 1, valueUpdate: 'input', event: { change: multiplierChange }"><br/>
 			Betting multiplier
 		</td>
-		<td><input type="number" id="multiplierField" value="1.0" disabled/></td>
+		<td><input type="number" id="multiplierField" data-bind="value: multiplier || 1" disabled/></td>
 	</tr>
 </table>
 </body>

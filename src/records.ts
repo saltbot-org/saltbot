@@ -201,12 +201,12 @@ export class Updater {
 
 function er(): void {
 	const lines: string[] = [];
-	let matches = [];
+	let matches: MatchRecord[] = [];
 	chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
 		matches = data;
 
 		for (const match of matches) {
-			let record = match.c1 + "," + match.c2 + "," + match.w + "," + match.sn + "," + match.pw + ",";
+			let record = `${match.c1},${match.c2},${match.w},${match.sn},${match.pw},`;
 			record += (match.hasOwnProperty("t")) ? match.t : "U";
 			record += ",";
 			record += (match.hasOwnProperty("m")) ? match.m : "U";
@@ -302,8 +302,9 @@ function ir(f: string): void {
 	chrome.storage.local.set({
 		characters_v1: characterRecords,
 	}, function() {
-		console.log("-\nrecords imported:\n" + nmr + " match records\n" + ncr + " character records");
-		displayDialogMessage("Records imported:\n" + nmr + " match records\n" + ncr + " character records");
+		const recordsImportedMsg = `Records imported: \n${nmr} match records\n${ncr} character records`;
+		console.log("-\n" + recordsImportedMsg);
+		displayDialogMessage(recordsImportedMsg);
 		Globals.dirtyRecords = true;
 	});
 }
@@ -361,8 +362,7 @@ function ic(jsonString: string): void {
 
 if (window.location.href === "http://www.saltybet.com/" || window.location.href === "http://mugen.saltybet.com/" ||
 	window.location.href === "https://www.saltybet.com/" || window.location.href === "https://mugen.saltybet.com/") {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	chrome.runtime.onMessage.addListener(function(request: { type: string; text: string }, _sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void): boolean {
+	chrome.runtime.onMessage.addListener(function(request: { type: string; text: string }, _sender: chrome.runtime.MessageSender, sendResponse: (response?: unknown) => void): boolean {
 		const ctrl = Globals.ctrl;
 		switch (request.type) {
 			case "er":

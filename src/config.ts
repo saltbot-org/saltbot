@@ -1,4 +1,4 @@
-import { Settings } from "./salty";
+import { Settings } from "./settings";
 import { Bettor, Character } from "./records";
 
 function btnClicked(clicktype: string, data: number | boolean | string = null): void {
@@ -50,9 +50,7 @@ function dr(sortByMoney: boolean): void {
 		let blist = "";
 		for (let j = 0; j < bw10.length; j++) {
 			const b = bw10[j];
-			blist += b.accuracy.toFixed(2) + " %acc " +
-				" (" + ((1 - (j / bw10.length)) * 100).toFixed(2) + "%pcl) :" +
-				" (" + b.type + ")(" + b.total + ") " + b.name + "\n";
+			blist += `${b.accuracy.toFixed(2)} %acc (${((1 - (j / bw10.length)) * 100).toFixed(2)}%pcl) : (${b.type}) (${b.total}) ${b.name}\n`;
 		}
 
 		const sumOfArray = (previous: number, current: number): number => previous + current;
@@ -62,8 +60,8 @@ function dr(sortByMoney: boolean): void {
 		document.querySelector<HTMLElement>("#details-ranking").style.display = "block";
 
 		//fill ranking div with text
-		rankingElement.innerHTML = ("Avg I: " + (iSum / accTypeI.length).toFixed(2) + "% (" + accTypeI.length + ")\n");
-		rankingElement.innerHTML += ("Avg C: " + (cSum / accTypeC.length).toFixed(2) + "% (" + accTypeC.length + ")\n");
+		rankingElement.innerHTML = `Avg I: ${(iSum / accTypeI.length).toFixed(2)}% (${accTypeI.length})\n`;
+		rankingElement.innerHTML += `Avg C: ${(cSum / accTypeC.length).toFixed(2)}% (${accTypeC.length})\n`;
 		rankingElement.innerHTML += blist;
 		rankingElement.innerHTML = rankingElement.innerHTML.split("\n").join("<br />");
 	});

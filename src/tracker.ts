@@ -2,7 +2,8 @@ import * as moment from 'moment';
 
 import { Character, Updater, MatchRecord } from './records';
 import { Strategy } from './strategy';
-import { Settings, isTournament } from './salty';
+import { Settings } from './settings';
+import { isTournament } from './salty';
 import { binarySearchByProperty } from './utils';
 
 export class Match {
@@ -116,7 +117,7 @@ export class Match {
 		strategy.adjustLevel(balance);
 		amountToBet = strategy.getBetAmount(balance, tournament, debug);
 		if (!tournament) {
-			console.log("- Multiplying initial bet amount " + amountToBet + " with " + this.multiplier);
+			console.log(`- Multiplying initial bet amount ${amountToBet} with ${this.multiplier}`);
 			amountToBet = Math.floor(amountToBet * this.multiplier);
 			if (amountToBet > balance) {
 				amountToBet = balance;
@@ -127,11 +128,11 @@ export class Match {
 				if (amountToBet > balance) {
 					amountToBet = balance;
 				}
-				console.log("- AGGRO multiplier active, increasing bet to " + amountToBet);
+				console.log(`- AGGRO multiplier active, increasing bet to ${amountToBet}`);
 			}
 			if (this.strategy.maximum) {
 				amountToBet = balance;
-				console.log("- Maximum bet mode active, going all in with " + amountToBet);
+				console.log(`- Maximum bet mode active, going all in with ${amountToBet}`);
 			}
 		}
 

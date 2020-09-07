@@ -1,39 +1,9 @@
 import { Updater, Character, MatchRecord, Bettor } from "./records";
+import { Settings } from "./settings";
 import { Match } from "./tracker";
 import { Observer, Lunatic, Cowboy, Scientist, Chromosome } from "./strategy";
 import { binaryInsertByProperty } from "./utils";
 import { Globals } from "./globals";
-
-export class Settings {
-	[key: string]: any
-
-	nextStrategy: string = null;
-	video = true;
-	betOnExhibitions = true;
-	level = 0;
-	//settings for stopping after a specified balance has been reached
-	limit_enabled = false;
-	limit = 100000;
-
-	allInTourney = true;
-
-	//settings for stopping after a specified tourney balance has been reached
-	tourneyLimit = 100000;
-	tourneyLimit_enabled = false;
-
-	//settings for aggro mode
-	aggro_enabled = false;
-	aggro_limit = 10000;
-
-	multiplier = 1.0;
-	keepAlive = false;
-
-	//settings for always going all in
-	upsetBetting_limit = 100000;
-	upsetBetting_enabled = false;
-	maximumBetAmount_limit = 10000;
-	maximumBetAmount_enabled = false;
-}
 
 class StatusScanner {
 	announcements: string[] = [];
@@ -185,7 +155,7 @@ export class Controller {
 					const c1 = records[1] as Character;
 					const c2 = records[2] as Character;
 
-					let predictionString = null;
+					let predictionString: string = null;
 					switch (mr.pw) {
 						case "a":
 							predictionString = "Did not bet";
@@ -198,16 +168,16 @@ export class Controller {
 							break;
 					}
 
-					console.log("Match result:" +
-						"\nCharacter 1: " + mr.c1 +
-						"\nCharacter 2: " + mr.c2 +
-						"\nWinner: " + (mr.w == 0 ? mr.c1 : mr.c2) +
-						"\nStrategy: " + mr.sn +
-						"\nPrediction: " + predictionString +
-						"\nTier: " + mr.t +
-						"\nMode: " + mr.m +
-						"\nOdds: " + mr.o +
-						"\nLength of match in seconds: " + mr.ts);
+					console.log(`Match result:
+Character 1: ${mr.c1}
+Character 2: ${mr.c2}
+Winner: ${(mr.w == 0 ? mr.c1 : mr.c2)}
+Strategy: ${mr.sn}
+Prediction: ${predictionString}
+Tier: ${mr.t}
+Mode: ${mr.m}
+Odds: ${mr.o}
+Length of match in seconds: ${mr.ts}`);
 
 					if (!Globals.dirtyRecords) {
 						this.updateRecords({
@@ -224,7 +194,7 @@ export class Controller {
 
 				} else {
 					//if we failed to get a winner and record the match, still count the match towards the reset number
-					console.log("- failed to determine winner, matches this cycle: " + this.matchesProcessed);
+					console.log(`- failed to determine winner, matches this cycle: ${this.matchesProcessed}`);
 					if (this.matchesProcessed >= this.matchesBeforeReset) {
 						location.reload();
 					}
@@ -242,13 +212,13 @@ export class Controller {
 			}
 			else if (!tournament && this.settings.limit_enabled && this.currentMatch && this.currentMatch.getBalance() >= this.settings.limit) {
 				//only observe after the limit is reached
-				console.log("- limit of " + this.settings.limit + " is reached, observing");
+				console.log(`- limit of ${this.settings.limit} is reached, observing`);
 				this.currentMatch = new Match(new Observer());
 			}
 
 			else if (tournament && this.settings.tourneyLimit_enabled && this.currentMatch && this.currentMatch.getBalance() >= this.settings.tourneyLimit) {
 				//only observe after the tourney limit is reached
-				console.log("- tourney limit of " + this.settings.limit + " is reached, observing");
+				console.log(`- tourney limit of ${this.settings.limit} is reached, observing`);
 				this.currentMatch = new Match(new Observer());
 			}
 
@@ -385,7 +355,7 @@ export class Controller {
 		}
 		updater.updateBettorsFromMatch(mr, bc1, bc2);
 		if (this.debugMode) {
-			console.log("- number of:: chars: " + characters.length + ", bettors: " + bettors.length);
+			console.log(`- number of:: chars: ${characters.length}, bettors: ${bettors.length}`);
 		}
 
 		//do aliasing for closure
@@ -400,7 +370,7 @@ export class Controller {
 			characters_v1: characters,
 		}, () => {
 			if (this.debugMode) {
-				console.log("- records saved, matches this cycle: " + mp);
+				console.log(`- records saved, matches this cycle: ${mp}`);
 			}
 			if (mp >= mbr) {
 				location.reload();
@@ -450,7 +420,7 @@ export class Controller {
 			this.settings.aggro_limit = aggro_limit;
 		}
 		this.settings.aggro_enabled = aggro_enabled;
-		this.saveSettings("- settings updated, talimit " + (aggro_enabled ? "enabled" : "disabled") + " limit : " + aggro_limit);
+		this.saveSettings(`- settings updated, talimit ${(aggro_enabled ? "enabled" : "disabled")} limit : ${aggro_limit}`);
 
 	}
 	setExhibitions(value: boolean): void {
@@ -463,7 +433,7 @@ export class Controller {
 	}
 	setMultiplier(value: number): void {
 		this.settings.multiplier = value;
-		this.saveSettings("- settings updated, multiplier: " + value);
+		this.saveSettings(`- settings updated, multiplier: ${value}`);
 	}
 	setLimit(enabled: boolean, limit: number): void {
 		if (limit === this.settings.limit && enabled === this.settings.limit_enabled) {
@@ -475,7 +445,7 @@ export class Controller {
 			this.settings.limit = limit;
 		}
 		this.settings.limit_enabled = enabled;
-		this.saveSettings("- settings updated, limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
+		this.saveSettings(`- settings updated, limit ${(enabled ? "enabled" : "disabled")} + " limit : ${limit}`);
 	}
 
 	setTourneyLimit(enabled: boolean, limit?: number): void {
@@ -488,7 +458,7 @@ export class Controller {
 			this.settings.tourneyLimit = limit;
 		}
 		this.settings.tourneyLimit_enabled = enabled;
-		this.saveSettings("- settings updated, tourney limit " + (enabled ? "enabled" : "disabled") + " limit : " + limit);
+		this.saveSettings(`- settings updated, tourney limit ${(enabled ? "enabled" : "disabled")} + " limit : ${limit}`);
 	}
 
 	setUpsetBetting(upsetBetting_enabled: boolean, upsetBetting_limit: number): void {
@@ -501,7 +471,7 @@ export class Controller {
 			this.settings.upsetBetting_limit = upsetBetting_limit;
 		}
 		this.settings.upsetBetting_enabled = upsetBetting_enabled;
-		this.saveSettings("- settings updated, upset mode " + (upsetBetting_enabled ? "enabled" : "disabled") + " limit : " + upsetBetting_limit);
+		this.saveSettings(`- settings updated, upset mode ${(upsetBetting_enabled ? "enabled" : "disabled")} limit : ${upsetBetting_limit}`);
 
 	}
 
@@ -513,10 +483,10 @@ export class Controller {
 
 		this.settings.maximumBetAmount_limit = limit;
 		this.settings.maximumBetAmount_enabled = enabled;
-		this.saveSettings("- settings updated, maximum bet amount " + (enabled ? "enabled" : "disabled") + " limit: " + limit);
+		this.saveSettings(`- settings updated, maximum bet amount ${(enabled ? "enabled" : "disabled")} limit: ${limit}`);
 	}
 
-	changeStrategy(sn: string, data?: any): void {
+	changeStrategy(sn: string, data?: string): void {
 		let t = "";
 		switch (sn) {
 			case "cs_o":
@@ -604,7 +574,7 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 	Globals.ctrl = new Controller();
 	const ctrl = Globals.ctrl;
 	ctrl.ensureTwitch();
-	chrome.storage.local.get(["settings_v1"], function(results) {
+	chrome.storage.local.get(["settings_v1"], function(results: { settings_v1: Settings }) {
 		if (results.settings_v1) {
 			ctrl.settings = results.settings_v1;
 
@@ -700,10 +670,9 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 					//save the betting totals
 					try {
 						const moneyText = document.querySelector("#odds").innerHTML.replace(/,/g, "");
-						let mtMatches = null;
 						const regex = /\$([0-9]*)/g;
 						if (regex.test(moneyText)) {
-							mtMatches = moneyText.match(regex);
+							const mtMatches = moneyText.match(regex);
 							ctrl.lastMatchCumulativeBetTotal = parseInt(mtMatches[0].replace("$", ""), 10) + parseInt(mtMatches[1].replace("$", ""), 10);
 						} else {
 							throw new Error("totals error");

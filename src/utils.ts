@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function binaryInsertByProperty<T extends Record<string, any>>(value: T, array: T[], propertyToSort: string, start = 0, end: number = array.length - 1): void {
 
 	const length: number = array.length;
@@ -35,6 +36,7 @@ export function binaryInsertByProperty<T extends Record<string, any>>(value: T, 
 	//we don't insert duplicates
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function binarySearchByProperty<T extends Record<string, any>>(value: T, array: T[], propertyToSort: string, start = 0, end: number = array.length - 1): number {
 
 	const length: number = array.length;

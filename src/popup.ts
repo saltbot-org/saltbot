@@ -1,6 +1,9 @@
+import * as tko from 'tko';
+import { Observable } from 'tko';
+
 import { MatchRecord, Updater, Character, displayDialogMessage } from './records';
 import { Strategy, Lunatic, CoinToss, Chromosome, Scientist, Cowboy } from './strategy';
-import { Settings } from './salty';
+import { Settings } from './settings';
 
 //enable links
 $(document).ready(function() {
@@ -40,74 +43,134 @@ function elementChanged(changetype: string, data: number | boolean | string): vo
 	btnClicked(changetype, data);
 }
 
-function erClick(): void {
-	btnClicked("er");
-}
-function ecClick(): void {
-	btnClicked("ec");
-}
-function tvClick(): void {
-	btnClicked("tv");
-}
-function taChange(): void {
-	const talimit = document.querySelector<HTMLInputElement>("#talimit").value;
-	elementChanged("talimit_" + (document.querySelector<HTMLInputElement>("#ta").checked ? "enable" : "disable"), talimit);
-}
-function tmChange(): void {
-	const tmlimit = document.querySelector<HTMLInputElement>("#tmlimit").value;
-	elementChanged("maximumBetAmount_" + (document.querySelector<HTMLInputElement>("#tm").checked ? "enable" : "disable"), tmlimit);
-}
-function limitChange(): void {
-	const limit = +document.querySelector<HTMLInputElement>("#limit").value;
-	if (!limit) {
-		return;
+class ViewModel extends Settings {
+	erClick(): void {
+		btnClicked("er");
 	}
 
-	if (limit < 1000) {
-		return;
+	ecClick(): void {
+		btnClicked("ec");
 	}
 
-	elementChanged("limit_" + ((document.querySelector<HTMLInputElement>("#tl").checked) ? "enable" : "disable"), limit);
-}
+	tvClick(): void {
+		btnClicked("tv");
+	}
 
-function multiplierChange(): void {
-	const multiplierValue = document.querySelector<HTMLInputElement>("#multiplierSlider").value;
-	elementChanged("multiplier", multiplierValue);
-}
+	taChange(): void {
+		const talimit = document.querySelector<HTMLInputElement>("#talimit").value;
+		elementChanged("talimit_" + (document.querySelector<HTMLInputElement>("#ta").checked ? "enable" : "disable"), talimit);
+	}
 
-function setButtonActive(identifier: string): void {
-	document.querySelector("#cs_o").classList.remove("active");
-	document.querySelector("#cs_rc").classList.remove("active");
-	document.querySelector("#cs_cs").classList.remove("active");
-	document.querySelector("#cs_ipu").classList.remove("active");
+	tmChange(): void {
+		const tmlimit = document.querySelector<HTMLInputElement>("#tmlimit").value;
+		elementChanged("maximumBetAmount_" + (document.querySelector<HTMLInputElement>("#tm").checked ? "enable" : "disable"), tmlimit);
+	}
 
-	$(identifier).addClass("active");
-}
-
-function changeStrategyClickO(): void {
-	btnClicked("cs_o");
-	setButtonActive("#cs_o");
-}
-function changeStrategyClickCS(): void {
-	chrome.storage.local.get(["chromosomes_v1"], function(results) {
-		console.log(results);
-		if (Object.keys(results).length === 0) {
-			displayDialogMessage("Cannot change mode to Scientist without initializing chromosome pool\nPlease click 'Reset Pool'");
-		} else {
-			const data = JSON.stringify(results.chromosomes_v1[0]);
-			btnClicked("cs_cs", data);
-			setButtonActive("#cs_cs");
+	limitChange(): void {
+		const limit = +document.querySelector<HTMLInputElement>("#limit").value;
+		if (!limit) {
+			return;
 		}
-	});
+
+		if (limit < 1000) {
+			return;
+		}
+
+		elementChanged("limit_" + ((document.querySelector<HTMLInputElement>("#tl").checked) ? "enable" : "disable"), limit);
+	}
+
+
+	multiplierChange(): void {
+		const multiplierValue = document.querySelector<HTMLInputElement>("#multiplierSlider").value;
+		//eslint-disable-next-line @typescript-eslint/no-unsafe-call
+		(this.multiplier as Observable)(Number(multiplierValue));
+		elementChanged("multiplier", multiplierValue);
+	}
+
+	setButtonActive(identifier: string): void {
+		document.querySelector("#cs_o").classList.remove("active");
+		document.querySelector("#cs_rc").classList.remove("active");
+		document.querySelector("#cs_cs").classList.remove("active");
+		document.querySelector("#cs_ipu").classList.remove("active");
+
+		$(identifier).addClass("active");
+	}
+
+
+	changeStrategyClickO(): void {
+		btnClicked("cs_o");
+		this.setButtonActive("#cs_o");
+	}
+
+	changeStrategyClickCS(): void {
+		chrome.storage.local.get(["chromosomes_v1"], results => {
+			console.log(results);
+			if (Object.keys(results).length === 0) {
+				displayDialogMessage("Cannot change mode to Scientist without initializing chromosome pool\nPlease click 'Reset Pool'");
+			} else {
+				const data = JSON.stringify(results.chromosomes_v1[0]);
+				btnClicked("cs_cs", data);
+				this.setButtonActive("#cs_cs");
+			}
+		});
+	}
+
+	changeStrategyClickRC(): void {
+		btnClicked("cs_rc");
+		this.setButtonActive("#cs_rc");
+	}
+
+	changeStrategyClickIPU(): void {
+		btnClicked("cs_ipu");
+		this.setButtonActive("#cs_ipu");
+	}
+
+	irClick(): void {
+		console.log("Attempting records import...");
+		const files = document.querySelector<HTMLInputElement>("#upload_r").files;
+		if (files.length > 0) {
+			console.log("Upload successful.");
+		}
+		else {
+			console.log("Upload canceled.");
+		}
+		console.log("Attempting to read file...");
+
+		const file = files[0];
+		document.querySelector<HTMLInputElement>("#upload_r").value = "";
+		const reader = new FileReader();
+		reader.onload = onFileReadRecord;
+		reader.readAsText(file);
+	}
+
+	icClick(): void {
+		console.log("Attempting chromosome import...");
+		const files = document.querySelector<HTMLInputElement>("#upload_c").files;
+		if (files.length > 0) {
+			console.log("Upload successful.");
+		}
+		else {
+			console.log("Upload canceled.");
+		}
+		console.log("Attempting to read file...");
+
+		const file = files[0];
+		document.querySelector<HTMLInputElement>("#upload_c").value = "";
+		const reader = new FileReader();
+		reader.onload = onFileReadChromosome;
+		reader.readAsText(file);
+	}
+
+	updateGeneticWeightsClick(): void {
+		simulator.evalMutations();
+	}
+
+	resetPoolClick(): void {
+		simulator.initializePool();
+	}
 }
-function changeStrategyClickRC(): void {
-	btnClicked("cs_rc");
-	setButtonActive("#cs_rc");
-}
-function changeStrategyClickIPU(): void {
-	btnClicked("cs_ipu");
-	setButtonActive("#cs_ipu");
-}
+
+
 
 function onFileReadRecord(e: ProgressEvent<FileReader>): void {
 	console.log("File read successful.");
@@ -118,40 +181,6 @@ function onFileReadChromosome(e: ProgressEvent<FileReader>): void {
 	console.log("File read successful.");
 	const t = e.target.result;
 	btnClicked("ic", t);
-}
-function irClick(): void {
-	console.log("Attempting records import...");
-	const files = document.querySelector<HTMLInputElement>("#upload_r").files;
-	if (files.length > 0) {
-		console.log("Upload successful.");
-	}
-	else {
-		console.log("Upload canceled.");
-	}
-	console.log("Attempting to read file...");
-
-	const file = files[0];
-	document.querySelector<HTMLInputElement>("#upload_r").value = "";
-	const reader = new FileReader();
-	reader.onload = onFileReadRecord;
-	reader.readAsText(file);
-}
-function icClick(): void {
-	console.log("Attempting chromosome import...");
-	const files = document.querySelector<HTMLInputElement>("#upload_c").files;
-	if (files.length > 0) {
-		console.log("Upload successful.");
-	}
-	else {
-		console.log("Upload canceled.");
-	}
-	console.log("Attempting to read file...");
-
-	const file = files[0];
-	document.querySelector<HTMLInputElement>("#upload_c").value = "";
-	const reader = new FileReader();
-	reader.onload = onFileReadChromosome;
-	reader.readAsText(file);
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -173,7 +202,7 @@ class Simulator {
 
 	public evalMutations(): void {
 		chrome.storage.local.get(["characters_v1", "chromosomes_v1"], (results: { "characters_v1": Character[]; "chromosomes_v1": Chromosome[] }) => {
-			let matches = [];
+			let matches: MatchRecord[] = [];
 			chrome.runtime.sendMessage({ query: "getMatchRecords" }, (queryResult: MatchRecord[]) => {
 				matches = queryResult;
 
@@ -182,16 +211,16 @@ class Simulator {
 					return;
 				}
 
-				const data = [];
+				const data: [ number, number ][] = [];
 				const correct = [];
 				const totalBettedOn: number[] = [];
 				const strategies: Strategy[] = [];
-				const totalPercentCorrect = [];
+				const totalPercentCorrect: number[] = [];
 				this.money = [];
 				const updater = new Updater();
 
 				// create orders from string passed in
-				const orders = [];
+				const orders: Order[] = [];
 				// queue up the entire last batch of chromosomes
 				const chromosomes = results.chromosomes_v1;
 				if (chromosomes) {
@@ -224,7 +253,7 @@ class Simulator {
 					}
 					strategy.debug = false;
 
-					data.push([]);
+					data.push([0, 0]);
 					correct.push(0);
 					totalBettedOn.push(0);
 					strategies.push(strategy);
@@ -244,7 +273,7 @@ class Simulator {
 						matches,
 					};
 
-					const predictions = [];
+					const predictions: string[] = [];
 					for (const strategy of strategies) {
 						//reset abstain every time
 						strategy.abstain = false;
@@ -269,7 +298,8 @@ class Simulator {
 
 							totalBettedOn[k] += 1;
 							totalPercentCorrect[k] = correct[k] / totalBettedOn[k] * 100;
-							data[k].push([totalBettedOn[k], totalPercentCorrect[k]]);
+							//eslint-disable-next-line
+							data[k] = [totalBettedOn[k], totalPercentCorrect[k]];
 						}
 						//update simulated money
 						if (match.o !== "U") {
@@ -328,8 +358,8 @@ class Simulator {
 
 					// created and push children of that half of best sorted population
 					for (let mf = 0; mf < 10; mf++) {
-						let parent1 = null;
-						let parent2 = null;
+						let parent1: Chromosome = null;
+						let parent2: Chromosome = null;
 						let child = null;
 						if (mf === 0) {
 							parent1 = parents[0];
@@ -370,10 +400,10 @@ class Simulator {
 					chromosomes_v1: nextGeneration,
 				}, () => {
 					this.roundsOfEvolution += 1;
-					console.log("\n\n-------- end of gen" + nextGeneration.length + "  " + this.roundsOfEvolution + ", m proc'd w/ CS "
-						+ totalBettedOn[0] + "/" + matches.length + "=" + (totalBettedOn[0] / matches.length * 100).toFixed(2) + "%m -> "
-						+ bestPercent.toFixed(1) + "%c, $" + sortingArray[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "   -----------------\n\n");
-					document.querySelector<HTMLInputElement>("#msgbox").value = "g(" + this.roundsOfEvolution + "), best: " + bestPercent.toFixed(1) + "%, $" + bestMoney.toFixed(0);
+					console.log(`\n\n-------- end of gen${nextGeneration.length}  ${this.roundsOfEvolution}, m proc'd w/ CS `
+							+ `${totalBettedOn[0]}/${matches.length}=${(totalBettedOn[0] / matches.length * 100).toFixed(2)}%m -> `
+							+ `${bestPercent.toFixed(1)}%c, $${sortingArray[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}   -----------------\n\n`);
+					document.querySelector<HTMLInputElement>("#msgbox").value = `g(${this.roundsOfEvolution}), best: ${bestPercent.toFixed(1)}%, $${bestMoney.toFixed(0)}`;
 					setTimeout(() => {
 						this.evalMutations();
 					}, 5000);
@@ -393,7 +423,7 @@ class Simulator {
 		for (let i = 0; i < pool.length; i++) {
 
 			if (i % 1 === 0) {
-				console.log(":: " + i + "\n" + pool[i].toDisplayString());
+				console.log(`:: ${i}\n${pool[i].toDisplayString()}`);
 			}
 			newPool.push(pool[i]);
 		}
@@ -455,52 +485,23 @@ class Simulator {
 }
 
 const simulator = new Simulator();
+const settings: ViewModel = new ViewModel();
 
 document.addEventListener("DOMContentLoaded", function() {
 	chrome.storage.local.get("settings_v1", function(result: { settings_v1: Settings }) {
 		if (result.settings_v1) {
-			document.querySelector<HTMLInputElement>("#tl").checked = result.settings_v1.limit_enabled || false;
-			document.querySelector<HTMLInputElement>("#limit").value = String(result.settings_v1.limit || 10000);
-			document.querySelector<HTMLInputElement>("#ta").checked = result.settings_v1.aggro_enabled || false;
-			document.querySelector<HTMLInputElement>("#talimit").value = String(result.settings_v1.aggro_limit || 10000);
-			document.querySelector<HTMLInputElement>("#tm").checked = result.settings_v1.maximumBetAmount_enabled || false;
-			document.querySelector<HTMLInputElement>("#tmlimit").value = String(result.settings_v1.maximumBetAmount_limit || 10000);
-			document.querySelector<HTMLInputElement>("#multiplierField").value = String(result.settings_v1.multiplier || 1);
-			document.querySelector<HTMLInputElement>("#multiplierSlider").value = String(result.settings_v1.multiplier || 1);
-
-			setButtonActive("#cs_" + result.settings_v1.nextStrategy);
+			for (const prop in result.settings_v1) {
+				if (settings.hasOwnProperty(prop)) {
+					// eslint-disable-next-line
+					settings[prop] = tko.observable(result.settings_v1[prop]);
+				}
+			}
+			
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+			tko.applyBindings(settings);
+			settings.setButtonActive("#cs_" + result.settings_v1.nextStrategy);
 		}
 	});
-
-	document.querySelector("#ber").addEventListener("click", erClick);
-	document.querySelector("#upload_r").addEventListener("change", irClick);
-	document.querySelector("#bec").addEventListener("click", ecClick);
-	document.querySelector("#upload_c").addEventListener("change", icClick);
-	document.querySelector("#ugw").addEventListener("click", function() {
-		simulator.evalMutations();
-	});
-	document.querySelector("#rgw").addEventListener("click", function() {
-		simulator.initializePool();
-	});
-	document.querySelector("#tv").addEventListener("click", tvClick);
-	document.querySelector("#ta").addEventListener("change", taChange);
-	document.querySelector("#talimit").addEventListener("keyup", taChange);
-	document.querySelector("#talimit").addEventListener("input", taChange);
-	document.querySelector("#tm").addEventListener("change", tmChange);
-	document.querySelector("#tmlimit").addEventListener("keyup", tmChange);
-	document.querySelector("#tmlimit").addEventListener("input", tmChange);
-	document.querySelector("#cs_o").addEventListener("click", changeStrategyClickO);
-	document.querySelector("#cs_cs").addEventListener("click", changeStrategyClickCS);
-	document.querySelector("#cs_rc").addEventListener("click", changeStrategyClickRC);
-	document.querySelector("#cs_ipu").addEventListener("click", changeStrategyClickIPU);
-	document.querySelector("#tl").addEventListener("change", limitChange);
-	document.querySelector("#limit").addEventListener("keyup", limitChange);
-	document.querySelector("#limit").addEventListener("input", limitChange);
-	const multiplierSlider = document.querySelector<HTMLInputElement>("#multiplierSlider");
-	multiplierSlider.onchange = multiplierChange;
-	multiplierSlider.oninput = function(): void {
-		document.querySelector<HTMLInputElement>("#multiplierField").value = multiplierSlider.value;
-	};
 
 	chrome.alarms.create("chromosome update", {
 		delayInMinutes: 0.1,
