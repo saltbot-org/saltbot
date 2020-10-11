@@ -84,7 +84,7 @@
 <div id="bec" class="btn btn-inline btn-small btn-success" data-bind="click: ecClick">
 	Export
 </div>
-<div id="bic" class="btn btn-inline btn-small btn-success" style="position: relative; width: 45px" data-bind="click: icClick">
+<div id="bic" class="btn btn-inline btn-small btn-success" style="position: relative; width: 45px" data-bind="event: { change: icClick }">
 	<span style="top: 5px; left:3px ;">Import</span>
 </div>
 <input type="file" id="upload_c" style="display: none">
@@ -99,7 +99,7 @@
 <div id="bir" class="btn btn-inline btn-small btn-success" style="position: relative; width: 45px;">
 	<span id="text_upload_r" style="top: 5px; left:3px ;">Import</span>
 </div>
-<input type="file" id="upload_r" style="display: none" data-bind="click: irClick">
+<input type="file" id="upload_r" style="display: none" data-bind="event: { change: irClick }">
 
 <h2 class="subheading">Options</h2>
 <div id="tv" class="btn btn-inline btn-small btn-success" data-bind="click: tvClick">
