@@ -6,6 +6,7 @@ name: Build
 on:
   push:
     branches: [ master ]
+    tags: [ * ]
   pull_request:
     branches: [ master ]
 
@@ -21,3 +22,42 @@ jobs:
         node-version: '13.x'
     - run: npm ci
     - run: npm run build --if-present
+    - run: |
+        cd dist
+        zip -r ../saltbot.zip *
+    - name: Upload extension zip
+      uses: actions/upload-artifact@v1
+      with:
+        name: extension
+        path: saltbot.zip
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Set tag env var
+      run: echo "TAG_VERSION=${GITHUB_REF:10}" >> $env:GITHUB_ENV
+
+    - name: Draft Release
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.TAG_VERSION }}
+        release_name: 'Saltbot ${{ env.TAG_VERSION }}'
+        draft: true
+        
+    - name: Download Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: extension
+    - name: Upload extension to GitHub Releases
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./extension/saltbot.zip
+        asset_name: 'saltbot ${{ env.TAG_VERSION }}.zip'
+        asset_content_type: application/zip
