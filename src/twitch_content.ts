@@ -1,14 +1,13 @@
 import { elementReady } from "./es6-element-ready";
 
 function addListener(): void {
-	elementReady(".chat-list").then((element: Element) => {
+	elementReady(".chat-list--default").then((element: Element) => {
 		// put a mutation observer on the chat which reports back to the main content script whenever Waifu speaks
 		const chatWindow = element;
 		const oldWaifuMessages: string[] = [];
 		const observer = new MutationObserver(function () {
-
 			const chatLines = chatWindow.querySelectorAll(".chat-line__message");
-			const Waifu4uLines: string[] = [];
+			const waifu4uLines: string[] = [];
 			chatLines.forEach(function (chatLine: Element) {
 				const from = chatLine.querySelector(".chat-author__display-name").textContent;
 
@@ -17,14 +16,14 @@ function addListener(): void {
 
 					if (!oldWaifuMessages.includes(message)) {
 						oldWaifuMessages.push(message);
-						Waifu4uLines.push(message);
+						waifu4uLines.push(message);
 					}
 
 				}
 			});
 
 			// at this point, we've captured input from Waifu
-			for (const line of Waifu4uLines) {
+			for (const line of waifu4uLines) {
 				chrome.runtime.sendMessage({
 					message: line,
 				}, function () {
