@@ -62,7 +62,7 @@ jobs:
         asset_name: saltbot ${{env.TAG_VERSION}}.zip
         asset_content_type: application/zip
     - name: Publish in Chrome Store
-      uses: Klemensas/chrome-extension-upload-action@1.4.1
+      uses: Passiverecords/chrome-extension-upload-action@1.4.1
       with:
         app-id: 'bholoegapebhflljekancpcnajigaiih'
         file-name: './extension/saltbot.zip'
