@@ -20,8 +20,8 @@ A betting bot for [SaltyBet.com](http://saltybet.com)
 To install the git version of this extension:
 * Clone the repo:  
 `git clone https://github.com/saltbot-org/saltbot.git`
-* Make sure you have Node.js installed. It is available at https://nodejs.org/en/download/
-* For Ubuntu/Linux Mint Users [Follow this guide to install Nodejs ver. 8.x](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04) and be sure npm is installed  
+* **Make sure you have Latest Node.js installed.** It is available at https://nodejs.org/en/download/
+* For Ubuntu/Linux Mint Users [Follow this guide to install Nodejs ver. 14.x](https://github.com/nodesource/distributions/blob/master/README.md#debinstall) and be sure npm is installed  
 `sudo apt install npm`
 * Open the command line and go to the base of the project where the file package.json is located
 * Run  
