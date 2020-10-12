@@ -84,10 +84,10 @@
 <div id="bec" class="btn btn-inline btn-small btn-success" data-bind="click: ecClick">
 	Export
 </div>
-<div id="bic" class="btn btn-inline btn-small btn-success" style="position: relative; width: 45px" data-bind="event: { change: icClick }">
+<div id="bic" class="btn btn-inline btn-small btn-success" style="position: relative; width: 45px">
 	<span style="top: 5px; left:3px ;">Import</span>
 </div>
-<input type="file" id="upload_c" style="display: none">
+<input type="file" id="upload_c" style="display: none" data-bind="event: { change: icClick }">
 <br>
 <label style="display: block;clear: both;"> Messages:
 	<input type="text" name="msgbox" id="msgbox" size="40"/>
