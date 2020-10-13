@@ -54,6 +54,10 @@ The more info you provide, the better we can diagnose the issue and remedy it.
 
 [**We have a subreddit for saltbot now at /r/saltbot**](https://www.reddit.com/r/saltbot/). Use this for extensive discussions of saltbot's features, improvements, strategy, etc.
 
+# Twitch Channel
+
+[**We now have a twitch channel where you can see the bot running live**,](https://twitch.tv/saltbot) be sure to swing by and follow!
+
 # Contributors & Members
 
 [**Click here for the current list of Contributors and Members**](https://github.com/saltbot-org/saltbot/network/members)
