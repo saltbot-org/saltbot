@@ -572,7 +572,7 @@ export class Scientist extends Strategy {
 			}
 
 			if (this.debug) {
-				oddsMessage = "avg odds (red:blue) -> (${c1Stats.averageOdds} : ${c2Stats.averageOdds})";
+				oddsMessage = `avg odds (red:blue) -> (${c1Stats.averageOdds} : ${c2Stats.averageOdds})`;
 			}
 		}
 
@@ -584,7 +584,7 @@ export class Scientist extends Strategy {
 				c2Score += timeAveWinWeight / 2;
 			}
 			if (this.debug) {
-				timeMessage = "avg win time (red:blue) -> (${c1Stats.averageWinTimeRaw.toFixed(0)} : ${c2Stats.averageWinTimeRaw.toFixed(0)})";
+				timeMessage = `avg win time (red:blue) -> (${c1Stats.averageWinTimeRaw.toFixed(0)} : ${c2Stats.averageWinTimeRaw.toFixed(0)})`;
 			}
 		}
 
@@ -596,7 +596,7 @@ export class Scientist extends Strategy {
 				c2Score += timeAveLoseWeight / 2;
 			}
 			if (this.debug) {
-				const msg = "  ::  avg loss time (red:blue) -> (${c1Stats.averageLossTimeRaw.toFixed(0)} : ${c2Stats.averageLossTimeRaw.toFixed(0)})";
+				const msg = `  ::  avg loss time (red:blue) -> (${c1Stats.averageLossTimeRaw.toFixed(0)} : ${c2Stats.averageLossTimeRaw.toFixed(0)})`;
 				if (timeMessage) {
 					timeMessage += msg;
 				}
@@ -665,7 +665,7 @@ export class Scientist extends Strategy {
 		let nerfMsg = "-- PROBLEMS:";
 		if ((c1Score === c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3 || c1.wins.length === 0 || c2.wins.length === 0) {
 			nerfAmount += nerfPoorScore;
-			nerfMsg += "\n- insufficient information (scores: ${c1Score.toFixed(2)}:${c2Score.toFixed(2)}), W:L(P1)(P2)-> (${c1.wins.length}:${c1.losses.length})(${c2.wins.length}:${c2.losses.length}), ";
+			nerfMsg += `\n- insufficient information (scores: ${c1Score.toFixed(2)}:${c2Score.toFixed(2)}), W:L(P1)(P2)-> (${c1.wins.length}:${c1.losses.length})(${c2.wins.length}:${c2.losses.length}), `;
 		}
 
 		// nerf the confidence if there is a reason
