@@ -38,7 +38,7 @@
     "@types/chrome": "^0.0.124",
     "@types/datatables.net": "^1.10.19",
     "@types/file-saver": "^2.0.1",
-    "@types/jquery": "^3.5.1",
+    "@types/jquery": "^3.5.4",
     "@types/jqueryui": "^1.12.13",
     "@types/node": "^14.6.4",
     "@typescript-eslint/eslint-plugin": "^4.0.0",
