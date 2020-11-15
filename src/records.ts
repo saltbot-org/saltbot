@@ -63,7 +63,7 @@ export class MatchRecord {
 export class Updater {
 	getCharAvgOdds(c: Character): number {
 		let o = 0;
-		let i;
+		let i: number;
 		for (i = 0; i < c.odds.length; i++) {
 			o += c.odds[i];
 		}
@@ -82,7 +82,7 @@ export class Updater {
 		return cobject;
 	}
 	getBettor(bname: string, bettorRecords: Bettor[], namesOfBettorsWhoAlreadyHaveRecords: string[]): Bettor {
-		let bobject = null;
+		let bobject: Bettor = null;
 		if (!namesOfBettorsWhoAlreadyHaveRecords.includes(bname)) {
 			bobject = new Bettor(bname);
 			bettorRecords.push(bobject);
@@ -310,7 +310,7 @@ function ir(f: string): void {
 }
 
 function ec(): void {
-	chrome.storage.local.get(["chromosomes_v1"], function(results) {
+	chrome.storage.local.get(["chromosomes_v1"], function(results: {chromosomes_v1: Chromosome[]}) {
 		if (results.chromosomes_v1 && results.chromosomes_v1.length > 0) {
 			let chromosome = new Chromosome();
 			chromosome = chromosome.loadFromObject(results.chromosomes_v1[0]);
@@ -342,7 +342,7 @@ function ic(jsonString: string): void {
 	}
 
 	//get the chromosomes currently saved in the list
-	chrome.storage.local.get(["chromosomes_v1"], function(results) {
+	chrome.storage.local.get(["chromosomes_v1"], function(results: {chromosomes_v1: Chromosome[]}) {
 		let chromosomes = results.chromosomes_v1;
 		if (chromosomes) {
 			chromosomes[0] = chromosome;

@@ -1,4 +1,5 @@
-import { Updater, Character, MatchRecord, Bettor } from "./records";
+import type { Character, MatchRecord, Bettor } from "./records"
+import { Updater } from "./records";
 import { Settings } from "./settings";
 import { Match } from "./tracker";
 import { Observer, Lunatic, Cowboy, Scientist, Chromosome } from "./strategy";

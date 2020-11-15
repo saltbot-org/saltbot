@@ -1,4 +1,4 @@
-import { MatchRecord } from "./records";
+import type { MatchRecord } from "./records";
 jQuery.extend((jQuery.fn as any).dataTableExt.oSort, {
 	"odds-pre"(odds: string) {
 		odds = odds.replace(" ", "");

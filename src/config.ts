@@ -1,5 +1,5 @@
-import { Settings } from "./settings";
-import { Bettor, Character } from "./records";
+import type { Settings } from "./settings";
+import type { Bettor, Character } from "./records";
 
 function btnClicked(clicktype: string, data: number | boolean | string = null): void {
 	chrome.tabs.query({

@@ -1,8 +1,9 @@
 import { openDB } from 'idb';
 
-import { MatchRecord, Updater, Character } from "./records";
-import { Chromosome } from "./strategy";
-import { Settings } from "./settings";
+import { Updater } from "./records"
+import type { MatchRecord, Character } from "./records";
+import type { Chromosome } from "./strategy";
+import type { Settings } from "./settings";
 async function getMatchRecords() {
 	const db = await openDB("saltbot", 1);
 	const tx = db.transaction("matches", "readonly");

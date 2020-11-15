@@ -1,4 +1,5 @@
 const { join } = require('path');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 module.exports = {
     mode: 'production',
@@ -22,11 +23,15 @@ module.exports = {
                 test: /\.ts?$/,
                 use: [
                     'ts-loader',
-                    'eslint-loader'
                 ]
             }
         ],
     },
+    plugins: [new ESLintPlugin(
+        {
+            extensions: [".ts"],
+        }
+    )],
     resolve: {
         extensions: ['.ts', '.js'],
     },

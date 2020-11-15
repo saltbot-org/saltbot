@@ -1,8 +1,8 @@
 import * as moment from 'moment';
 
 import { Character, Updater, MatchRecord } from './records';
-import { Strategy } from './strategy';
-import { Settings } from './settings';
+import type { Strategy } from './strategy';
+import type { Settings } from './settings';
 import { isTournament } from './salty';
 import { binarySearchByProperty } from './utils';
 
@@ -69,7 +69,7 @@ export class Match {
 		if (this.names.includes(winner)) {
 			const updater = new Updater();
 			this.winner = (winner === this.character1.name) ? 0 : 1;
-			let pw = null;
+			let pw: string = null;
 			if (this.strategy.abstain) {
 				pw = "a";
 			}

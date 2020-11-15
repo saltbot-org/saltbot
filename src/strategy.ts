@@ -1,4 +1,4 @@
-import { Character, MatchRecord } from './records';
+import type { Character, MatchRecord } from './records';
 import { Globals } from './globals';
 
 export abstract class Strategy {
@@ -78,7 +78,7 @@ export abstract class Strategy {
 		}
 	}
 
-	adjustLevel(balance: number) {
+	adjustLevel(balance: number): void {
 		if (!this.level) {
 			this.level = 0;
 		}
@@ -101,7 +101,7 @@ export abstract class Strategy {
 		} while (changed);
 	}
 
-	getBetAmount(balance: number, tournament: boolean, debug: boolean) {
+	getBetAmount(balance: number, tournament: boolean, debug: boolean): number {
 		const simBettingLimitScale = 0.1;
 		const lowBettingScale = 0.01;
 		const allowConfRescale = true;
@@ -312,10 +312,11 @@ export class Chromosome {
 	randomize(): Chromosome {
 		for (const prop in this) {
 			if (this.hasOwnProperty(prop) && prop !== "rank") {
-				(this[prop] as number) = Math.random();
-				if ((this[prop] as any) < 0.0001) {
-					(this[prop] as any) = 0.01;
+				let newValue = Math.random();
+				if (newValue < 0.0001) {
+					newValue = 0.01;
 				}
+				(this[prop] as number) = newValue;
 			}
 		}
 
@@ -326,36 +327,36 @@ export class Chromosome {
 
 	normalize(): Chromosome {
 		let sum = 0;
-		for (const el in this) {
-			if (this.hasOwnProperty(el)) {
-				if (Number(this[el]) < 0) {
-					(this[el] as any) = 0.01;
+		for (const prop in this) {
+			if (this.hasOwnProperty(prop) && prop !== "rank") {
+				if (this[prop] < 0.0001) {
+					(this[prop] as number) = 0.01;
 				}
-				sum += Number(this[el]);
+				sum += Number(this[prop]);
 			}
 		}
-		for (const el in this) {
-			if (this.hasOwnProperty(el)) {
-				(this[el] as any) /= (sum * 0.01);
+		for (const prop in this) {
+			if (this.hasOwnProperty(prop) && prop !== "rank") {
+				(this[prop] as number) /= (sum * 0.01);
 			}
 		}
 		return this;
 	}
 
 	loadFromJSON(json: string): Chromosome {
-		const copy = JSON.parse(json);
-		for (const i in copy) {
-			if (this.hasOwnProperty(i)) {
-				this[i] = Number(copy[i]);
+		const copy = (JSON.parse(json) as Chromosome);
+		for (const prop in copy) {
+			if (this.hasOwnProperty(prop)) {
+				this[prop] = Number(copy[prop]);
 			}
 		}
 		return this;
 	}
 
 	loadFromObject(obj: Chromosome): Chromosome {
-		for (const i in obj) {
-			if (this.hasOwnProperty(i)) {
-				this[i] = Number(obj[i]);
+		for (const prop in obj) {
+			if (this.hasOwnProperty(prop)) {
+				this[prop] = Number(obj[prop]);
 			}
 		}
 		return this;
@@ -380,7 +381,7 @@ export class Chromosome {
 		const smallVal = 0.000001;
 		for (const i in offspring) {
 			if (typeof offspring[i] === "number" && i !== "rank") {
-				offspring[i] = (Math.random() < parentSplitChance) ? this[i] : other[i];
+				(offspring[i] as number) = ((Math.random() < parentSplitChance) ? this[i] : other[i]) as number;
 				const radiation = (Math.random() - 0.5) * 2.0;
 				let change = radiation * mutationScale;
 				if (Math.abs(change) < smallVal) {
@@ -502,7 +503,7 @@ export class Scientist extends Strategy {
 		this.level = level;
 	}
 
-	getBetAmount(balance: number, tournament: boolean, debug: boolean) {
+	getBetAmount(balance: number, tournament: boolean, debug: boolean): number {
 		if (tournament) {
 			return super.getBetAmount(balance, tournament, debug);
 		}
@@ -553,10 +554,10 @@ export class Scientist extends Strategy {
 				`(${c2.wins.toString().replace(/,/g, "")}:${c2.losses.toString().replace(/,/g, "")})`;
 		}
 		// weight in win percent
-		const WPSum = c1WP + c2WP;
-		if (WPSum > 0) {
-			c1Score += winPercentageWeight * c1WP / WPSum;
-			c2Score += winPercentageWeight * c2WP / WPSum;
+		const wpSum = c1WP + c2WP;
+		if (wpSum > 0) {
+			c1Score += winPercentageWeight * c1WP / wpSum;
+			c2Score += winPercentageWeight * c2WP / wpSum;
 		}
 		else {
 			c1Score += winPercentageWeight * 0.5;
@@ -705,7 +706,7 @@ export class Lunatic extends Strategy {
 		return this.prediction;
 	}
 
-	getBetAmount(balance: number, tournament: boolean, debug: boolean) {
+	getBetAmount(balance: number, tournament: boolean, debug: boolean): number {
 		if (tournament) {
 			return super.getBetAmount(balance, tournament, debug);
 		}

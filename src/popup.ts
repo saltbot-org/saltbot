@@ -1,7 +1,8 @@
 import * as tko from 'tko';
-import { Observable } from 'tko';
+import type { Observable } from 'tko';
 
-import { MatchRecord, Updater, Character, displayDialogMessage } from './records';
+import { displayDialogMessage } from './records';
+import { MatchRecord, Updater, Character } from './records';
 import { Strategy, Lunatic, CoinToss, Chromosome, Scientist, Cowboy } from './strategy';
 import { Settings } from './settings';
 
