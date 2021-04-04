@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/saltbot-org/saltbot#readme",
   "dependencies": {
-    "datatables.net": "^1.10.23",
+    "datatables.net": "^1.10.24",
     "datatables.net-dt": "^1.10.23",
     "file-saver": "^2.0.5",
     "idb": "^6.0.0",
