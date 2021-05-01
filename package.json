@@ -44,7 +44,7 @@
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
-    "eslint": "^7.23.0",
+    "eslint": "^7.25.0",
     "eslint-webpack-plugin": "^2.5.4",
     "rimraf": "^3.0.2",
     "ts-loader": "^9.1.1",
