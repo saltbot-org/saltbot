@@ -31,7 +31,7 @@
     "jquery": "^3.6.0",
     "jquery-ui": "^1.12.1",
     "moment": "^2.29.1",
-    "npm": "^7.11.2",
+    "npm": "^7.16.0",
     "tko": "^4.0.0-alpha5h"
   },
   "devDependencies": {
