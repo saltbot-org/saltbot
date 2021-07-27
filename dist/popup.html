@@ -61,30 +61,30 @@
 <span id="player2" value="1337">with records.js.</span>
 
 <h2 class="subheading">Change Mode</h2>
-<div id="cs_o" class="btn btn-inline btn-small btn-success" data-bind="click: changeStrategyClickO">
+<div id="cs_o" class="btn btn-inline btn-small btn-success" title="Record data only." data-bind="click: changeStrategyClickO">
 	Monk
 </div>
-<div id="cs_cs" class="btn btn-inline btn-small btn-success" data-bind="click: changeStrategyClickCS">
+<div id="cs_cs" class="btn btn-inline btn-small btn-success" title="Most accurate method, uses all data to create a relative confidence score and adjusted flat betting amount. Recommended to be used with a minimum of 5000 recorded matches." data-bind="click: changeStrategyClickCS">
 	Scientist
 </div>
-<div id="cs_rc" class="btn btn-inline btn-small btn-success" data-bind="click: changeStrategyClickRC">
+<div id="cs_rc" class="btn btn-inline btn-small btn-success" title="Bets based on win percentage only, place bets based on a percentage of your total winnings and not a flat amount. 'The dumber version of Scientist'." data-bind="click: changeStrategyClickRC">
 	Cowboy
 </div>
-<div id="cs_ipu" class="btn btn-inline btn-small btn-success" data-bind="click: changeStrategyClickIPU">
+<div id="cs_ipu" class="btn btn-inline btn-small btn-success" title="Flips a coin and hopes for the best, bets flat amounts based on winnings thresholds like Scientist." data-bind="click: changeStrategyClickIPU">
 	Lunatic
 </div>
 <h2 class="subheading">Chromosomes Management</h2>
-<div id="ugw" class="btn btn-inline btn-small btn-success" data-bind="click: updateGeneticWeightsClick">
+<div id="ugw" class="btn btn-inline btn-small btn-success" title="Rebuilds your chromosome weights based on your current recorded data. This can take a bit so be patient with it." data-bind="click: updateGeneticWeightsClick">
 	Update Genetic Weights
 </div>
-<div id="rgw" class="btn btn-inline btn-small btn-success" data-bind="click: resetPoolClick">
+<div id="rgw" class="btn btn-inline btn-small btn-success" title="Resets your chromosome weights to 0, this should only be done if you are importing fresh/experimental datasets and then rebuilding the chromosome with the 'Update Genetic Weights' button!" data-bind="click: resetPoolClick">
 	Reset Pool
 </div>
 <br/>
-<div id="bec" class="btn btn-inline btn-small btn-success" data-bind="click: ecClick">
+<div id="bec" class="btn btn-inline btn-small btn-success" title="Export your current chromosome weights." data-bind="click: ecClick">
 	Export
 </div>
-<div id="bic" class="btn btn-inline btn-small btn-success" style="position: relative; width: 45px">
+<div id="bic" class="btn btn-inline btn-small btn-success" title="Import new chromosome weight data." style="position: relative; width: 45px">
 	<span style="top: 5px; left:3px ;">Import</span>
 </div>
 <input type="file" id="upload_c" style="display: none" data-bind="event: { change: icClick }">
@@ -93,16 +93,16 @@
 	<input type="text" name="msgbox" id="msgbox" size="40"/>
 </label>
 <h2 class="subheading">Records Management</h2>
-<div id="ber" class="btn btn-inline btn-small btn-success" data-bind="click: erClick">
+<div id="ber" class="btn btn-inline btn-small btn-success" title="Export current recorded match data." data-bind="click: erClick">
 	Export
 </div>
-<div id="bir" class="btn btn-inline btn-small btn-success" style="position: relative; width: 45px;">
+<div id="bir" class="btn btn-inline btn-small btn-success" title="Import match data." style="position: relative; width: 45px;">
 	<span id="text_upload_r" style="top: 5px; left:3px ;">Import</span>
 </div>
 <input type="file" id="upload_r" style="display: none" data-bind="event: { change: irClick }">
 
 <h2 class="subheading">Options</h2>
-<div id="tv" class="btn btn-inline btn-small btn-success" data-bind="click: tvClick">
+<div id="tv" class="btn btn-inline btn-small btn-success" title="Turns saltybet.com video on/off, great for lower-end hardware machines and slower internet connections." data-bind="click: tvClick">
 	Toggle Video
 </div>
 <h2 class="subheading">Betting Controls</h2>
