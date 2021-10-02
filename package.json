@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@types/chrome": "^0.0.158",
-    "@types/datatables.net": "^1.10.19",
+    "@types/datatables.net": "^1.10.21",
     "@types/file-saver": "^2.0.2",
     "@types/jquery": "^3.5.5",
     "@types/jqueryui": "^1.12.15",
