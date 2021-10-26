@@ -224,7 +224,7 @@ Length of match in seconds: ${mr.ts}`);
 			}
 
 			else {
-				let level;
+				let level: number;
 				if (this.currentMatch && this.currentMatch.strategy) {
 					level = this.currentMatch.strategy.level;
 				} else {
@@ -338,7 +338,7 @@ Length of match in seconds: ${mr.ts}`);
 			bettors = results.bettors_v1;
 		}
 		const updater = new Updater();
-		const namesOfBettorsWhoAlreadyHaveRecords = [];
+		const namesOfBettorsWhoAlreadyHaveRecords: string[] = [];
 		for (const bettor of bettors) {
 			namesOfBettorsWhoAlreadyHaveRecords.push(bettor.name);
 		}

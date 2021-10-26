@@ -59,11 +59,11 @@ if (!triggered && document.readyState === "complete") {
 setTimeout(() => {
 	if ($("div[data-a-target='chat-welcome-message']").length === 0) {
 		//welcome message was not found, reload the page
-		window.location.reload(true);
+		window.location.reload();
 	}
 }, 20000);
 
 //reload every hour
 setTimeout(function () {
-	window.location.reload(true);
+	window.location.reload();
 }, 3600000);

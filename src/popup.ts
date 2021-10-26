@@ -7,14 +7,14 @@ import { Strategy, Lunatic, CoinToss, Chromosome, Scientist, Cowboy } from './st
 import { Settings } from './settings';
 
 //enable links
-$(document).ready(function() {
+$(function() {
 	$("body").on("click", "a", function() {
 		chrome.tabs.create({ url: $(this).attr("href") });
 		return false;
 	});
 });
 
-$(document).ready(function() {
+$(function() {
 	document.querySelector<HTMLElement>("#bic").onclick = function(): void {
 		document.querySelector<HTMLElement>("#upload_c").click();
 	};
@@ -361,7 +361,7 @@ class Simulator {
 					for (let mf = 0; mf < 10; mf++) {
 						let parent1: Chromosome = null;
 						let parent2: Chromosome = null;
-						let child = null;
+						let child: Chromosome = null;
 						if (mf === 0) {
 							parent1 = parents[0];
 							parent2 = parents[parents.length - 1];

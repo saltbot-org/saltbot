@@ -66,7 +66,7 @@ function reimportMatches() {
 		const db = open.result;
 		let store = db.createObjectStore("matches", { autoIncrement: true });
 
-		chrome.storage.local.get(["matches_v1"], function (results) {
+		chrome.storage.local.get(["matches_v1"], function (results: {matches_v1: MatchRecord[]}) {
 			if (results.matches_v1) {
 				const tx = db.transaction("matches", "readwrite");
 				store = tx.objectStore("matches");
@@ -88,7 +88,7 @@ function reimportMatches() {
 
 		const getAllRequest = store.getAll();
 		getAllRequest.onsuccess = function () {
-			updateCharacters(getAllRequest.result);
+			updateCharacters(getAllRequest.result as MatchRecord[]);
 		};
 	};
 }
@@ -202,10 +202,10 @@ chrome.runtime.onMessage.addListener(function(details: any, sender: chrome.runti
 			return true;
 		}
 		else if (details.query === "setMatchRecords" && details.data) {
-			setMatchRecords(details.data);
+			setMatchRecords(details.data as MatchRecord[]);
 		}
 		else if (details.query === "addMatchRecord" && details.data) {
-			addMatchRecord(details.data);
+			addMatchRecord(details.data as MatchRecord);
 		}
 	}
 

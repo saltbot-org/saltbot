@@ -390,7 +390,7 @@ export class Chromosome {
 				if ((Math.random() < mutationChance) && (offspring[i] != null)) {
 					offspring[i] += change;
 				}
-				if (Math.abs(offspring[i]) < smallVal) {
+				if (Math.abs(offspring[i] as number) < smallVal) {
 					offspring[i] = smallVal;
 				}
 			}
