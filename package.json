@@ -34,7 +34,7 @@
     "tko": "^4.0.0-alpha5h"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.161",
+    "@types/chrome": "^0.0.165",
     "@types/datatables.net": "^1.10.21",
     "@types/file-saver": "^2.0.3",
     "@types/jquery": "^3.5.8",
