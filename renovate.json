@@ -1,0 +1,6 @@
+{
+  "extends": [
+    "github>teppeis/renovate-config",
+    "group:allNonMajor"
+  ]
+}
