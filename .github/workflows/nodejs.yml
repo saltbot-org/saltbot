@@ -26,7 +26,7 @@ jobs:
         cd dist
         zip -r ../saltbot.zip *
     - name: Upload extension zip
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: extension
         path: saltbot.zip
