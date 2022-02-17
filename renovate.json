@@ -1,6 +1,7 @@
 {
   "extends": [
     "github>teppeis/renovate-config",
-    "group:allNonMajor"
+    "group:allNonMajor",
+    ":dependencyDashboard"
   ]
 }
