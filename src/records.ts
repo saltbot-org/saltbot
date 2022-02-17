@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import { Chromosome } from './strategy';
 import { binarySearchByProperty, binaryInsertByProperty } from './utils';
 import { Globals } from './globals';
+import { saveAs } from 'file-saver';
 
 export function displayDialogMessage(message: string): void {
 	const dialog = $("#dialog");
