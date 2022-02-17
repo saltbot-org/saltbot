@@ -3,5 +3,8 @@
     "github>teppeis/renovate-config",
     "group:allNonMajor",
     ":dependencyDashboard"
-  ]
+  ],
+  "npm": {
+    "schedule": "on the first day of the month"
+  }
 }
