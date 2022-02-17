@@ -1,3 +1,6 @@
 {
-  "extends": ["github>teppeis/renovate-config"]
+  "extends": [
+    "github>teppeis/renovate-config",
+    "group:allNonMajor"
+  ]
 }
