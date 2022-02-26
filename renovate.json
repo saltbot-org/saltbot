@@ -4,7 +4,15 @@
     "group:allNonMajor",
     ":dependencyDashboard"
   ],
+  "timezone": "Europe/Berlin",
   "npm": {
-    "schedule": "on the first day of the month"
+    "extends": ["schedule:monthly"]
+  },
+  "github-actions": {
+    "extends": ["group:all"],
+    "enabled": true,
+    "automerge": true,
+    "branchTopic": "github-actions",
+    "commitMessageTopic": "github-actions"
   }
 }
