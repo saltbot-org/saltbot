@@ -1,12 +1,13 @@
 {
   "extends": [
-    "github>teppeis/renovate-config",
+    "config:base",
     "group:allNonMajor",
     ":dependencyDashboard"
   ],
   "timezone": "Europe/Berlin",
   "npm": {
-    "extends": ["schedule:monthly"]
+    "extends": ["schedule:monthly"],
+    "enabled": true
   },
   "github-actions": {
     "extends": ["group:all"],
