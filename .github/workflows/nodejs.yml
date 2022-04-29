@@ -52,6 +52,8 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: extension
+    - name: Display structure of downloaded files
+      run: ls -R
     - name: Upload extension to GitHub Releases
       uses: actions/upload-release-asset@v1
       env:
