@@ -12,7 +12,7 @@ function addListener(): void {
 				const from = chatLine.querySelector(".chat-author__display-name").textContent;
 
 				if (from.toUpperCase() === "WAIFU4U") {
-					const message = chatLine.querySelector("span[data-a-target='chat-message-text'],a[data-a-target='chat-line__message--link'],a.ffz-tooltip").textContent;
+					const message = chatLine.querySelector(".message").textContent;
 
 					if (!oldWaifuMessages.includes(message)) {
 						oldWaifuMessages.push(message);
