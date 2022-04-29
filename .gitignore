@@ -6,3 +6,4 @@ dist/js/*.js
 archive
 *~
 node_modules
+dist/js/lib/moment.min.js
