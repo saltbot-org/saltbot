@@ -52,22 +52,20 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: extension
-    - name: Display structure of downloaded files
-      run: ls -R
     - name: Upload extension to GitHub Releases
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./extension/saltbot.zip
+        asset_path: ./saltbot.zip
         asset_name: saltbot ${{env.TAG_VERSION}}.zip
         asset_content_type: application/zip
     - name: Publish in Chrome Store
       uses: Passiverecords/chrome-extension-upload-action@1.4.1
       with:
         app-id: 'bholoegapebhflljekancpcnajigaiih'
-        file-name: './extension/saltbot.zip'
+        file-name: './saltbot.zip'
         client-id: ${{ secrets.CLIENT_ID }}
         client-secret: ${{ secrets.CLIENT_SECRET }}
         refresh-token: ${{ secrets.REFRESH_TOKEN }}
