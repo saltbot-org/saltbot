@@ -48,6 +48,5 @@ module.exports = {
     },
     externals: {
         moment: 'moment',
-        'file-saver': 'file-saver'
     },
 };
