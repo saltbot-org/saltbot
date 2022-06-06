@@ -3,8 +3,6 @@
 <head>
     <title>SaltBot Controls</title>
     <script type="text/javascript" src="js/lib/jquery.min.js"></script>
-    <script type="text/javascript" src="js/lib/moment.min.js"></script>
-    <script type="text/javascript" src="js/lib/FileSaver.min.js"></script>
     <script type="text/javascript" src="js/popup.js"></script>
     <link rel="stylesheet" href="css/obvious-buttons.css" />
     <style>
@@ -44,9 +42,9 @@
                                                        supported by Chrome and Opera */
         }
 
-            .btn.active {
-                color: black;
-            }
+        .btn.active {
+            color: black;
+        }
     </style>
 </head>
 <body>
@@ -81,26 +79,10 @@
 <div id="rgw" class="btn btn-inline btn-small btn-success" title="Resets your chromosome weights to 0, this should only be done if you are importing fresh/experimental datasets and then rebuilding the chromosome with the 'Update Genetic Weights' button!" data-bind="click: resetPoolClick">
 	Reset Pool
 </div>
-<br/>
-<div id="bec" class="btn btn-inline btn-small btn-success" title="Export your current chromosome weights." data-bind="click: ecClick">
-	Export
-</div>
-<div id="bic" class="btn btn-inline btn-small btn-success" title="Import new chromosome weight data." style="position: relative; width: 45px">
-	<span style="top: 5px; left:3px ;">Import</span>
-</div>
-<input type="file" id="upload_c" style="display: none" data-bind="event: { change: icClick }">
 <br>
 <label style="display: block;clear: both;"> Messages:
 	<input type="text" name="msgbox" id="msgbox" size="40"/>
 </label>
-<h2 class="subheading">Records Management</h2>
-<div id="ber" class="btn btn-inline btn-small btn-success" title="Export current recorded match data." data-bind="click: erClick">
-	Export
-</div>
-<div id="bir" class="btn btn-inline btn-small btn-success" title="Import match data." style="position: relative; width: 45px;">
-	<span id="text_upload_r" style="top: 5px; left:3px ;">Import</span>
-</div>
-<input type="file" id="upload_r" style="display: none" data-bind="event: { change: irClick }">
 
 <h2 class="subheading">Options</h2>
 <div id="tv" class="btn btn-inline btn-small btn-success" title="Turns saltybet.com video on/off, great for lower-end hardware machines and slower internet connections." data-bind="click: tvClick">

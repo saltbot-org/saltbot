@@ -5,7 +5,12 @@
 	<link rel="stylesheet" href="css/structure.css" type="text/css"/>
 	<link rel="stylesheet" href="css/form.css" type="text/css"/>
 	<link rel="stylesheet" href="css/theme.css" type="text/css"/>
+	<link rel="stylesheet" href="css/obvious-buttons.css" />
+	<link rel="stylesheet" href="css/jquery-ui.css" />
 	<script src="js/lib/jquery.min.js"></script>
+	<script src="js/lib/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="js/lib/moment.min.js"></script>
+    <script type="text/javascript" src="js/lib/FileSaver.min.js"></script>
 	<script src="js/config.js"></script>
 </head>
 <body id="public">
@@ -37,6 +42,22 @@
 		<p>
 			<input type="checkbox" id="toggleKeepAlive"/>Restore crashed or closed saltybet tabs
 		</p>
+		<h2>Chromosome Management</h2>
+		<div id="bec" class="btn btn-inline btn-success" title="Export your current chromosome weights.">
+			Export
+		</div>
+		<div id="bic" class="btn btn-inline btn-success" title="Import new chromosome weight data.">
+			<span style="top: 5px; left:3px ;">Import</span>
+		</div>
+		<h2 class="subheading">Records Management</h2>
+		<div id="ber" class="btn btn-inline btn-success" title="Export current recorded match data.">
+			Export
+		</div>
+		<div id="bir" class="btn btn-inline btn-success" title="Import match data.">
+			<span id="text_upload_r" style="top: 5px; left:3px ;">Import</span>
+		</div>
+		<input type="file" id="upload_r" style="display: none">
+		<input type="file" id="upload_c" style="display: none">
 		<h2 title="Show a table of player rankings">Display Player Rankings</h2>
 		<p>
 			<input type="radio" name="rankings" id="bdr"/>Players by %
@@ -48,6 +69,7 @@
 		</details>
 
 	</form>
+	<div id="dialog"></div>
 </div>
 </body>
 </html>

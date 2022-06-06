@@ -47,6 +47,7 @@ module.exports = {
         minimize: false
     },
     externals: {
-        moment: 'moment'
+        moment: 'moment',
+        'file-saver': 'file-saver'
     },
 };

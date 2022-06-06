@@ -209,9 +209,6 @@ chrome.runtime.onMessage.addListener(function(details: any, sender: chrome.runti
 		}
 	}
 
-	if (sendResponse !== undefined) {
-		sendResponse(null);
-	}
 	return false;
 });
 function sendUpdatedChromosome(): void {

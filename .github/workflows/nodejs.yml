@@ -61,12 +61,11 @@ jobs:
         asset_path: ./saltbot.zip
         asset_name: saltbot ${{env.TAG_VERSION}}.zip
         asset_content_type: application/zip
-    - name: Publish in Chrome Store
-      uses: Passiverecords/chrome-extension-upload-action@1.4.1
+    - name: Publish in Firefox Store
+      uses: trmcnvn/firefox-addon@v1
       with:
-        app-id: 'bholoegapebhflljekancpcnajigaiih'
-        file-name: './saltbot.zip'
-        client-id: ${{ secrets.CLIENT_ID }}
-        client-secret: ${{ secrets.CLIENT_SECRET }}
-        refresh-token: ${{ secrets.REFRESH_TOKEN }}
-        publish: true
+        uuid: '{19d4bb02-364f-4095-b061-92cfeb308d1e}'
+        xpi: ./saltbot.zip
+        manifest: dist/manifest.json
+        api-key: ${{ secrets.FIREFOX_API_KEY }}
+        api-secret: ${{ secrets.FIREFOX_API_SECRET }}

@@ -14,15 +14,6 @@ $(function() {
 	});
 });
 
-$(function() {
-	document.querySelector<HTMLElement>("#bic").onclick = function(): void {
-		document.querySelector<HTMLElement>("#upload_c").click();
-	};
-	document.querySelector<HTMLElement>("#bir").onclick = function(): void {
-		document.querySelector<HTMLElement>("#upload_r").click();
-	};
-});
-
 function btnClicked(clicktype: string, data: number | boolean | string | ArrayBuffer = null): void {
 	data = data || null;
 	chrome.tabs.query({
@@ -45,14 +36,6 @@ function elementChanged(changetype: string, data: number | boolean | string): vo
 }
 
 class ViewModel extends Settings {
-	erClick(): void {
-		btnClicked("er");
-	}
-
-	ecClick(): void {
-		btnClicked("ec");
-	}
-
 	tvClick(): void {
 		btnClicked("tv");
 	}
@@ -126,42 +109,6 @@ class ViewModel extends Settings {
 		this.setButtonActive("#cs_ipu");
 	}
 
-	irClick(): void {
-		console.log("Attempting records import...");
-		const files = document.querySelector<HTMLInputElement>("#upload_r").files;
-		if (files.length > 0) {
-			console.log("Upload successful.");
-		}
-		else {
-			console.log("Upload canceled.");
-		}
-		console.log("Attempting to read file...");
-
-		const file = files[0];
-		document.querySelector<HTMLInputElement>("#upload_r").value = "";
-		const reader = new FileReader();
-		reader.onload = onFileReadRecord;
-		reader.readAsText(file);
-	}
-
-	icClick(): void {
-		console.log("Attempting chromosome import...");
-		const files = document.querySelector<HTMLInputElement>("#upload_c").files;
-		if (files.length > 0) {
-			console.log("Upload successful.");
-		}
-		else {
-			console.log("Upload canceled.");
-		}
-		console.log("Attempting to read file...");
-
-		const file = files[0];
-		document.querySelector<HTMLInputElement>("#upload_c").value = "";
-		const reader = new FileReader();
-		reader.onload = onFileReadChromosome;
-		reader.readAsText(file);
-	}
-
 	updateGeneticWeightsClick(): void {
 		simulator.evalMutations();
 	}
@@ -169,19 +116,6 @@ class ViewModel extends Settings {
 	resetPoolClick(): void {
 		simulator.initializePool();
 	}
-}
-
-
-
-function onFileReadRecord(e: ProgressEvent<FileReader>): void {
-	console.log("File read successful.");
-	const t = e.target.result;
-	btnClicked("ir", t);
-}
-function onFileReadChromosome(e: ProgressEvent<FileReader>): void {
-	console.log("File read successful.");
-	const t = e.target.result;
-	btnClicked("ic", t);
 }
 
 //---------------------------------------------------------------------------------------------------------

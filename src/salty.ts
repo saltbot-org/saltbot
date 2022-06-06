@@ -527,34 +527,6 @@ Length of match in seconds: ${mr.ts}`);
 	}
 }
 
-function prepareJQueryDialog(): void {
-	$('link[href="../css/jquery-ui-1.11.min.css"]').prop("disabled", true);
-	const link = '<link rel="stylesheet" type="text/css" href="' + chrome.extension.getURL("css/jquery-ui.css") + '">';
-	$("head").append(link);
-
-	const wrapper = document.getElementById("wrapper");
-	const messageDialogue = document.createElement("div");
-	messageDialogue.setAttribute("id", "dialog");
-	wrapper.appendChild(messageDialogue);
-
-	let dialogTimer: NodeJS.Timer = null;
-
-	$("#dialog").dialog({
-		autoOpen: false,
-		title: "Saltbot Notification",
-		open() {
-			if (dialogTimer !== null) {
-				clearTimeout(dialogTimer);
-			}
-
-			const dia = $(this);
-			dialogTimer = setTimeout(function() {
-				dia.dialog("close");
-			}, 5000);
-		},
-	});
-}
-
 function correctChatIFrame(): void {
 	const chatFrame = (document.getElementById("chat-frame-stream") as HTMLIFrameElement);
 	if (chatFrame.src === "http://twitch.tv/saltybet/chat") {
@@ -734,11 +706,3 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 window.addEventListener("beforeunload", function() {
 	Globals.ctrl.enableVideoWindow();
 });
-
-prepareJQueryDialog();
-
-export function displayDialogMessage(message: string): void {
-	const dialog = $("#dialog");
-	dialog.html(message.replace(/\n/g, "<br />"));
-	dialog.dialog("open");
-}

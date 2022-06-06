@@ -1,9 +1,5 @@
-import * as moment from 'moment';
-
-import { Chromosome } from './strategy';
 import { binarySearchByProperty, binaryInsertByProperty } from './utils';
 import { Globals } from './globals';
-import { saveAs } from 'file-saver';
 
 export function displayDialogMessage(message: string): void {
 	const dialog = $("#dialog");
@@ -199,185 +195,11 @@ export class Updater {
 	}
 }
 
-
-function er(): void {
-	const lines: string[] = [];
-	let matches: MatchRecord[] = [];
-	chrome.runtime.sendMessage({ query: "getMatchRecords" }, function(data: MatchRecord[]) {
-		matches = data;
-
-		for (const match of matches) {
-			let record = `${match.c1},${match.c2},${match.w},${match.sn},${match.pw},`;
-			record += (match.hasOwnProperty("t")) ? match.t : "U";
-			record += ",";
-			record += (match.hasOwnProperty("m")) ? match.m : "U";
-			record += ",";
-			record += (match.hasOwnProperty("o")) ? match.o : "U";
-			record += ",";
-			record += (match.hasOwnProperty("ts")) ? match.ts : 0;
-			record += ",";
-			record += (match.hasOwnProperty("cf")) ? match.cf : 2;
-			record += ",";
-			record += (match.hasOwnProperty("if")) ? match.if : 2;
-			record += ",";
-			record += (match.hasOwnProperty("dt")) ? match.dt : moment().format("DD-MM-YYYY");
-			record += "\n";
-			lines.push(record);
-		}
-
-		const blobM = new Blob(lines, {
-			type: "text/plain;charset=utf-8",
-		});
-		const timeStr = moment().format("YYYY-MM-DD-HH.mm");
-		saveAs(blobM, "saltyRecordsM--" + timeStr + ".txt");
-	});
-}
-
-function ir(f: string): void {
-	const updater = new Updater();
-	const matchRecords = [];
-	const characterRecords: Character[] = [];
-	const namesOfCharactersWhoAlreadyHaveRecords: string[] = [];
-
-	//numberOfProperties refers to c1, c2, w, sn, etc.
-	const numberOfProperties = 12;
-	let mObj: MatchRecord = null;
-	const lines = f.split("\n");
-	for (const line of lines) {
-		line.replace("\r", "");
-		const match = line.split(",");
-
-		for (let j = 0; j < match.length; j++) {
-			switch (j % numberOfProperties) {
-				case 0:
-					mObj = new MatchRecord();
-					mObj.c1 = match[j];
-					break;
-				case 1:
-					mObj.c2 = match[j];
-					break;
-				case 2:
-					mObj.w = +match[j];
-					break;
-				case 3:
-					mObj.sn = match[j];
-					break;
-				case 4:
-					mObj.pw = match[j];
-					break;
-				case 5:
-					mObj.t = match[j];
-					break;
-				case 6:
-					mObj.m = match[j];
-					break;
-				case 7:
-					mObj.o = match[j];
-					break;
-				case 8:
-					mObj.ts = +match[j];
-					break;
-				case 9:
-					mObj.cf = +match[j];
-					break;
-				case 10:
-					mObj.if = +match[j];
-					break;
-				case 11: {
-					//trim to get rid of linebreaks at the end
-					mObj.dt = match[j].trim();
-					matchRecords.push(mObj);
-					const c1Obj = updater.getCharacter(mObj.c1, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
-					const c2Obj = updater.getCharacter(mObj.c2, characterRecords, namesOfCharactersWhoAlreadyHaveRecords);
-					updater.updateCharactersFromMatch(mObj, c1Obj, c2Obj);
-					break;
-				}
-			}
-		}
-	}
-	const nmr = matchRecords.length;
-	const ncr = characterRecords.length;
-	//All records have been rebuilt, so update them
-
-	chrome.runtime.sendMessage({ data: matchRecords, query: "setMatchRecords" });
-	chrome.storage.local.set({
-		characters_v1: characterRecords,
-	}, function() {
-		const recordsImportedMsg = `Records imported: \n${nmr} match records\n${ncr} character records`;
-		console.log("-\n" + recordsImportedMsg);
-		displayDialogMessage(recordsImportedMsg);
-		Globals.dirtyRecords = true;
-	});
-}
-
-function ec(): void {
-	chrome.storage.local.get(["chromosomes_v1"], function(results: {chromosomes_v1: Chromosome[]}) {
-		if (results.chromosomes_v1 && results.chromosomes_v1.length > 0) {
-			let chromosome = new Chromosome();
-			chromosome = chromosome.loadFromObject(results.chromosomes_v1[0]);
-			const lines = JSON.stringify(chromosome, null, "\t").split("\n");
-			for (let i = 0; i < lines.length; ++i) {
-				lines[i] += "\n";
-			}
-
-			const blobM = new Blob(lines, {
-				type: "text/plain;charset=utf-8",
-			});
-			const timeStr = moment().format("YYYY-MM-DD-HH.mm");
-			saveAs(blobM, "chromosome--" + timeStr + ".txt");
-		}
-		else {
-			console.log("- No chromosomes found.");
-		}
-	});
-}
-
-function ic(jsonString: string): void {
-	const chromosome = new Chromosome();
-	try {
-		chromosome.loadFromJSON(jsonString);
-	}
-	catch (err) {
-		console.log("- Could not read chromosome file.");
-		return;
-	}
-
-	//get the chromosomes currently saved in the list
-	chrome.storage.local.get(["chromosomes_v1"], function(results: {chromosomes_v1: Chromosome[]}) {
-		let chromosomes = results.chromosomes_v1;
-		if (chromosomes) {
-			chromosomes[0] = chromosome;
-		}
-		else {
-			chromosomes = [chromosome];
-		}
-		chrome.storage.local.set({
-			chromosomes_v1: chromosomes,
-		}, function() {
-			console.log("- Chromosome imported successfully.");
-			displayDialogMessage("Chromosome imported successfully.");
-		});
-	});
-
-}
-
 if (window.location.href === "http://www.saltybet.com/" || window.location.href === "http://mugen.saltybet.com/" ||
 	window.location.href === "https://www.saltybet.com/" || window.location.href === "https://mugen.saltybet.com/") {
-	chrome.runtime.onMessage.addListener(function(request: { type: string; text: string }, _sender: chrome.runtime.MessageSender, sendResponse: (response?: unknown) => void): boolean {
+	chrome.runtime.onMessage.addListener(function(request: { type: string; text: string }, _sender: chrome.runtime.MessageSender) {
 		const ctrl = Globals.ctrl;
 		switch (request.type) {
-			case "er":
-				er();
-				break;
-			case "ir":
-				ir(request.text);
-				break;
-			case "ec":
-				ec();
-				break;
-			case "ic":
-				ic(request.text);
-				break;
 			case "tv":
 				ctrl.toggleVideoWindow();
 				break;
@@ -428,10 +250,6 @@ if (window.location.href === "http://www.saltybet.com/" || window.location.href 
 			case "maximumBetAmount_disable":
 				ctrl.setMaximumBetAmount(request.type.endsWith("enable"), +request.text);
 				break;
-			default:
-				sendResponse({ farewell: ("Request type " + request.type + " cannot be handled.") });
-				return true;
 		}
-		return false;
 	});
 }

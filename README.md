@@ -4,7 +4,7 @@ A betting bot for [SaltyBet.com](http://saltybet.com)
 
 * Read about it [**here**](http://explosionduck.com/wp/story-of-a-betting-bot/) and learn how to use it [**here**](http://explosionduck.com/wp/so-you-want-to-use-saltbot/). 
 * Download sample data(match record and chromosome) above or [**click here.**](https://github.com/saltbot-org/saltbot/tree/master/data/2020-01-27)
-* Download the app from the Chrome Store [**here**](https://chrome.google.com/webstore/detail/saltbot/bholoegapebhflljekancpcnajigaiih).
+* Install the Add-On from Firefox [**here**](https://addons.mozilla.org/de/firefox/addon/salt-bot/).
 
 # System Requirements
 **Minimum Specs:**
@@ -15,7 +15,7 @@ A betting bot for [SaltyBet.com](http://saltybet.com)
 * Quad Core processor 3.0Ghz+
 * 8gb DDR3 RAM 1600mhz
 
-# Installing latest version(Chrome/Chromium)
+# Installing latest version(Firefox)
 
 To install the git version of this extension:
 * Clone the repo:  
@@ -26,19 +26,12 @@ To install the git version of this extension:
 * Open the command line and go to the base of the project where the file package.json is located
 * Run  
 `npm install && npm run build`
-* Open chrome extension settings and enable developer mode
-* Click "load unpacked extension"
-* Navigate to the '/dist/' folder and load it
+* Open [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox)
+* Click "Load Temporary Add-On..."
 * Import the data and chromosome files
 * Select your preferred mode and settings and let it run.
 
-# Updating
-
-To keep your version up to date simply:
-* Run `git pull`
-* Run `npm install && npm run build`
-* Open Chrome Extension settings and click "reload" on Saltbot
-* Reload saltybet.com and the twitch chat tab
+This version of Saltbot will only be available until Firefox is closed.
 
 # Bug Reports
 
