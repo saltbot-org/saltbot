@@ -37,7 +37,7 @@ jobs:
     steps:
     - name: Set tag env var
       run: echo "TAG_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
+    - uses: actions/checkout@v3
     - name: Draft Release
       id: create_release
       uses: actions/create-release@latest
