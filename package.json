@@ -29,7 +29,7 @@
     "file-saver": "2.0.5",
     "idb": "7.0.1",
     "jquery": "3.6.0",
-    "jquery-ui": "1.13.1",
+    "jquery-ui": "1.13.2",
     "moment": "2.29.3",
     "tko": "4.0.0-alpha5h"
   },
