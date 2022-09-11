@@ -12,7 +12,8 @@ function addListener(): void {
 				const from = chatLine.querySelector(".chat-author__display-name").textContent;
 
 				if (from.toUpperCase() === "WAIFU4U") {
-					const message = chatLine.querySelector(".message").textContent;
+					// .message for FrankerFaceZ, chat-line-message-body for vanilla Twitch chat
+					const message = chatLine.querySelector(".message, span[data-test-selector='chat-line-message-body']").textContent;
 
 					if (!oldWaifuMessages.includes(message)) {
 						oldWaifuMessages.push(message);
