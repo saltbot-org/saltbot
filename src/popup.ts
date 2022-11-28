@@ -255,7 +255,7 @@ class Simulator {
 				const money = true;
 				const accuracy = true;
 				const unshackle = true;
-				const weightAccToMoney = 0.75; //1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
+				const weightAccToMoney = 75; //1 - 1/100000000000;			// valid range (0,1), enabled if accuracy & money are. 50% would be the original method. Also good for evening the magnitude between them.
 
 				for (let l = 0; l < orders.length; l++) {
 					let penalty = 1;
@@ -273,7 +273,7 @@ class Simulator {
 						return (b[2] * b[3]) - (a[2] * a[3]);
 					}
 					else {
-						return (((weightAccToMoney * b[1]) + ((1 - weightAccToMoney) * b[2])) * b[3]) - (((weightAccToMoney * a[1]) + ((1 - weightAccToMoney) * a[2])) * a[3]);
+						return ((((weightAccToMoney * b[1]) + ((1 - weightAccToMoney) * b[2])) * b[3]) - (((weightAccToMoney * a[1]) + ((1 - weightAccToMoney) * a[2])) * a[3]) / 100);
 					}
 				});
 
@@ -437,10 +437,10 @@ document.addEventListener("DOMContentLoaded", function() {
 			settings.setButtonActive("#cs_" + result.settings_v1.nextStrategy);
 		}
 	});
-
+	/*
 	chrome.alarms.create("chromosome update", {
 		delayInMinutes: 0.1,
 		periodInMinutes: 1.0,
 	});
-
+	*/
 });

@@ -59,7 +59,7 @@ export class Match {
 		}
 		//add more time to matches that are recognized as being in exhibition mode, proportional to the amount of required matches missing
 		if (this.mode === "e") {
-			this.time = Math.round(this.time * 1.5);
+			this.time = Math.round(this.time * 15) / 10;
 		}
 		// add favor stats
 		this.crowdFavor = crowdFavor;

@@ -102,11 +102,11 @@ export abstract class Strategy {
 	}
 
 	getBetAmount(balance: number, tournament: boolean, debug: boolean): number {
-		const simBettingLimitScale = 0.1;
-		const lowBettingScale = 0.01;
+		const simBettingLimitScale = 10;
+		const lowBettingScale = 1;
 		const allowConfRescale = true;
-		const rangeConfidanceScale = [0.52, 0.95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
-		const rangeTourneyScale = [0.1, 0.45];			// range of tourney scale.
+		const rangeConfidanceScale = [52, 95];	// range of confidence scale, range [0.5, 1] (theses need not be exact)
+		const rangeTourneyScale = [10, 45];			// range of tourney scale.
 		if (!this.confidence) {
 			this.confidence = 1;
 		}
@@ -121,13 +121,13 @@ export abstract class Strategy {
 			 this.confidence > 0.9 ||
 			 (1 - this.confidence) * balance <= bailout;*/
 
-			let conf = (this.confidence || 0.5);
+			let conf = (this.confidence || 50);
 			const confPrint = conf;
 			if (!allIn && allowConfRescale) {
-				conf = (conf - rangeConfidanceScale[0]) *
+				conf = (((conf - rangeConfidanceScale[0]) *
 					(rangeTourneyScale[1] - rangeTourneyScale[0]) /
-					(rangeConfidanceScale[1] - rangeConfidanceScale[0]) + rangeTourneyScale[0];
-				conf = Math.max(rangeTourneyScale[0], conf);
+					(rangeConfidanceScale[1] - rangeConfidanceScale[0]) + rangeTourneyScale[0]) / 100);
+				conf = Math.max(rangeTourneyScale[0], conf) / 100;
 			}
 			amountToBet = allIn ? balance : Math.round(balance * (conf));
 
@@ -156,7 +156,7 @@ export abstract class Strategy {
 		} else if (!this.lowBet) {
 			amountToBet = Math.round(balance * simBettingLimitScale * this.confidence);
 			if (amountToBet > balance * simBettingLimitScale) {
-				amountToBet = Math.round(balance * simBettingLimitScale);
+				amountToBet = Math.round(balance * simBettingLimitScale) / 100;
 			}
 			if (amountToBet < bailout) {
 				if (debug) {
@@ -191,7 +191,7 @@ export class CoinToss extends Strategy {
 	execute(info: { character1: Character; character2: Character; matches: MatchRecord[] }): string {
 		const c1 = info.character1;
 		const c2 = info.character2;
-		this.prediction = (Math.random() > .5) ? c1.name : c2.name;
+		this.prediction = (Math.random() > 50) ? c1.name : c2.name;
 		return this.prediction;
 	}
 }
@@ -226,9 +226,9 @@ export class Cowboy extends Strategy {
 			const npChar = (c1.ratio < c2.ratio) ? c1 : c2;
 			//confidence score
 			this.confidence = (pChar.name === c1.name) ? c1Ratio - c2Ratio : c2Ratio - c1Ratio;
-			this.confidence += 0.5;
-			if (this.confidence > 1) { this.confidence = 1; }
-			if (this.confidence < 0.6) {
+			this.confidence += 50;
+			if (this.confidence > 10) { this.confidence = 10; }
+			if (this.confidence < 60) {
 				if (this.debug) {
 					console.log(`- Cowboy has insufficient confidence (confidence: ${this.confidence.toFixed(2)}), W:L(P1)(P2)-> (${c1.wins.length}:${c1.losses.length})(${c2.wins.length}:${c2.losses.length})`);
 				}
@@ -236,7 +236,7 @@ export class Cowboy extends Strategy {
 				this.lowBet = true;
 				return null;
 			}
-			if (pChar.ratio <= 0.5 || (npChar.ratio === 0.5 && (npChar.wins.length + npChar.losses.length === 2))) {
+			if (pChar.ratio <= 50 || (npChar.ratio === 50 && (npChar.wins.length + npChar.losses.length === 2))) {
 				if (this.debug) {
 					console.log(`- Cowboy discourages betting on or against <51% (${(c1Ratio * 100).toFixed(2)}% : ${(c2Ratio * 100).toFixed(2)}%)`);
 				}
@@ -268,12 +268,12 @@ export class Chromosome {
 	[key: string]: any;
 
 	//confidence weights
-	oddsWeight = 0.5;
-	timeAveWin = 1;	//.timeWeight  =  1;
-	timeAveLose = 1;
-	winPercentageWeight = 1;
-	crowdFavorWeight = 0.5;
-	illumFavorWeight = 0.5;
+	oddsWeight = 50;
+	timeAveWin = 10;	//.timeWeight  =  1;
+	timeAveLose = 10;
+	winPercentageWeight = 10;
+	crowdFavorWeight = 50;
+	illumFavorWeight = 50;
 	// tier scoring
 	wX = 1;
 	wS = 1;
@@ -313,8 +313,8 @@ export class Chromosome {
 		for (const prop in this) {
 			if (this.hasOwnProperty(prop) && prop !== "rank") {
 				let newValue = Math.random();
-				if (newValue < 0.0001) {
-					newValue = 0.01;
+				if (newValue < 1) {
+					newValue = 1;
 				}
 				(this[prop] as number) = newValue;
 			}
@@ -329,8 +329,8 @@ export class Chromosome {
 		let sum = 0;
 		for (const prop in this) {
 			if (this.hasOwnProperty(prop) && prop !== "rank") {
-				if (this[prop] < 0.0001) {
-					(this[prop] as number) = 0.01;
+				if (this[prop] < 1) {
+					(this[prop] as number) = 1;
 				}
 				sum += Number(this[prop]);
 			}
@@ -375,14 +375,14 @@ export class Chromosome {
 
 	mate(other: Chromosome): Chromosome {
 		const offspring = new Chromosome();
-		const parentSplitChance = 0.625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
-		const mutationScale = 2;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
-		const mutationChance = 0.1;	// range [0,1]
-		const smallVal = 0.000001;
+		const parentSplitChance = 625;	// gene from parents chance. This can be higher, Assuming left P is higher score dominate.
+		const mutationScale = 2000;	// range (0, +inf), too low, results will be dominated by parents' original weights crossing; too high, sim. cannot refine good values.
+		const mutationChance = 100;	// range [0,1]
+		const smallVal = 1;
 		for (const i in offspring) {
 			if (typeof offspring[i] === "number" && i !== "rank") {
 				(offspring[i] as number) = ((Math.random() < parentSplitChance) ? this[i] : other[i]) as number;
-				const radiation = (Math.random() - 0.5) * 2.0;
+				const radiation = (Math.random() - 50) * 20;
 				let change = radiation * mutationScale;
 				if (Math.abs(change) < smallVal) {
 					change = smallVal;
@@ -529,7 +529,7 @@ export class Scientist extends Strategy {
 		let ilumMessage: string = null;
 
 		// the weights come in from the chromosome
-		const scoreBase = 0.001;      // range (0,0.5], prevents over-confidence.
+		const scoreBase = 1;      // range (0,0.5], prevents over-confidence.
 		let c1Score = scoreBase;
 		let c2Score = scoreBase;
 
@@ -556,12 +556,12 @@ export class Scientist extends Strategy {
 		// weight in win percent
 		const wpSum = c1WP + c2WP;
 		if (wpSum > 0) {
-			c1Score += winPercentageWeight * c1WP / wpSum;
-			c2Score += winPercentageWeight * c2WP / wpSum;
+			c1Score += ((winPercentageWeight * c1WP / wpSum) / 1000);
+			c2Score += ((winPercentageWeight * c2WP / wpSum) / 1000);
 		}
 		else {
-			c1Score += winPercentageWeight * 0.5;
-			c2Score += winPercentageWeight * 0.5;
+			c1Score += ((winPercentageWeight * 50) / 1000);
+			c2Score += ((winPercentageWeight * 50) / 1000);
 		}
 
 		if (c1Stats.averageOdds != null && c2Stats.averageOdds != null) {
@@ -569,7 +569,7 @@ export class Scientist extends Strategy {
 				c1Score += oddsWeight;
 			}
 			else if (c1Stats.averageOdds < c2Stats.averageOdds) {
-				c2Score += oddsWeight;
+				c2Score += (oddsWeight / 1000);
 			}
 
 			if (this.debug) {
@@ -579,10 +579,10 @@ export class Scientist extends Strategy {
 
 		if (c1Stats.averageWinTime != null && c2Stats.averageWinTime != null) {
 			if (c1Stats.averageWinTime < c2Stats.averageWinTime) {
-				c1Score += timeAveWinWeight / 2;
+				c1Score += ((timeAveWinWeight / 2) / 1000);
 			}
 			else if (c1Stats.averageWinTime > c2Stats.averageWinTime) {
-				c2Score += timeAveWinWeight / 2;
+				c2Score += ((timeAveWinWeight / 2) / 1000);
 			}
 			if (this.debug) {
 				timeMessage = `avg win time (red:blue) -> (${c1Stats.averageWinTimeRaw.toFixed(0)} : ${c2Stats.averageWinTimeRaw.toFixed(0)})`;
@@ -591,10 +591,10 @@ export class Scientist extends Strategy {
 
 		if (c1Stats.averageLossTime != null && c2Stats.averageLossTime != null) {
 			if (c1Stats.averageLossTime > c2Stats.averageLossTime) {
-				c1Score += timeAveLoseWeight / 2;
+				c1Score += ((timeAveLoseWeight / 2) / 1000);
 			}
 			else if (c1Stats.averageLossTime < c2Stats.averageLossTime) {
-				c2Score += timeAveLoseWeight / 2;
+				c2Score += ((timeAveLoseWeight / 2) / 1000);
 			}
 			if (this.debug) {
 				const msg = `  ::  avg loss time (red:blue) -> (${c1Stats.averageLossTimeRaw.toFixed(0)} : ${c2Stats.averageLossTimeRaw.toFixed(0)})`;
@@ -609,10 +609,10 @@ export class Scientist extends Strategy {
 
 		if (c1Stats.cfPercent != null && c2Stats.cfPercent != null) {
 			if (c1Stats.cfPercent > c2Stats.cfPercent) {
-				c1Score += crowdFavorWeight;
+				c1Score += (crowdFavorWeight / 1000);
 			}
 			else if (c1Stats.cfPercent < c2Stats.cfPercent) {
-				c2Score += crowdFavorWeight;
+				c2Score += (crowdFavorWeight / 1000);
 			}
 			const cfPercentTotal = c1Stats.cfPercent + c2Stats.cfPercent;
 			if (this.debug) {
@@ -623,10 +623,10 @@ export class Scientist extends Strategy {
 
 		if (c1Stats.ifPercent != null && c2Stats.ifPercent != null) {
 			if (c1Stats.ifPercent > c2Stats.ifPercent) {
-				c1Score += illumFavorWeight;
+				c1Score += (illumFavorWeight / 1000);
 			}
 			else if (c1Stats.ifPercent < c2Stats.ifPercent) {
-				c2Score += illumFavorWeight;
+				c2Score += (illumFavorWeight / 1000);
 			}
 			const ifPercentTotal = c1Stats.ifPercent + c2Stats.ifPercent;
 			if (this.debug) {
@@ -661,11 +661,11 @@ export class Scientist extends Strategy {
 		/*---------------------------------------------------------------------------------------------------*/
 		// CONFIDENCE ADJUSTMENT SECTION
 		/*---------------------------------------------------------------------------------------------------*/
-		const nerfPoorScore = 0.66;
+		const nerfPoorScore = 66;
 		let nerfAmount = 0;
 		let nerfMsg = "-- PROBLEMS:";
 		if ((c1Score === c2Score) || c1.wins.length + c1.losses.length <= 3 || c2.wins.length + c2.losses.length <= 3 || c1.wins.length === 0 || c2.wins.length === 0) {
-			nerfAmount += nerfPoorScore;
+			nerfAmount += (nerfPoorScore / 100);
 			nerfMsg += `\n- insufficient information (scores: ${c1Score.toFixed(2)}:${c2Score.toFixed(2)}), W:L(P1)(P2)-> (${c1.wins.length}:${c1.losses.length})(${c2.wins.length}:${c2.losses.length}), `;
 		}
 
