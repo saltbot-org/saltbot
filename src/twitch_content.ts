@@ -9,17 +9,20 @@ function addListener(): void {
 			const chatLines = chatWindow.querySelectorAll(".chat-line__message");
 			const waifu4uLines: string[] = [];
 			chatLines.forEach(function (chatLine: Element) {
-				const from = chatLine.querySelector(".chat-author__display-name").textContent;
+				const authorElement = chatLine.querySelector(".chat-author__display-name")
+				if (authorElement) {
+					const author = authorElement.textContent;
 
-				if (from.toUpperCase() === "WAIFU4U") {
-					// .message for FrankerFaceZ, text-fragment for vanilla Twitch chat
-					const message = (chatLine.querySelector(".message") || chatLine.querySelector("span.text-fragment").parentElement).textContent;
+					if (author.toUpperCase() === "WAIFU4U") {
+						// .message for FrankerFaceZ, text-fragment for vanilla Twitch chat
+						const message = (chatLine.querySelector(".message") || chatLine.querySelector("span.text-fragment").parentElement).textContent;
 
-					if (!oldWaifuMessages.includes(message)) {
-						oldWaifuMessages.push(message);
-						waifu4uLines.push(message);
+						if (!oldWaifuMessages.includes(message)) {
+							oldWaifuMessages.push(message);
+							waifu4uLines.push(message);
+						}
+
 					}
-
 				}
 			});
 
